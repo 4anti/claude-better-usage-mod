@@ -6,8 +6,8 @@
     {
       "name": "usage-quota",
       "source": "./",
-      "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, what this chat took, context window usage, one-click Compact and Auto compact.",
-      "version": "0.2.0",
+      "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, what this chat took, context window usage, one-click Compact and Auto compact.",
+      "version": "0.3.0",
       "license": "MIT",
       "keywords": ["usage", "quota", "rate limits", "context window", "compact", "mod"]
     }

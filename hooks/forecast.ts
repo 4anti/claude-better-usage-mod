@@ -78,13 +78,19 @@ function resetName(t: number, now: number): string {
   return t - now < 24 * HOUR ? `the ${time(t)} reset` : `${weekday(t)}'s reset`
 }
 
+/** when a reset is: its time today, its weekday and time later */
+export const resumesAt = (t: number, now: number) => (isSameDay(t, now) ? time(t) : `${weekday(t)} ${time(t)}`)
+
+/** a past window by its end: "Sun 4:40 PM" for a 5 hour one, "Oct 5" for a week */
+export const endedAt = (t: number, kind: string) =>
+  kind === 'five_hour'
+    ? `${new Date(t).toLocaleDateString('en-US', { weekday: 'short' })} ${time(t)}`
+    : new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
 /** the headline and the window it speaks for (its colour follows that window's %) */
 export function headline(list: Forecast[], now: number): { text: string; lead: Forecast } | null {
   const hit = list.find(f => f.status === 'hit')
-  if (hit) {
-    const at = isSameDay(hit.resetsAt, now) ? time(hit.resetsAt) : `${weekday(hit.resetsAt)} ${time(hit.resetsAt)}`
-    return { text: `Limit reached. Usage resumes at ${at}.`, lead: hit }
-  }
+  if (hit) return { text: `Limit reached. Usage resumes at ${resumesAt(hit.resetsAt, now)}.`, lead: hit }
   const out = list.filter(f => f.status === 'out').sort((a, b) => a.runOutAt - b.runOutAt)[0]
   if (out) return { text: `At this pace you'll run out before ${resetName(out.resetsAt, now)}.`, lead: out }
   const lead = list.find(f => f.kind === 'seven_day' && f.status !== 'idle') ?? list.find(f => f.status !== 'idle')

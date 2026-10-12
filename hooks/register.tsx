@@ -2,11 +2,19 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { AutoCompact, Category, Hold, Limit, PaceOf, Snapshot, Spend } from '../types'
-import { AT_DEFAULT, bandTree } from './band'
+import { stepAlerts } from './alerts'
+import type { Alerts } from './alerts'
+import { bandTree, summary } from './band'
 import type { BandActions } from './band'
 import { sameWindow } from './forecast'
-import { parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace } from './limits'
-import type { PaceStore, Saved } from './limits'
+import { historyTree } from './history'
+import { addHistory, parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace } from './limits'
+import type { PaceStore, Past, Saved } from './limits'
+import { readSettings } from './settings'
+
+// what the config menu set, read again on every load (a change there reloads)
+let settings = readSettings()
+const HISTORY_PANE = 'usage-history'
 
 // the engine reads these where they are made: the state they name stays in this file
 const snapshot = atom({ plugin: 'usage-quota', key: 'snapshot' } as const, null as Snapshot | null)
@@ -142,9 +150,43 @@ async function trackPace($: EngineInterface, limits: Limit[], now: number): Prom
   const spike = spikeOf(spikeFrom, live)
   if (spike) spikeFrom = undefined
   const saved = ((await storeGet($, 'pace')) as PaceStore | undefined) ?? { finals: {}, windows: {} }
-  const { store, isChanged, pace } = stepPace(saved, limits, now, spike)
+  const { store, isChanged, pace, closed } = stepPace(saved, limits, now, spike)
   if (isChanged) await storeSet($, 'pace', store)
+  // the windows that ended join the history pane's list, shared by every chat
+  if (closed.length > 0) {
+    const past = ((await storeGet($, 'history')) as Past[] | undefined) ?? []
+    const next = addHistory(past, closed)
+    if (next !== past) await storeSet($, 'history', next)
+  }
   return pace
+}
+
+// A notification through the person's own channel; the desktop app has none for
+// plugins, so there (and wherever it is not sent) it is a toast in the app instead.
+async function notify($: EngineInterface, text: string): Promise<void> {
+  const sent = await $.ui.notify(text, { title: 'Claude usage' }).catch(() => undefined)
+  if (!sent?.isSent) $.ui.toast(text, { timeoutMs: 10_000 })
+}
+
+// shortcut: two chats reading the store in the same instant may both notify; a
+// lock across chats would fix it if it ever shows
+async function checkAlerts($: EngineInterface, limits: Limit[], now: number): Promise<void> {
+  if (limits.length === 0) return
+  const prev = ((await storeGet($, 'alerts')) as Alerts | undefined) ?? {}
+  const { alerts, messages } = stepAlerts(prev, limits, now, settings.alertAt)
+  if (alerts === prev) return
+  await storeSet($, 'alerts', alerts)
+  // turned off, the alerts still move on: turning them on never sends old news
+  if (settings.notify) for (const text of messages) await notify($, text)
+}
+
+// the plugin's status line: the error that stopped a refresh, or the usage while the
+// band is off; set only when it changes
+let shownStatus: string | undefined
+function showStatus($: EngineInterface, text: string | undefined): void {
+  if (text === shownStatus) return
+  shownStatus = text
+  $.ui.status(text)
 }
 
 // The window is shown as three groups: Messages, Tools (System + MCP tools) and Other
@@ -196,13 +238,10 @@ async function calibrate($: EngineInterface): Promise<void> {
   await refresh($, 'due')
 }
 
-// Auto compact fires whenever the chat is idle (no turn running) and the context
-// is at or past the %: at the end of a turn, on opening a chat, on any refresh between
-// turns. Held back only by: `waits` (the band is asking, or the person chose
-// "after my next compact", which is also what an unanswered ask means: cleared only by
-// a real compaction, never by the % flickering below), `stuck` (a compaction already ran and
-// the context is still past the %: it would only repeat; dropping below clears it).
-// The % is compared as the band shows it, rounded.
+// Auto compact fires whenever the chat is idle and the context is at or past the %
+// (compared as shown, rounded). Held back only by `waits` (the band is asking, or "after
+// my next compact": cleared by a real compaction alone) and `stuck` (a compaction ran
+// and the context is still past the %: it would only repeat; dropping below clears it).
 // a reply has been seen since the chat opened or was last compacted
 let hadReply = false
 async function setHold($: EngineInterface, patch: Partial<Hold>): Promise<void> {
@@ -228,10 +267,9 @@ function compactNow($: EngineInterface): void {
   })
 }
 
-// Auto compact compacts through the session itself, not by typing /compact: a
-// command run from the end of a turn is refused while the turn winds down, which
-// is why it toasted and then did nothing. The compaction also rejects while a turn
-// runs, so it is tried again a few times, a couple of seconds apart.
+// Auto compact compacts through the session itself: /compact run from a turn's end is
+// refused while the turn winds down. That also rejects while a turn runs, so it is
+// tried again a few times, a couple of seconds apart.
 const AUTO_TRIES = 6
 let canCompactDirectly = true
 const AUTO_RETRY_MS = 2_000
@@ -304,10 +342,8 @@ async function saveAuto($: EngineInterface, next: AutoCompact): Promise<void> {
   await storeSet($, 'autoCompactDefault', next)
 }
 
-// auto compact is set per chat: a chat that never had it opens with the last setting
-// chosen anywhere (off at the default % before any); a chat reopened, or the app
-// restarted, gets back its own. Read again whenever the chat's id changes (a /clear
-// goes on under a new one, unannounced)
+// auto compact is set per chat; a chat with none opens with the last setting chosen
+// anywhere. Read again whenever the chat's id changes (a /clear goes on under a new one)
 let autoChat: string | undefined
 async function chatId($: EngineInterface): Promise<string> {
   try {
@@ -327,7 +363,7 @@ async function loadAuto($: EngineInterface): Promise<void> {
   // set before the setting below lands: a tick running meanwhile must already see it
   if (isNewChat) isAskFirst = !saved && fallback?.isOn === true
   const own = saved ?? fallback
-  await update($, autoCompact, () => (own ? { ...own, at: own.at ?? AT_DEFAULT } : { isOn: false, at: AT_DEFAULT }))
+  await update($, autoCompact, () => (own ? { ...own, at: own.at ?? settings.autoCompactAt } : { isOn: false, at: settings.autoCompactAt }))
   if (!isNewChat) return
   await update($, hold, () => ({ chat: id, waits: false, stuck: false }))
   await update($, autoAsk, () => null)
@@ -360,7 +396,7 @@ function cleanAt(value: string): string {
 // what the field shows comes from state, not a module variable: a press or a typing
 // runs apart from the draw, so a value the draw kept would not be seen here
 async function redrawField($: EngineInterface, value: string): Promise<void> {
-  const at = (await read($, autoCompact)).at ?? AT_DEFAULT
+  const at = (await read($, autoCompact)).at ?? settings.autoCompactAt
   await update($, fieldText, drawn => (value === (drawn ?? `${at}`) ? value + NO_WIDTH : value))
 }
 
@@ -386,7 +422,7 @@ async function commitAt($: EngineInterface, value: string): Promise<void> {
   restTimer = null
   const text = cleanAt(value)
   // only digits reach here: blank is the default, out of range is pulled in, every time
-  const typed = text === '' ? AT_DEFAULT : Number(text)
+  const typed = text === '' ? settings.autoCompactAt : Number(text)
   const at = Math.min(AT_MAX, Math.max(AT_MIN, typed))
   if (typed !== at) $.ui.toast(`Auto compact: ${typed < at ? 'the least' : 'the most'} is ${at}% – set to ${at}%`)
   await setThreshold($, at)
@@ -441,7 +477,6 @@ let inFlight: Promise<void> = Promise.resolve()
 // an ask that arrived while a 3s tick was running: done right after it, not dropped
 let pendingAsk: Ask = 'no'
 let lastSnapshot = ''
-let hadError = false
 
 // collapsed or not is one setting for every chat, kept in the shared store: each chat
 // reads it twice a second (one small read, nothing else) and follows
@@ -563,6 +598,7 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
     ].filter(c => c.tokens > 0)
     const { limits, at: limitsAt, error: limitsError } = await limitsOf($, usage.rateLimits, now, ask)
     const pace = await trackPace($, limits, now)
+    await checkAlerts($, limits, now)
     const next: Snapshot = {
       window: context.window,
       tokens: used,
@@ -583,12 +619,10 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
       lastSnapshot = json
       await update($, snapshot, () => next)
     }
-    if (hadError) $.ui.status(undefined)
-    hadError = false
+    showStatus($, settings.statusLine && !(await read($, isOn)) ? summary(next) : undefined)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    $.ui.status(`usage-quota: ${message.replace(/^usage-quota: /, '')}`)
-    hadError = true
+    showStatus($, `usage-quota: ${message.replace(/^usage-quota: /, '')}`)
   } finally {
     isRefreshing = false
     done()
@@ -612,7 +646,7 @@ function bandActions($: EngineInterface): BandActions {
     typeAt: value => typedAt($, value),
     setAt: value => commitAt($, value),
     toggleAuto: auto => {
-      const flipped = { isOn: !auto.isOn, at: auto.at ?? AT_DEFAULT }
+      const flipped = { isOn: !auto.isOn, at: auto.at ?? settings.autoCompactAt }
       void saveAuto($, flipped).then(async () => {
         if (flipped.isOn) await askIfPast($, flipped.at)
         else await update($, autoAsk, () => null)
@@ -630,9 +664,15 @@ function bandActions($: EngineInterface): BandActions {
   }
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  settings = readSettings(options)
+
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'quota', description: 'Toggle the Claude Code Usage Quota band above the prompt' })
+    await $.command.register({
+      name: 'quota',
+      description: 'Toggle the usage band above the prompt; /quota history shows past windows',
+      argumentHint: '[history]',
+    })
     const result = await next(e)
     try {
       calib = ((await $.store.get('calib')) as typeof calib | undefined) ?? {}
@@ -710,11 +750,28 @@ export const register: Register = on => {
     return result
   })
 
-  on('command.run', { command: 'quota' }, async $ => {
+  on('command.run', { command: 'quota' }, async ($, e) => {
+    if (e.args.trim() === 'history') {
+      const opened = await $.ui.open({ id: HISTORY_PANE, title: 'Usage history' })
+      return { text: opened.isPlaced ? 'Usage history opened.' : 'Usage history opens once there is room for it.' }
+    }
     const now = !(await read($, isOn))
     await update($, isOn, () => now)
+    // on: the limits at once; off: the status line takes over
     if (now) await refresh($, 'now')
+    else await refreshAfter($)
     return { text: now ? 'Claude Code Usage Quota on.' : 'Claude Code Usage Quota off.' }
+  })
+
+  on('ui.render', { component: 'Pane', requestId: HISTORY_PANE }, async ($, e) => {
+    const snap = await read($, snapshot)
+    return historyTree($.ui.resolve(e), e.surface, Math.max(30, e.props.bodyColumns), {
+      past: ((await storeGet($, 'history')) as Past[] | undefined) ?? [],
+      limits: snap?.limits ?? [],
+      now: await $.clock.now(),
+      isLight: (await read($, theme)) === 'light',
+      ramp: settings.limitRamp,
+    })
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -733,7 +790,10 @@ export const register: Register = on => {
       ask: await read($, autoAsk),
       tick: await read($, fieldTick),
       spent: await read($, spend),
-      drawnAt: (await read($, fieldText)) ?? `${auto.at ?? AT_DEFAULT}`,
+      drawnAt: (await read($, fieldText)) ?? `${auto.at ?? settings.autoCompactAt}`,
+      limitRamp: settings.limitRamp,
+      contextRamp: settings.contextRamp,
+      chatCost: settings.chatCost,
     }, bandActions($))
   })
 }

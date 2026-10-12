@@ -1,8 +1,10 @@
 import { expect, test } from 'claude-code/testing'
 
+import { stepAlerts } from '../hooks/alerts'
 import { CONTEXT_RAMP, DARK, LIGHT, LIMIT_RAMP, mix, rampColor } from '../hooks/colors'
 import { forecast, headline } from '../hooks/forecast'
-import { stepPace } from '../hooks/limits'
+import { addHistory, stepPace } from '../hooks/limits'
+import { parseRamp, readSettings } from '../hooks/settings'
 
 const NOW = Date.parse('2026-10-04T06:00:00Z')
 const MIN = 60_000
@@ -55,4 +57,57 @@ test('the pace store learns a finished window\'s peak without changing the store
   expect(isChanged).toBe(true)
   expect(store.finals).toEqual({ five_hour: [30] })
   expect(pace.five_hour?.typical).toBe(30)
+})
+
+test('a window that ends is reported once, for the history', async () => {
+  const before = { finals: {}, windows: { five_hour: { resetsAt: NOW - HOUR, peak: 30, skip: 0 } } }
+  const first = stepPace(before, [{ kind: 'five_hour', percentUsed: 5, resetsAt: iso(4 * HOUR) }], NOW)
+  expect(first.closed).toEqual([{ kind: 'five_hour', resetsAt: NOW - HOUR, peak: 30 }])
+  expect(stepPace(first.store, [{ kind: 'five_hour', percentUsed: 6, resetsAt: iso(4 * HOUR) }], NOW).closed).toEqual([])
+})
+
+test('the history keeps the newest windows of each kind, never one twice', async () => {
+  const fives = Array.from({ length: 12 }, (_, i) => ({ kind: 'five_hour', resetsAt: NOW - i * 5 * HOUR, peak: i }))
+  const kept = addHistory([], fives)
+  expect(kept.filter(p => p.kind === 'five_hour')).toHaveLength(10)
+  expect(kept[0]!.resetsAt).toBe(NOW)
+  // the same window again, from another chat: unchanged, the same list
+  expect(addHistory(kept, [fives[0]!])).toBe(kept)
+  const week = { kind: 'seven_day', resetsAt: NOW, peak: 70 }
+  expect(addHistory(kept, [week]).filter(p => p.kind === 'seven_day')).toEqual([week])
+})
+
+test('the alert % notifies once per window, and a jump to the limit says only that', async () => {
+  const five = (p: number, resetsIn = 2 * HOUR) => [{ kind: 'five_hour', percentUsed: p, resetsAt: iso(resetsIn) }]
+  const first = stepAlerts({}, five(80), NOW, 90)
+  expect(first.messages).toEqual([])
+  const at90 = stepAlerts(first.alerts, five(91), NOW, 90)
+  expect(at90.messages).toEqual(['5 Hour limit at 91% – resets in 2h.'])
+  expect(stepAlerts(at90.alerts, five(95), NOW, 90).messages).toEqual([])
+  // straight past both in a new window: one message
+  const jump = stepAlerts({}, five(100), NOW, 90)
+  expect(jump.messages).toHaveLength(1)
+  expect(jump.messages[0]).toMatch(/^5 Hour limit reached\. Usage resumes at /)
+  // nothing new: the very same alerts back
+  expect(stepAlerts(jump.alerts, five(100), NOW, 90).alerts).toBe(jump.alerts)
+})
+
+test('a 5 hour window resetting is said only when it had warned', async () => {
+  const warned = stepAlerts({}, [{ kind: 'five_hour', percentUsed: 92, resetsAt: iso(MIN) }], NOW, 90).alerts
+  const after = stepAlerts(warned, [{ kind: 'five_hour', percentUsed: 0 }], NOW + 2 * MIN, 90)
+  expect(after.messages).toEqual(['5 Hour limit reset: your full allowance is back.'])
+  expect(stepAlerts(after.alerts, [{ kind: 'five_hour', percentUsed: 0 }], NOW + 3 * MIN, 90).messages).toEqual([])
+  const quiet = stepAlerts({}, [{ kind: 'five_hour', percentUsed: 40, resetsAt: iso(MIN) }], NOW, 90).alerts
+  expect(stepAlerts(quiet, [], NOW + 2 * MIN, 90).messages).toEqual([])
+})
+
+test('settings fall back to the defaults when out of range or unreadable', async () => {
+  expect(readSettings({})).toEqual({
+    notify: true, alertAt: 90, chatCost: true, statusLine: true, autoCompactAt: 30, limitRamp: LIMIT_RAMP, contextRamp: CONTEXT_RAMP,
+  })
+  expect(readSettings({ alertAt: 20, autoCompactAt: 150 })).toMatchObject({ alertAt: 50, autoCompactAt: 99 })
+  expect(parseRamp('40, 60, 85', LIMIT_RAMP)).toEqual([40, 60, 85])
+  expect(parseRamp('60 40 85', LIMIT_RAMP)).toBe(LIMIT_RAMP)
+  expect(parseRamp('a b c', LIMIT_RAMP)).toBe(LIMIT_RAMP)
+  expect(parseRamp('10 20', LIMIT_RAMP)).toBe(LIMIT_RAMP)
 })

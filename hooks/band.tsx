@@ -3,8 +3,8 @@
 import type { ElementTable, RenderSurface } from 'claude-code'
 
 import type { AutoCompact, Category, Snapshot, Spend } from '../types'
-import { CONTEXT_RAMP, DARK, LIGHT, LIMIT_RAMP, rampColor } from './colors'
-import type { Palette } from './colors'
+import { DARK, LIGHT, rampColor } from './colors'
+import type { Palette, Ramp } from './colors'
 import { duration, forecast, headline, markerOf, order, WINDOWS } from './forecast'
 import type { Forecast } from './forecast'
 
@@ -20,6 +20,19 @@ export type BandView = {
   tick: number
   spent: Spend
   drawnAt: string
+  /** from the settings: where the colours turn, and whether the chat's cost shows */
+  limitRamp: Ramp
+  contextRamp: Ramp
+  chatCost: boolean
+}
+
+/** the band in one line, for the status line while it is off: "5H 7% · Weekly 57% · Context 38%" */
+export function summary(snap: Snapshot): string {
+  const limits = Object.entries(WINDOWS).flatMap(([kind, win]) => {
+    const l = snap.limits.find(x => x.kind === kind)
+    return l ? [`${kind === 'five_hour' ? '5H' : win.label} ${Math.round(l.percentUsed)}%`] : []
+  })
+  return [...limits, `Context ${Math.round(snap.percent)}%`].join(' · ')
 }
 
 /** what the band's controls do, owned by the hooks module */
@@ -31,9 +44,6 @@ export type BandActions = {
   answer(choice: 'now' | 'next'): void
   collapse(): Promise<void>
 }
-
-// the % the field shows when none is set
-export const AT_DEFAULT = 30
 
 function tokens(n: number): string {
   // 1M, not 1.0M; 1.5M keeps its decimal
@@ -60,7 +70,7 @@ function tickColor(f: Forecast, c: Palette): string {
 
 type Segment = { color: string; share: number }
 
-const BAR_PX = 7.5
+export const BAR_PX = 7.5
 
 // an iOS-style switch: a pill, the knob right and green when on, left and grey when off
 // three cells wide, so the click area laid over it covers all of it
@@ -97,7 +107,7 @@ function switchSvg(isOn: boolean, c: Palette): string {
 
 // a thin rounded bar for surfaces that draw Svg: segments laid out over 0..1000,
 // with an optional tick, the bar's own height, at `marker` percent (the forecast at reset)
-function barSvg(segments: Segment[], width: number, marker?: { at: number; color: string }): string {
+export function barSvg(segments: Segment[], width: number, marker?: { at: number; color: string }): string {
   const height = BAR_PX
   const y = 0
   const total = segments.reduce((sum, s) => sum + s.share, 0) || 1
@@ -149,7 +159,7 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
   const Svg = surface === 'desktop' && 'Svg' in table ? table.Svg : undefined
   // the light palette is the desktop's alone: the terminal keeps its own colours
   const c = surface === 'desktop' && view.isLight ? LIGHT : DARK
-  const limitColor = (p: number) => rampColor(p, LIMIT_RAMP, c)
+  const limitColor = (p: number) => rampColor(p, view.limitRamp, c)
   // both windows always, once there is any reading: one the reading lacks is not running
   const known = snap.limits.length === 0 ? [] : Object.keys(WINDOWS).map(kind => snap.limits.find(l => l.kind === kind) ?? { kind, percentUsed: 0 })
   const list = known.map(l => forecast(l, now, snap.pace?.[l.kind])).filter((f): f is Forecast => f !== null)
@@ -309,7 +319,7 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
     }, [])
 
   // this chat's part of the 5 hour limit, once a reply has been counted
-  const spendNote = spent.last === null ? null : `This chat used ${share(spent.total)} – last reply ${share(spent.last)}`
+  const spendNote = !view.chatCost || spent.last === null ? null : `This chat used ${share(spent.total)} – last reply ${share(spent.last)}`
 
   const limitsBlock = (
     <Box flexDirection="column" width={isSplit ? '50%' : undefined}>
@@ -349,7 +359,7 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
     </Box>
   )
 
-  const contextColor = rampColor(snap.percent, CONTEXT_RAMP, c)
+  const contextColor = rampColor(snap.percent, view.contextRamp, c)
   const usedText = <Text bold color={contextColor}>{`${Math.round(snap.percent)}% used`}</Text>
   const freeText = <Text color={c.muted}>{`${tokens(free)} free of ${tokens(snap.window)}`}</Text>
   const contextName = (

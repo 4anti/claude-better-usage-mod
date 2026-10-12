@@ -63,11 +63,15 @@ export function spikeOf(from: Saved | undefined, live: Saved | undefined): Recor
   return Object.keys(jump).length === 0 ? undefined : jump
 }
 
-/** the pace store after these readings, whether it changed, and each window's pace */
-export function stepPace(saved: PaceStore, limits: Limit[], now: number, spike?: Record<string, number>): { store: PaceStore; isChanged: boolean; pace: Record<string, PaceOf> } {
+/** a window that has ended, by when it reset and how far it got */
+export type Past = { kind: string; resetsAt: number; peak: number }
+
+/** the pace store after these readings, whether it changed, each window's pace, and the windows that ended */
+export function stepPace(saved: PaceStore, limits: Limit[], now: number, spike?: Record<string, number>): { store: PaceStore; isChanged: boolean; pace: Record<string, PaceOf>; closed: Past[] } {
   let store = saved
   let isChanged = false
   const pace: Record<string, PaceOf> = {}
+  const closed: Past[] = []
   for (const l of limits) {
     const resetsAt = l.resetsAt ? Date.parse(l.resetsAt) : NaN
     if (!WINDOWS[l.kind] || !Number.isFinite(resetsAt) || resetsAt <= now) continue
@@ -76,7 +80,10 @@ export function stepPace(saved: PaceStore, limits: Limit[], now: number, spike?:
     let finals = store.finals[l.kind]
     if (!w || Math.abs(w.resetsAt - resetsAt) > SAME_WINDOW_MS) {
       // a new window: the last one's peak is how far it got
-      if (w && w.peak > 0) finals = [...(finals ?? []), w.peak].slice(-FINALS_KEPT)
+      if (w && w.peak > 0) {
+        finals = [...(finals ?? []), w.peak].slice(-FINALS_KEPT)
+        closed.push({ kind: l.kind, resetsAt: w.resetsAt, peak: w.peak })
+      }
       w = { resetsAt, peak: l.percentUsed, skip: 0 }
     } else if (l.percentUsed > w.peak) w = { ...w, peak: l.percentUsed }
     const jump = spike?.[l.kind]
@@ -87,5 +94,16 @@ export function stepPace(saved: PaceStore, limits: Limit[], now: number, spike?:
     }
     pace[l.kind] = { typical: median(finals) ?? TYPICAL_DEFAULT, skip: w.skip }
   }
-  return { store, isChanged, pace }
+  return { store, isChanged, pace, closed }
+}
+
+// the past windows the history pane lists: two days of 5 hour ones, two months of weeks
+const HISTORY_KEPT: Record<string, number> = { five_hour: 10, seven_day: 8 }
+
+/** the history with these ended windows added, newest first; one already there is not added twice */
+export function addHistory(history: Past[], closed: Past[]): Past[] {
+  const fresh = closed.filter(c => !history.some(h => h.kind === c.kind && Math.abs(h.resetsAt - c.resetsAt) <= SAME_WINDOW_MS))
+  if (fresh.length === 0) return history
+  const all = [...fresh, ...history].sort((a, b) => b.resetsAt - a.resetsAt)
+  return Object.keys(HISTORY_KEPT).flatMap(kind => all.filter(p => p.kind === kind).slice(0, HISTORY_KEPT[kind]))
 }

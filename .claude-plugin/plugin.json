@@ -1,12 +1,56 @@
 {
   "name": "usage-quota",
-  "version": "0.2.0",
-  "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, what this chat took, context window usage, one-click Compact and Auto compact.",
+  "version": "0.3.0",
+  "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, what this chat took, context window usage, one-click Compact and Auto compact.",
   "author": { "name": "Anant Raghunath", "url": "https://github.com/anantraghunath" },
   "homepage": "https://github.com/4anti/claude-usage-quota-mod",
   "repository": "https://github.com/4anti/claude-usage-quota-mod",
   "license": "MIT",
   "keywords": ["usage", "quota", "rate limits", "context window", "compact", "mod"],
   "privacyPolicyUrl": "https://github.com/4anti/claude-usage-quota-mod#privacy",
-  "types": "./types/index.d.ts"
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "notify": {
+      "type": "boolean",
+      "title": "Alerts",
+      "description": "Notify when a 5 Hour or Weekly limit reaches the alert %, when it is reached, and when a 5 Hour window you were warned about resets. A system notification in the terminal; a message in the desktop app.",
+      "default": true
+    },
+    "alertAt": {
+      "type": "number",
+      "title": "Alert at %",
+      "description": "The % of a limit that raises the first alert (50 to 100).",
+      "default": 90
+    },
+    "chatCost": {
+      "type": "boolean",
+      "title": "Show what this chat used",
+      "description": "Show \"This chat used X% – last reply Y%\" under the 5 Hour bar.",
+      "default": true
+    },
+    "statusLine": {
+      "type": "boolean",
+      "title": "Usage in the status line",
+      "description": "While the band is off (/quota), show \"5H 7% · Weekly 57% · Context 38%\" in the status line.",
+      "default": true
+    },
+    "autoCompactAt": {
+      "type": "number",
+      "title": "Auto compact default %",
+      "description": "The context % that Auto compact starts from when you turn it on (15 to 99).",
+      "default": 30
+    },
+    "limitColors": {
+      "type": "string",
+      "title": "Limit colours",
+      "description": "Three %s for the 5 Hour and Weekly bars: grey up to the first, yellow at the second, red at the third.",
+      "default": "50 75 95"
+    },
+    "contextColors": {
+      "type": "string",
+      "title": "Context colours",
+      "description": "Three %s for the context: grey up to the first, yellow at the second, red at the third.",
+      "default": "25 50 80"
+    }
+  }
 }
