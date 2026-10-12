@@ -2,8 +2,11 @@
 // per load: a change there reloads the module. Anything out of range falls back.
 import { CONTEXT_RAMP, LIMIT_RAMP } from './colors'
 import type { Ramp } from './colors'
+import { LANGUAGES } from './i18n'
 
 export type Settings = {
+  /** a language code, or "auto": the app's language, else the system's */
+  language: string
   /** a notification at alertAt and at the limit, and when a warned 5 Hour window resets */
   notify: boolean
   alertAt: number
@@ -30,6 +33,7 @@ export function parseRamp(value: unknown, fallback: Ramp): Ramp {
 
 export function readSettings(options: Readonly<Record<string, unknown>> = {}): Settings {
   return {
+    language: typeof options.language === 'string' && options.language in LANGUAGES ? options.language : 'auto',
     notify: options.notify !== false,
     alertAt: number(options.alertAt, 90, 50, 100),
     chatCost: options.chatCost !== false,

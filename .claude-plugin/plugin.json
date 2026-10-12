@@ -1,7 +1,7 @@
 {
   "name": "usage-quota",
-  "version": "0.3.0",
-  "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, what this chat took, context window usage, one-click Compact and Auto compact.",
+  "version": "0.4.0",
+  "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, 16 languages, what this chat took, context window usage, one-click Compact and Auto compact.",
   "author": { "name": "Anant Raghunath", "url": "https://github.com/anantraghunath" },
   "homepage": "https://github.com/4anti/claude-usage-quota-mod",
   "repository": "https://github.com/4anti/claude-usage-quota-mod",
@@ -10,6 +10,13 @@
   "privacyPolicyUrl": "https://github.com/4anti/claude-usage-quota-mod#privacy",
   "types": "./types/index.d.ts",
   "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The band's language. auto follows the desktop app's language, else your system's (LC_ALL, LANG), else English.",
+      "default": "auto",
+      "options": ["auto", "en", "tr", "de", "fr", "es", "pt", "it", "nl", "pl", "ru", "uk", "ja", "ko", "zh-CN", "zh-TW", "id"]
+    },
     "notify": {
       "type": "boolean",
       "title": "Alerts",

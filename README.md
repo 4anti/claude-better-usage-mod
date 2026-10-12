@@ -7,7 +7,7 @@
 A live band above the Claude Code prompt: your 5 Hour and Weekly limits with a forecast to the next reset, alerts before you run out, what each chat costs, and how full your context window is. Compact in one click, or let it compact for you.
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/4anti/claude-usage-quota-mod/test.yml?branch=main&style=flat-square&labelColor=212121&label=tests)](https://github.com/4anti/claude-usage-quota-mod/actions/workflows/test.yml)
-[![Version](https://img.shields.io/badge/version-0.3.0-9b9a96?style=flat-square&labelColor=212121)](https://github.com/4anti/claude-usage-quota-mod/releases)
+[![Version](https://img.shields.io/badge/version-0.4.0-9b9a96?style=flat-square&labelColor=212121)](https://github.com/4anti/claude-usage-quota-mod/releases)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.287%2B-9b9a96?style=flat-square&labelColor=212121)](https://claude.com/claude-code)
 [![Works in](https://img.shields.io/badge/works_in-Desktop_%2B_Terminal-9b9a96?style=flat-square&labelColor=212121)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-9b9a96?style=flat-square&labelColor=212121)](LICENSE)
@@ -51,7 +51,7 @@ Bars and their % follow what you've actually used. The **forecast tick** carries
 
 ### Usage history
 
-`/quota history` opens a pane with how far each recent window got: the running one first, then the last 10 five-hour windows and 8 weeks, with your average and how often you hit the limit. Windows are recorded as they end, so the list fills up as you use Claude.
+`/quota-history` opens a pane with how far each recent window got: the running one first, then the last 10 five-hour windows and 8 weeks, with your average and how often you hit the limit. Windows are recorded as they end, so the list fills up as you use Claude.
 
 ### What this chat costs
 
@@ -138,7 +138,8 @@ claude plugin marketplace remove 4anti-mods
 | Action | How |
 | --- | --- |
 | Turn the band off or on | `/quota` (while it's off, the status line shows *5H 7% · Weekly 57% · Context 38%*) |
-| See past windows | `/quota history` |
+| See past windows | `/quota-history` |
+| Change settings, language included | `/quota-settings` |
 | Expand or collapse | the **▼ / ▲** button |
 | Compact now | the **Compact** button |
 | Auto compact | the switch, then type a % (it sets on Enter, a click elsewhere, or a 2-second pause) |
@@ -148,10 +149,11 @@ In the desktop app, the band appears once a session has started. The *Welcome ba
 
 ## Settings
 
-Change these with `/config` in a terminal session, under the plugin's own rows. In the desktop app, ask Claude to set them. Values out of range fall back to the default.
+`/quota-settings` opens a pane with every setting as a picker, in the desktop app and the terminal alike. A change applies at once. In a terminal, `/config` lists the same settings under the plugin's own rows. Values out of range fall back to the default.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
+| Language | Same as the app | The band's language (see [Languages](#languages)) |
 | Alerts | on | Notify at the alert %, at the limit, and when a warned 5 Hour window resets |
 | Alert at % | 90 | The % of a limit that raises the first alert (50 to 100) |
 | Show what this chat used | on | The *This chat used* line under the 5 Hour bar |
@@ -159,6 +161,16 @@ Change these with `/config` in a terminal session, under the plugin's own rows. 
 | Auto compact default % | 30 | Where Auto compact starts when you turn it on (15 to 99) |
 | Limit colours | `50 75 95` | Grey up to the first %, yellow at the second, red at the third |
 | Context colours | `25 50 80` | The same, for the context |
+
+## Languages
+
+The band, its alerts, the history and settings panes, and its messages speak 16 languages, with times and days in each language's own form (*16:40*, *Pazar*, *日曜日*):
+
+English · Türkçe · Deutsch · Français · Español · Português · Italiano · Nederlands · Polski · Русский · Українська · 日本語 · 한국어 · 简体中文 · 繁體中文 · Bahasa Indonesia
+
+By default the band follows the desktop app's language, then your system's (`LC_ALL`, `LANG`), then English. Pick one in `/quota-settings` to override it. Right-to-left scripts are left out for now, because terminals draw them unreliably.
+
+Adding a language is one file in `hooks/i18n/`. Copy `en.ts`, translate each line and keep every `{placeholder}`. The type checker lists any key you missed, and a test checks the placeholders. Corrections from native speakers are welcome.
 
 ## Privacy
 
@@ -168,11 +180,12 @@ Everything runs on your machine with the same access Claude Code has. The mod **
 | --- | --- |
 | **Network** | About every 2 minutes, one request to `https://api.anthropic.com/api/oauth/usage` through your existing Claude login. Claude Code attaches the credential; the mod never sees it. This is the only host it contacts. |
 | **Your session** | Reads the context size and the limits each reply carries. It never reads or sends what you or Claude write. |
-| **Commands** | Runs `/compact` when you press **Compact** or Auto compact reaches your %. Adds `/quota` and `/quota history`. |
+| **Commands** | Runs `/compact` when you press **Compact** or Auto compact reaches your %. Adds `/quota`, `/quota-history` and `/quota-settings`. |
 | **Notifications** | Your limits' alerts, through Claude Code's own notification channel (the one your `preferredNotifChannel` setting picks). |
 | **Stored on your machine** | In Claude Code's plugin store: the last readings, your learned pace, which alerts were sent, and the history of past windows (peaks and reset times only). |
 | **Programs** | Only to match a desktop app that follows the system theme: `reg query` for `AppsUseLightTheme` on Windows, `defaults read -g AppleInterfaceStyle` on macOS. |
-| **Files** | Reads the desktop app's `config.json` for its theme setting, and nothing else. |
+| **Files** | Reads the desktop app's `config.json` for its theme and language settings, and nothing else. |
+| **Settings** | `/quota-settings` changes the plugin's own settings, the ones `/config` lists, and no others. |
 
 ## Development
 
@@ -195,6 +208,8 @@ claude --plugin-dir ./claude-usage-quota-mod
 | `hooks/limits.ts` | Reading the usage service's answer, learning your usual pace, the history list |
 | `hooks/alerts.ts` | When to alert, once per window |
 | `hooks/settings.ts` | Reading and checking the settings |
+| `hooks/settings-pane.tsx` | The settings pane's layout |
+| `hooks/i18n/` | The 16 languages, one file each, and how the band picks one |
 | `hooks/colors.ts` | The palettes and the grey → yellow → red ramp |
 | `tests/` | UI tests on both surfaces (`band.test.tsx`, `features.test.tsx`) and unit tests (`logic.test.ts`) |
 

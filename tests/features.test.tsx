@@ -1,6 +1,9 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { On, SessionRateLimit, SessionUsage } from 'claude-code'
 
+import { LANGUAGES } from '../hooks/i18n'
+import { en } from '../hooks/i18n/en'
+
 const NOW = Date.parse('2026-10-04T06:00:00Z')
 const MIN = 60_000
 const HOUR = 60 * MIN
@@ -22,13 +25,24 @@ function usage(rateLimits: SessionRateLimit[]): SessionUsage {
 
 // the engine beneath the plugin; what it was asked to say and pin is kept
 function world(on: On, state: { limits: SessionRateLimit[] }, seed: Record<string, unknown> = {}, isSent = true) {
-  const said = { notes: [] as string[], toasts: [] as string[], status: [] as (string | undefined)[], opened: [] as string[] }
+  const said = {
+    notes: [] as string[], toasts: [] as string[], status: [] as (string | undefined)[], opened: [] as string[],
+    commands: [] as { name: string; description: string }[], configs: [] as { key: string; value: unknown }[],
+  }
   const clock = mock.clock(on, { now: NOW })
   mock.store(on, seed)
   on('session.usage', () => ({ value: usage(state.limits) }))
   on('session.authorize', () => ({ value: null }))
   on('session.start', (_$, e) => ({ cwd: e.cwd }))
-  on('command.register', () => ({ value: { command: 'quota' } }) as never)
+  on('command.register', (_$, e) => {
+    const command = e as unknown as { name: string; description: string }
+    said.commands.push({ name: command.name, description: command.description })
+    return { value: { command: command.name } } as never
+  })
+  on('config.set', (_$, e) => {
+    said.configs.push({ key: e.key, value: e.value })
+    return { value: e.value } as never
+  })
   on('session.measure', () => ({ changed: [] }))
   on('ui.render', () => ({ type: 'Box', props: {}, children: [] }) as never)
   on('ui.notify', (_$, e) => {
@@ -110,10 +124,84 @@ test('/quota history opens the history pane: the running window, then the past o
     expect(await ui.find({ type: 'Text', text: 'Now' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '100%' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '40%' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: 'Average 70% · reached the limit 1 of 2 times' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Average 70% · limit reached 1/2' })).toBeDefined()
     // no Weekly window has ended yet
     expect(await ui.find({ type: 'Text', text: 'Finished windows show here once they reset.' })).toBeDefined()
     await ui.unmount()
+  }
+})
+
+test('typing /quota lists all three commands: the band, its history and its settings', async ($, on) => {
+  const { said } = world(on, { limits: [] })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  expect(said.commands.map(c => c.name)).toEqual(['quota', 'quota-history', 'quota-settings'])
+  await $.command.run({ command: 'quota-settings', args: '' } as never)
+  await $.command.run({ command: 'quota-history', args: '' } as never)
+  await $.command.run({ command: 'quota', args: 'settings' } as never)
+  expect(said.opened).toEqual(['usage-settings', 'usage-history', 'usage-settings'])
+})
+
+test('the band speaks the language set: Turkish words, Turkish times', { options: { language: 'tr' } }, async ($, on) => {
+  const state = { limits: [
+    { kind: 'five_hour', percentUsed: 7, resetsAt: iso(4 * HOUR) },
+    { kind: 'seven_day', percentUsed: 57, resetsAt: iso(5 * 24 * HOUR) },
+  ] as SessionRateLimit[] }
+  const { said } = world(on, state)
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  expect(said.commands[0]?.description).toBe('Kullanım şeridini aç veya kapat')
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'AbovePrompt', props: PROPS })
+    // NOW is a Sunday: Weekly, on course to run out, resets on Friday ("Cuma")
+    expect(await ui.find({ type: 'Text', text: 'Bu hızla Cuma günkü sıfırlamadan önce limitin dolacak.' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: '5 Saat' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Haftalık' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Bağlam' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', label: 'Sıkıştır' } as never)).toBeDefined()
+    await ui.unmount()
+  }
+})
+
+test("set to auto, the band follows the desktop app's language", async ($, on) => {
+  const state = { limits: [{ kind: 'seven_day', percentUsed: 57, resetsAt: iso(5 * 24 * HOUR) }] as SessionRateLimit[] }
+  world(on, state)
+  on('env.get', (_$, e) => ({ value: (e as unknown as { name: string }).name === 'APPDATA' ? 'C:/AppData' : undefined }) as never)
+  on('fs.stat', () => ({ value: { kind: 'file', size: 100, mtimeMs: 1, isLink: false } }) as never)
+  on('fs.read', () => ({ value: JSON.stringify({ userThemeMode: 'dark', locale: 'de-DE' }) }) as never)
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  expect(await ui.find({ type: 'Text', text: 'Wöchentlich' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Kontext' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('the settings pane changes a setting through the config, as the menu would', async ($, on) => {
+  const { said } = world(on, { limits: [] })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'Pane', props: { ...PANE_PROPS, title: 'Usage settings' }, requestId: 'usage-settings' })
+    expect(await ui.find({ type: 'Text', text: 'Language' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Alert at' })).toBeDefined()
+    await ui.select({ key: 'language', value: 'ja' })
+    await ui.select({ key: 'alertAt', value: '80' })
+    await ui.select({ key: 'notify', value: 'false' })
+    await ui.input({ key: 'limitColors', text: '40 60 85' })
+    await ui.unmount()
+  }
+  expect(said.configs.slice(0, 4)).toEqual([
+    { key: 'usage-quota.language', value: 'ja' },
+    { key: 'usage-quota.alertAt', value: 80 },
+    { key: 'usage-quota.notify', value: false },
+    { key: 'usage-quota.limitColors', value: '40 60 85' },
+  ])
+})
+
+test('every language has every word, and its placeholders', async () => {
+  const holes = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort().join(',')
+  for (const [code, strings] of Object.entries(LANGUAGES)) {
+    for (const key of Object.keys(en) as (keyof typeof en)[]) {
+      expect({ code, key, value: typeof strings[key] }).toEqual({ code, key, value: 'string' })
+      if (key !== 'locale' && key !== 'name') expect({ code, key, holes: holes(strings[key]) }).toEqual({ code, key, holes: holes(en[key]) })
+    }
   }
 })
 

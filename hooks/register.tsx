@@ -8,13 +8,20 @@ import { bandTree, summary } from './band'
 import type { BandActions } from './band'
 import { sameWindow } from './forecast'
 import { historyTree } from './history'
-import { addHistory, parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace } from './limits'
-import type { PaceStore, Past, Saved } from './limits'
+import { addHistory, AskError, isPlanDue, nextBackoff, parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace, sumGroups } from './limits'
+import type { Ask, Backoff, Group, PaceStore, Past, Saved } from './limits'
+import { fmt, resolveLanguage, stringsOf } from './i18n'
 import { readSettings } from './settings'
+import { settingsTree } from './settings-pane'
 
 // what the config menu set, read again on every load (a change there reloads)
 let settings = readSettings()
 const HISTORY_PANE = 'usage-history'
+const SETTINGS_PANE = 'usage-settings'
+// the band's words, in the language set or the one detected (applyLanguage)
+let t = stringsOf('en')
+// the desktop app's own language, from its settings (read beside its theme)
+let appLocale: string | undefined
 
 // the engine reads these where they are made: the state they name stays in this file
 const snapshot = atom({ plugin: 'usage-quota', key: 'snapshot' } as const, null as Snapshot | null)
@@ -31,6 +38,16 @@ const autoAsk = atom({ plugin: 'usage-quota', key: 'autoAsk' } as const, null as
 const hold = atom({ plugin: 'usage-quota', key: 'hold' } as const, { chat: '', waits: false, stuck: false } as Hold)
 // how much of the 5 hour limit this chat's replies took, kept in state for the same reason
 const spend = atom({ plugin: 'usage-quota', key: 'spend' } as const, { chat: '', total: 0, last: null, from: null } as Spend)
+// the language the band draws in, as a code: a change redraws it
+const language = atom({ plugin: 'usage-quota', key: 'language' } as const, 'en')
+
+// the setting's language, else the app's, else the shell's (LC_ALL, LANG), else English
+let shellLocale: string | undefined
+async function applyLanguage($: EngineInterface): Promise<void> {
+  const code = resolveLanguage(settings.language, appLocale, shellLocale)
+  t = stringsOf(code)
+  if (code !== (await read($, language))) await update($, language, () => code)
+}
 
 const LOCAL_EVERY_MS = 3_000
 
@@ -47,30 +64,6 @@ async function storeSet($: EngineInterface, key: string, value: unknown): Promis
     await $.store.set(key, value)
   } catch {
     // this chat still has it
-  }
-}
-
-// The usage service rate-limits per login, and the app's own Usage panel asks it on
-// the same allowance, so ask it seldom: when a chat opens, then every 2 minutes with the
-// exact context count, one ask for the whole app (when it was last asked, the answer and
-// any back-off sit in the shared store). Between asks the figures every reply from
-// Claude carries keep the band current.
-const PLAN_EVERY_MS = 2 * 60_000
-// timers drift: a 2-minute tick a moment early still counts as due
-const PLAN_SLACK_MS = 10_000
-// after a failed ask wait 2, then 5, then 15 minutes, or what the service says
-const PLAN_BACKOFF_MS = [120_000, 300_000, 900_000]
-
-type Backoff = { until: number; failures: number; error: string }
-/** 'no': the 3s tick, never asks; 'due': asks if 2 minutes have passed app-wide; 'now': asks unless backed off */
-type Ask = 'no' | 'due' | 'now'
-
-class AskError extends Error {
-  constructor(
-    message: string,
-    readonly retryAfterMs?: number,
-  ) {
-    super(message)
   }
 }
 
@@ -107,9 +100,7 @@ async function limitsOf(
   let saved = (await storeGet($, 'limits')) as Saved | undefined
   let backoff = (await storeGet($, 'planBackoff')) as Backoff | undefined
   const askedAt = ((await storeGet($, 'planAskedAt')) as number | undefined) ?? 0
-  const isFree = now >= (backoff?.until ?? 0)
-  const isDue = ask === 'now' || (ask === 'due' && now - askedAt >= PLAN_EVERY_MS - PLAN_SLACK_MS)
-  if (isDue && isFree) {
+  if (isPlanDue(ask, now, askedAt, backoff)) {
     // claim the ask first, so the other chats see it taken and skip theirs
     await storeSet($, 'planAskedAt', now)
     try {
@@ -122,12 +113,7 @@ async function limitsOf(
       if (backoff) await storeSet($, 'planBackoff', { until: 0, failures: 0, error: '' })
       backoff = undefined
     } catch (error) {
-      const failures = (backoff?.failures ?? 0) + 1
-      const wait =
-        error instanceof AskError && error.retryAfterMs !== undefined
-          ? error.retryAfterMs
-          : PLAN_BACKOFF_MS[Math.min(failures - 1, PLAN_BACKOFF_MS.length - 1)]!
-      backoff = { until: now + wait, failures, error: error instanceof Error ? error.message : String(error) }
+      backoff = nextBackoff(backoff, error, now)
       await storeSet($, 'planBackoff', backoff)
     }
   }
@@ -138,10 +124,8 @@ async function limitsOf(
   return { limits, at: merged?.at, error: backoff?.error || undefined }
 }
 
-// A chat reopened with a long history re-reads it all on its first reply: one big jump
-// in usage. Its first turn notes the limits it started from; the first new reading
-// that moved is that jump, and is left out of the pace. Only for a chat that opened
-// with this much already in it (a new chat's first reply is real work).
+// A chat reopened with a long history re-reads it all on its first reply: that jump is
+// left out of the pace. Only for a chat opened with this much in it (spikeOf).
 const RESUME_MIN_TOKENS = 20_000
 let isOpening = true
 let openMessages = 0
@@ -169,20 +153,34 @@ async function notify($: EngineInterface, text: string): Promise<void> {
   if (!sent?.isSent) $.ui.toast(text, { timeoutMs: 10_000 })
 }
 
-// shortcut: two chats reading the store in the same instant may both notify; a
-// lock across chats would fix it if it ever shows
+// shortcut: two chats reading the store at once may both notify; lock across chats if seen
 async function checkAlerts($: EngineInterface, limits: Limit[], now: number): Promise<void> {
   if (limits.length === 0) return
   const prev = ((await storeGet($, 'alerts')) as Alerts | undefined) ?? {}
-  const { alerts, messages } = stepAlerts(prev, limits, now, settings.alertAt)
+  const { alerts, messages } = stepAlerts(prev, limits, now, settings.alertAt, t)
   if (alerts === prev) return
   await storeSet($, 'alerts', alerts)
   // turned off, the alerts still move on: turning them on never sends old news
   if (settings.notify) for (const text of messages) await notify($, text)
 }
 
-// the plugin's status line: the error that stopped a refresh, or the usage while the
-// band is off; set only when it changes
+// a pane opened by the person's command, and the line the command answers with
+async function openPane($: EngineInterface, id: string, title: string): Promise<string> {
+  const opened = await $.ui.open({ id, title })
+  return fmt(opened.isPlaced ? t.paneOpened : t.paneWaits, { title })
+}
+
+// a setting changed from the pane as the config menu would: the mod reloads with it
+async function setSetting($: EngineInterface, field: string, value: string | number | boolean): Promise<void> {
+  try {
+    const result = await $.config.set({ key: `usage-quota.${field}`, value })
+    if ('deny' in result && result.deny) $.ui.toast(fmt(t.settingFailed, { reason: result.deny }))
+  } catch (error) {
+    $.ui.toast(fmt(t.settingFailed, { reason: error instanceof Error ? error.message : String(error) }))
+  }
+}
+
+// the status line: a refresh's error, or the usage while the band is off; set on change
 let shownStatus: string | undefined
 function showStatus($: EngineInterface, text: string | undefined): void {
   if (text === shownStatus) return
@@ -190,18 +188,10 @@ function showStatus($: EngineInterface, text: string | undefined): void {
   $.ui.status(text)
 }
 
-// The window is shown as three groups: Messages, Tools (System + MCP tools) and Other
-// (the system prompt, skills, memory files, agents, MCP server instructions).
-const TOOL_NAMES = new Set(['System tools', 'MCP tools'])
-type Group = 'Messages' | 'Tools' | 'Other'
-const groupOf = (name: string): Group => (name === 'Messages' ? 'Messages' : TOOL_NAMES.has(name) ? 'Tools' : 'Other')
-
-// The free local breakdown ('summary') estimates each category from its text, which
-// reads tools ~1.3-1.6x heavy. The exact count ('full', what /context and the app's
-// Context window panel show) costs no tokens but sends one token-count request per tool
-// and memory file (~320 here). So run it every 2 minutes, keep the exact/estimate ratio
-// of Tools and Other (in the store, for every session), and scale the live 3s estimate
-// by it; Messages is then the API's real input total less those two.
+// The free local breakdown ('summary') reads tools ~1.3-1.6x heavy; the exact count
+// ('full', as /context shows) costs no tokens but one token-count request per tool and
+// memory file. So it runs every 2 minutes, and its exact/estimate ratio of Tools and
+// Other scales the live 3s estimate; Messages is the API's real total less those two.
 const CALIBRATE_EVERY_MS = 2 * 60_000
 let calib: Partial<Record<Group, number>> = {}
 let isCalibrating = false
@@ -209,12 +199,6 @@ let isCalibrating = false
 // and the local estimate is all there is. The exact count fills that gap until the next reply.
 let exactCount: { at: number; sums: Record<Group, number> } | undefined
 let noReplySince: number | undefined
-
-function sumGroups(categories: readonly { name: string; tokens: number; kind: string }[]): Record<Group, number> {
-  const sums: Record<Group, number> = { Messages: 0, Tools: 0, Other: 0 }
-  for (const c of categories) if (c.kind === 'used') sums[groupOf(c.name)] += c.tokens
-  return sums
-}
 
 async function calibrate($: EngineInterface): Promise<void> {
   if (isCalibrating) return
@@ -239,10 +223,9 @@ async function calibrate($: EngineInterface): Promise<void> {
   await refresh($, 'due')
 }
 
-// Auto compact fires whenever the chat is idle and the context is at or past the %
-// (compared as shown, rounded). Held back only by `waits` (the band is asking, or "after
-// my next compact": cleared by a real compaction alone) and `stuck` (a compaction ran
-// and the context is still past the %: it would only repeat; dropping below clears it).
+// Auto compact fires when the chat is idle and the context (rounded) is at or past the
+// %, held back only by `waits` (the band asks, or "after my next compact", cleared by a
+// real compaction) and `stuck` (it compacted and is still past: cleared by dropping below).
 // a reply has been seen since the chat opened or was last compacted
 let hadReply = false
 async function setHold($: EngineInterface, patch: Partial<Hold>): Promise<void> {
@@ -268,9 +251,8 @@ function compactNow($: EngineInterface): void {
   })
 }
 
-// Auto compact compacts through the session itself: /compact run from a turn's end is
-// refused while the turn winds down. That also rejects while a turn runs, so it is
-// tried again a few times, a couple of seconds apart.
+// Auto compact compacts through the session (a /compact run from a turn's end is refused
+// while it winds down), tried again a few times, 2 seconds apart, while a turn runs.
 const AUTO_TRIES = 6
 let canCompactDirectly = true
 const AUTO_RETRY_MS = 2_000
@@ -290,14 +272,14 @@ function autoCompactNow($: EngineInterface, attempt = 1): void {
       // held as stuck while the figures are read again, so no tick fires a second one
       await setHold($, { stuck: true })
       isCompacting = false
-      if (result && 'skip' in result && result.skip) $.ui.toast(`Auto compact was skipped: ${result.skip}`)
+      if (result && 'skip' in result && result.skip) $.ui.toast(fmt(t.autoSkipped, { reason: result.skip }))
       lastSnapshot = ''
       const usage = await $.session.usage({ breakdown: 'summary' })
       const percent = usage.context.percent ?? 0
       // still past the % after compacting: say so once, and do not loop on it
       const auto = await read($, autoCompact)
       if (auto.at !== null && Math.round(percent) >= auto.at) {
-        $.ui.toast(`Context is still at ${Math.round(percent)}% after compacting, past your ${auto.at}%: auto compact waits until it drops below`)
+        $.ui.toast(fmt(t.stillPast, { percent: Math.round(percent), at: auto.at }))
       } else await setHold($, { stuck: false })
       await refresh($)
     } catch (error) {
@@ -309,7 +291,7 @@ function autoCompactNow($: EngineInterface, attempt = 1): void {
       }
       if (attempt < AUTO_TRIES) return autoCompactNow($, attempt + 1)
       isCompacting = false
-      $.ui.toast(`Auto compact could not start: ${reason}`)
+      $.ui.toast(fmt(t.autoFailed, { reason }))
       $.ui.log(`usage-quota: auto compact failed: ${reason}`, { to: 'debug' })
     }
   })
@@ -330,7 +312,7 @@ async function watchAuto($: EngineInterface, percent: number): Promise<void> {
     return askIfPast($, auto.at)
   }
   if (held.waits || held.stuck || isBusy || isCompacting) return
-  $.ui.toast(`Context at ${Math.round(percent)}%: auto compacting (set at ${auto.at}%)`)
+  $.ui.toast(fmt(t.autoCompacting, { percent: Math.round(percent), at: auto.at }))
   autoCompactNow($)
 }
 
@@ -371,20 +353,17 @@ async function loadAuto($: EngineInterface): Promise<void> {
   await update($, spend, () => ({ chat: id, total: 0, last: null, from: null }))
 }
 
-// the % field sets on Enter, or when the focus leaves it with an unset draft (a
-// click elsewhere in the band, or the next prompt sent); 15 to 99, outside is pulled
-// in. After a set the field is drawn afresh (fieldTick), which also drops its focus
+// the % field sets on Enter, or when the focus leaves it with a draft; 15 to 99, outside
+// is pulled in. After a set the field is drawn afresh (fieldTick), dropping its focus
 const AT_MIN = 15
 const AT_MAX = 99
 let draftAt: string | null = null
 
-// no event says a click landed outside the band, so a draft also sets itself once
-// typing has rested a while, as if the person had clicked away
+// no event says a click landed outside the band: a draft sets itself once typing rests
 const AT_REST_MS = 2_000
 let restTimer: { cancel(): void } | null = null
 
-// the field takes digits only, 3 at most: anything else typed or pasted is dropped
-// as it arrives, by drawing the field's text again cleaned
+// the field takes 3 digits at most: anything else is dropped by redrawing it cleaned
 const AT_DIGITS = 3
 // a mark of no width, so a cleaned text equal to the one drawn still redraws (an
 // unchanged value would leave the typing as it is) without a new field losing focus
@@ -394,8 +373,7 @@ function cleanAt(value: string): string {
   return value.replace(/\D/g, '').slice(0, AT_DIGITS)
 }
 
-// what the field shows comes from state, not a module variable: a press or a typing
-// runs apart from the draw, so a value the draw kept would not be seen here
+// what the field shows comes from state: a press or typing runs apart from the draw
 async function redrawField($: EngineInterface, value: string): Promise<void> {
   const at = (await read($, autoCompact)).at ?? settings.autoCompactAt
   await update($, fieldText, drawn => (value === (drawn ?? `${at}`) ? value + NO_WIDTH : value))
@@ -425,7 +403,7 @@ async function commitAt($: EngineInterface, value: string): Promise<void> {
   // only digits reach here: blank is the default, out of range is pulled in, every time
   const typed = text === '' ? settings.autoCompactAt : Number(text)
   const at = Math.min(AT_MAX, Math.max(AT_MIN, typed))
-  if (typed !== at) $.ui.toast(`Auto compact: ${typed < at ? 'the least' : 'the most'} is ${at}% – set to ${at}%`)
+  if (typed !== at) $.ui.toast(fmt(typed < at ? t.atLeast : t.atMost, { at }))
   await setThreshold($, at)
   // a new field every time (its key changes), so it shows the set value whatever was typed
   await update($, fieldText, () => null)
@@ -444,7 +422,7 @@ async function askIfPast($: EngineInterface, at: number | null): Promise<void> {
   const isPast = at !== null && Math.round(lastPercent) >= at
   await setHold($, { waits: isPast, stuck: false })
   await update($, autoAsk, () => (isPast ? { at: at!, percent: Math.round(lastPercent) } : null))
-  if (!isPast && at !== null) $.ui.toast(`Auto compact at ${at}% context`)
+  if (!isPast && at !== null) $.ui.toast(fmt(t.autoArmed, { at }))
 }
 
 async function answerAsk($: EngineInterface, choice: 'now' | 'next'): Promise<void> {
@@ -456,11 +434,10 @@ async function answerAsk($: EngineInterface, choice: 'now' | 'next'): Promise<vo
   }
 }
 
-// What a turn took of the 5 hour limit: how far it moved from the turn's start to the
-// reading after its end, added to the chat's total for the window.
-// shortcut: the limit is the whole account's, so another chat's use while this turn
-// runs counts here too, and between the usage service's 2-minute answers the figures
-// are whole percents; exact per-reply cost needs token counts priced per model
+// What a turn took of the 5 hour limit: how far it moved across the turn.
+// shortcut: the limit is the whole account's, so another chat's use during the turn
+// counts too, and between the service's answers the figures are whole percents; exact
+// per-reply cost needs token counts priced per model
 async function countSpend($: EngineInterface): Promise<void> {
   const { from } = await read($, spend)
   const after = (await read($, snapshot))?.limits.find(l => l.kind === 'five_hour')
@@ -479,18 +456,15 @@ let inFlight: Promise<void> = Promise.resolve()
 let pendingAsk: Ask = 'no'
 let lastSnapshot = ''
 
-// collapsed or not is one setting for every chat, kept in the shared store: each chat
-// reads it twice a second (one small read, nothing else) and follows
+// collapsed or not is one setting for every chat, in the shared store, read twice a second
 const COLLAPSE_EVERY_MS = 500
 async function syncCollapsed($: EngineInterface): Promise<void> {
   const saved = ((await storeGet($, 'collapsed')) as boolean | undefined) === true
   if (saved !== (await read($, isCollapsed))) await update($, isCollapsed, () => saved)
 }
 
-// The desktop app's theme is not told to plugins: it is read from the app's own
-// settings (userThemeMode), and for "system" from the OS. Looked at every 2s so a
-// switch shows at once, each look a single file-time check (the file is read only
-// once it changed); the OS, for "system" alone, is asked at most every 15s
+// The desktop app's theme (and language) is read from its own settings every 2s, each
+// look one file-time check; for a "system" theme the OS is asked at most every 15s
 const THEME_EVERY_MS = 2_000
 const SYSTEM_EVERY_MS = 15_000
 let didLogTheme = false
@@ -521,6 +495,7 @@ async function osTheme($: EngineInterface): Promise<'dark' | 'light'> {
 }
 // the settings file is read again only when it has changed since the last look: a
 // look is otherwise one file-time check, no read, no parse
+// (the app's language is read from the same file, so a switch there shows at once too)
 let themeFile: { mtimeMs: number; mode: string | undefined } | undefined
 async function syncTheme($: EngineInterface): Promise<void> {
   let mode: string | undefined
@@ -530,8 +505,13 @@ async function syncTheme($: EngineInterface): Promise<void> {
     const { mtimeMs } = await $.fs.stat(path)
     if (themeFile?.mtimeMs === mtimeMs) mode = themeFile.mode
     else {
-      mode = (JSON.parse(await $.fs.read(path)) as { userThemeMode?: string }).userThemeMode
+      const config = JSON.parse(await $.fs.read(path)) as { userThemeMode?: string; locale?: string }
+      mode = config.userThemeMode
       themeFile = { mtimeMs, mode }
+      if (config.locale !== appLocale) {
+        appLocale = config.locale
+        await applyLanguage($)
+      }
     }
   } catch (error) {
     if (!didLogTheme) $.ui.log(`usage-quota: the app's theme could not be read: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
@@ -620,7 +600,7 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
       lastSnapshot = json
       await update($, snapshot, () => next)
     }
-    showStatus($, settings.statusLine && !(await read($, isOn)) ? summary(next) : undefined)
+    showStatus($, settings.statusLine && !(await read($, isOn)) ? summary(next, t) : undefined)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     showStatus($, `usage-quota: ${message.replace(/^usage-quota: /, '')}`)
@@ -669,11 +649,18 @@ export const register: Register = (on, options) => {
   settings = readSettings(options)
 
   on('session.start', async ($, e, next) => {
-    await $.command.register({
-      name: 'quota',
-      description: 'Toggle the usage band above the prompt; /quota history shows past windows',
-      argumentHint: '[history]',
-    })
+    // the language first: the commands are described in it
+    try {
+      shellLocale = (await $.env.get('LC_ALL')) ?? (await $.env.get('LANG'))
+    } catch {
+      // no shell language: the app's, else English
+    }
+    await syncTheme($)
+    await applyLanguage($)
+    // each its own command, so typing /quota lists all three
+    await $.command.register({ name: 'quota', description: t.cmdQuota, argumentHint: '[history | settings]' })
+    await $.command.register({ name: 'quota-history', description: t.cmdHistory })
+    await $.command.register({ name: 'quota-settings', description: t.cmdSettings })
     const result = await next(e)
     try {
       calib = ((await $.store.get('calib')) as typeof calib | undefined) ?? {}
@@ -693,7 +680,6 @@ export const register: Register = (on, options) => {
     $.clock.every(LOCAL_EVERY_MS, () => void refresh($))
     $.clock.every(COLLAPSE_EVERY_MS, () => void syncCollapsed($))
     // whatever surface the session started on (a desktop chat may say none)
-    await syncTheme($)
     $.clock.every(THEME_EVERY_MS, () => void syncTheme($))
     return result
   })
@@ -752,17 +738,19 @@ export const register: Register = (on, options) => {
   })
 
   on('command.run', { command: 'quota' }, async ($, e) => {
-    if (e.args.trim() === 'history') {
-      const opened = await $.ui.open({ id: HISTORY_PANE, title: 'Usage history' })
-      return { text: opened.isPlaced ? 'Usage history opened.' : 'Usage history opens once there is room for it.' }
-    }
+    const sub = e.args.trim()
+    if (sub === 'history') return { text: await openPane($, HISTORY_PANE, t.historyTitle) }
+    if (sub === 'settings') return { text: await openPane($, SETTINGS_PANE, t.settingsTitle) }
     const now = !(await read($, isOn))
     await update($, isOn, () => now)
     // on: the limits at once; off: the status line takes over
     if (now) await refresh($, 'now')
     else await refreshAfter($)
-    return { text: now ? 'Claude Code Usage Quota on.' : 'Claude Code Usage Quota off.' }
+    return { text: now ? t.bandOn : t.bandOff }
   })
+
+  on('command.run', { command: 'quota-history' }, async $ => ({ text: await openPane($, HISTORY_PANE, t.historyTitle) }))
+  on('command.run', { command: 'quota-settings' }, async $ => ({ text: await openPane($, SETTINGS_PANE, t.settingsTitle) }))
 
   on('ui.render', { component: 'Pane', requestId: HISTORY_PANE }, async ($, e) => {
     const snap = await read($, snapshot)
@@ -772,7 +760,18 @@ export const register: Register = (on, options) => {
       now: await $.clock.now(),
       isLight: (await read($, theme)) === 'light',
       ramp: settings.limitRamp,
+      t: stringsOf(await read($, language)),
     })
+  })
+
+  on('ui.render', { component: 'Pane', requestId: SETTINGS_PANE }, async ($, e, next) => {
+    // its pickers and fields are the terminal's and the desktop's
+    if (e.surface !== 'terminal' && e.surface !== 'desktop') return next(e)
+    return settingsTree($.ui.resolve(e), e.surface, {
+      settings,
+      t: stringsOf(await read($, language)),
+      isLight: (await read($, theme)) === 'light',
+    }, (field, value) => void setSetting($, field, value))
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -795,6 +794,7 @@ export const register: Register = (on, options) => {
       limitRamp: settings.limitRamp,
       contextRamp: settings.contextRamp,
       chatCost: settings.chatCost,
+      t: stringsOf(await read($, language)),
     }, bandActions($))
   })
 }

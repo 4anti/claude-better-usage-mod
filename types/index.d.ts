@@ -38,6 +38,8 @@ declare module 'claude-code' {
       autoAsk: { at: number; percent: number } | null
       hold: Hold
       spend: Spend
+      /** the language the band draws in, as a code ("en", "tr", "zh-CN") */
+      language: string
       /** bumped on every % set: draws the field afresh even when the value is unchanged */
       fieldTick: number
       fieldText: string | null

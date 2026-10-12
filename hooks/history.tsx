@@ -6,16 +6,19 @@ import type { Limit } from '../types'
 import { BAR_PX, barSvg } from './band'
 import { DARK, LIGHT, rampColor } from './colors'
 import type { Ramp } from './colors'
-import { duration, endedAt, WINDOWS } from './forecast'
+import { duration, endedAt, windowName, WINDOWS } from './forecast'
+import { fmt } from './i18n'
+import type { Strings } from './i18n'
 import type { Past } from './limits'
 
-export type HistoryView = { past: Past[]; limits: Limit[]; now: number; isLight: boolean; ramp: Ramp }
+export type HistoryView = { past: Past[]; limits: Limit[]; now: number; isLight: boolean; ramp: Ramp; t: Strings }
 
 // the row's name column: "Sun 10:40 PM" at most
 const NAME_CELLS = 13
 
 export function historyTree(table: ElementTable<RenderSurface>, surface: RenderSurface, width: number, view: HistoryView) {
   const { Box, Text } = table
+  const { t } = view
   const Svg = surface === 'desktop' && 'Svg' in table ? table.Svg : undefined
   const c = surface === 'desktop' && view.isLight ? LIGHT : DARK
   const cells = Math.max(10, width - NAME_CELLS - 6)
@@ -55,13 +58,13 @@ export function historyTree(table: ElementTable<RenderSurface>, surface: RenderS
     return (
       <Box key={kind} flexDirection="column">
         <Text bold>{label}</Text>
-        {isRunning ? row('Now', live.percentUsed, `${kind}-now`) : null}
-        {isRunning ? <Text color={c.muted} wrap="wrap">{`resets in ${duration(resetsAt - view.now)}`}</Text> : null}
-        {past.map(p => row(endedAt(p.resetsAt, kind), p.peak, `${kind}-${p.resetsAt}`))}
+        {isRunning ? row(t.now, live.percentUsed, `${kind}-now`) : null}
+        {isRunning ? <Text color={c.muted} wrap="wrap">{fmt(t.resetsIn, { time: duration(resetsAt - view.now) })}</Text> : null}
+        {past.map(p => row(endedAt(p.resetsAt, kind, t), p.peak, `${kind}-${p.resetsAt}`))}
         <Text color={c.muted} wrap="wrap">
           {past.length === 0
-            ? 'Finished windows show here once they reset.'
-            : `Average ${Math.round(average)}% · reached the limit ${hits} of ${past.length} ${past.length === 1 ? 'time' : 'times'}`}
+            ? t.noPast
+            : fmt(t.average, { percent: Math.round(average), hits, count: past.length })}
         </Text>
       </Box>
     )
@@ -69,7 +72,7 @@ export function historyTree(table: ElementTable<RenderSurface>, surface: RenderS
 
   return (
     <Box flexDirection="column" rowGap={1}>
-      {Object.entries(WINDOWS).map(([kind, win]) => section(kind, win.label))}
+      {Object.keys(WINDOWS).map(kind => section(kind, windowName(kind, t)))}
     </Box>
   )
 }

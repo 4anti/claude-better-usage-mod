@@ -6,6 +6,43 @@ import { median, sameWindow, SAME_WINDOW_MS, TYPICAL_DEFAULT, WINDOWS } from './
 
 export type Saved = { at: number; limits: Limit[] }
 
+// The usage service rate-limits per login, and the app's own Usage panel asks it on
+// the same allowance, so ask it seldom: when a chat opens, then every 2 minutes with the
+// exact context count, one ask for the whole app (when it was last asked, the answer and
+// any back-off sit in the shared store). Between asks the figures every reply from
+// Claude carries keep the band current.
+const PLAN_EVERY_MS = 2 * 60_000
+// timers drift: a 2-minute tick a moment early still counts as due
+const PLAN_SLACK_MS = 10_000
+// after a failed ask wait 2, then 5, then 15 minutes, or what the service says
+const PLAN_BACKOFF_MS = [120_000, 300_000, 900_000]
+
+export type Backoff = { until: number; failures: number; error: string }
+/** 'no': the 3s tick, never asks; 'due': asks if 2 minutes have passed app-wide; 'now': asks unless backed off */
+export type Ask = 'no' | 'due' | 'now'
+
+/** a refused ask, with how long the service said to wait */
+export class AskError extends Error {
+  constructor(
+    message: string,
+    readonly retryAfterMs?: number,
+  ) {
+    super(message)
+  }
+}
+
+export const isPlanDue = (ask: Ask, now: number, askedAt: number, backoff: Backoff | undefined) =>
+  now >= (backoff?.until ?? 0) && (ask === 'now' || (ask === 'due' && now - askedAt >= PLAN_EVERY_MS - PLAN_SLACK_MS))
+
+/** the back-off after one more failed ask */
+export function nextBackoff(prev: Backoff | undefined, error: unknown, now: number): Backoff {
+  const failures = (prev?.failures ?? 0) + 1
+  const wait = error instanceof AskError && error.retryAfterMs !== undefined
+    ? error.retryAfterMs
+    : PLAN_BACKOFF_MS[Math.min(failures - 1, PLAN_BACKOFF_MS.length - 1)]!
+  return { until: now + wait, failures, error: error instanceof Error ? error.message : String(error) }
+}
+
 /** the 5 Hour and Weekly limits in the usage service's answer; throws when it has neither */
 export function parsePlan(text: string): Limit[] {
   const body = JSON.parse(text) as Record<string, { utilization?: number | null; resets_at?: string | null } | null>
@@ -17,6 +54,19 @@ export function parsePlan(text: string): Limit[] {
   }
   if (limits.length === 0) throw new Error('answer had no limits')
   return limits
+}
+
+// The context is shown as three groups: Messages, Tools (System + MCP tools) and Other
+// (the system prompt, skills, memory files, agents, MCP server instructions).
+const TOOL_NAMES = new Set(['System tools', 'MCP tools'])
+export type Group = 'Messages' | 'Tools' | 'Other'
+const groupOf = (name: string): Group => (name === 'Messages' ? 'Messages' : TOOL_NAMES.has(name) ? 'Tools' : 'Other')
+
+/** the tokens the context's used categories hold, by group */
+export function sumGroups(categories: readonly { name: string; tokens: number; kind: string }[]): Record<Group, number> {
+  const sums: Record<Group, number> = { Messages: 0, Tools: 0, Other: 0 }
+  for (const c of categories) if (c.kind === 'used') sums[groupOf(c.name)] += c.tokens
+  return sums
 }
 
 /** a Retry-After header, in ms, when it gives a usable number of seconds */
