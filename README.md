@@ -1,233 +1,177 @@
-# Claude Code Usage Quota Mod with Auto Compact
+<div align="center">
 
-[![Version: v0.1.6](docs/badges/version-v0.1.6.svg)](https://github.com/anantraghunath/claude-code-usage-quota-mod/releases/latest) ![Auto compact: 30% default](docs/badges/auto-compact-v2.svg) ![Compact: one click](docs/badges/compact-v2.svg) ![5 Hour + Weekly: whole account](docs/badges/limits-v2.svg) ![Forecast: before reset](docs/badges/forecast-v2.svg) ![Works in: Desktop + Terminal](docs/badges/works-in-v2.svg) ![License: MIT](docs/badges/license-v2.svg)
+# Usage Quota for Claude Code
 
-**Know your Claude limits before they hit you.** A live band above the Claude Code prompt that shows your plan limits, forecasts whether you'll run out before they reset, and shows how full your context window is. **Compact in one click, or let it compact automatically.**
+**Know your Claude limits before they hit you.**
 
-The 5 Hour and Weekly limits are **your whole Claude account's**, including what you use in Claude chat and Cowork. The band itself shows in **Claude Code**: the desktop app and the terminal.
+A live band above the Claude Code prompt: your 5 Hour and Weekly limits with a forecast to the next reset, what each chat costs, and how full your context window is. Compact in one click, or let it compact for you.
 
-**Live from the moment a session opens.** Many usage mods stay blank until Claude replies, because they only read the figures each reply carries. This one asks Anthropic's usage service straight away, for free (it uses no tokens and doesn't count toward your limits), so your limits are there as soon as the band appears, and it keeps them current every few seconds while you work.
+[![Version](https://img.shields.io/badge/version-0.2.0-9b9a96?style=flat-square&labelColor=212121)](https://github.com/4anti/claude-usage-quota-mod/releases)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.287%2B-9b9a96?style=flat-square&labelColor=212121)](https://claude.com/claude-code)
+[![Works in](https://img.shields.io/badge/works_in-Desktop_%2B_Terminal-9b9a96?style=flat-square&labelColor=212121)](#install)
+[![License: MIT](https://img.shields.io/badge/license-MIT-9b9a96?style=flat-square&labelColor=212121)](LICENSE)
 
-Type **`/quota`** to turn the band off and on.
+<img src="docs/band-expanded.png" alt="The usage band above the prompt in the Claude desktop app, expanded: 5 Hour at 7%, Weekly at 57% with a red forecast tick, context at 38%" width="900">
 
-## EXPANDED
+</div>
 
-![The band, expanded, above the prompt in the Claude desktop app](docs/expanded-desktop.png)
+## Overview
 
-## COLLAPSED
+The band reads Anthropic's usage service the moment a session opens, so your limits are there before the first reply. It stays current while you work: every 3 seconds for the context, and every 2 minutes for your plan. It costs no tokens and doesn't count toward your limits.
 
-One row that still shows the time left until each limit resets:
+The 5 Hour and Weekly limits are **your whole Claude account's**, including Claude chat and Cowork. The band itself shows in **Claude Code**, in the desktop app and the terminal.
 
-![The band, collapsed, above the prompt in the Claude desktop app](docs/collapsed-desktop.png)
+## Features
 
-> [!TIP]
-> **Never hit a full context again: Auto compact, on by one click.**
-> With Auto compact on, the band compacts your session once the context reaches **30%** (the default; set **15 to 99**). A long context costs more on every reply, so compacting early keeps replies **cheaper** and your limits **lasting longer**. Auto compact never interrupts a reply. Want to compact right now? The **Compact** button runs `/compact` in one click.
->
-> **Each session keeps its own Auto compact setting**, even after a restart, so you can run them differently side by side:
-> - **Building something big?** Set Auto compact higher (say 70%) or turn it off, so Claude keeps the whole picture. Press **Compact** yourself at a good stopping point. (With it off, Claude Code's built-in compaction still steps in when the context is nearly full.)
-> - **Everyday sessions?** One click turns Auto compact on at 30%. They stay lean, and your 5 Hour and Weekly limits last longer.
+### Plan limits with a forecast
 
-## WHAT IT SHOWS
+- **% used** of the 5 Hour and Weekly limits, matching the app's own *Plan usage limits* panel.
+- **A forecast to the reset**: *On pace for about 55% by reset*, or *Limit will hit in 3d 3h*. The tick on each bar marks where you'll be when the window resets.
+- **A headline** for the window that needs attention: *On track*, *At this pace you'll run out before Sunday's reset*, or *Limit reached*.
+- **A learned pace.** The forecast starts from how far your past windows usually got. For the first 15% of a window it uses only that, so an early burst doesn't raise a false alarm. Then it shifts smoothly to your actual pace.
 
-**5 Hour and Weekly limits**
-- The **% used**, matching the app's own *Plan usage limits* panel.
-- A **forecast** of where you'll be at reset: a grey tick on the bar and a note, e.g. *On pace for about 87% by reset – resets in 23m*.
-- A **headline** at a glance: *On track. You should reach Wednesday's reset with room to spare.*
-- The forecast starts from **your usual pace** (learned from your past windows) and shifts to your actual pace as the window goes on, so an early burst doesn't set it off.
-- Bars turn **amber at 75%** and **red at 90%**, or sooner if you're on course to run out.
+### Color that means something
 
-On course to run out, it warns you and says **when you'll hit the limit**:
+Everything is Claude's own grey until usage matters. It then shifts smoothly, never in sudden steps:
 
-![The band, expanded, on course to run out before the 5 hour reset](docs/run-out-expanded-v2.png)
+| | Grey | Yellow | Red |
+| --- | --- | --- | --- |
+| **5 Hour and Weekly** | up to 50% | 75% | 95% and over |
+| **Context** | up to 25% | 50% | 80% and over |
 
-![The band, collapsed, on course to run out](docs/run-out-collapsed-v2.png)
+Bars and their % follow what you've actually used. The **forecast tick** carries the warning on its own: light grey on track, **yellow** when you're heading past the limit, **red** when far past it.
 
-**Context window**
-- The % used and space free, as `/context` counts it, split into Messages, Tools and Other.
-- **Amber at 50%**, **red at 80%**: the point to compact.
+### What this chat costs
 
-**Compacting**
+Under the 5 Hour bar: *This chat used 3% – last reply 0.5%*. It's measured from the start to the end of each reply, and starts over when the 5 Hour window resets.
+
+### Context window
+
+- The % used and the space free, as `/context` counts it.
+- A breakdown into **Messages**, **Tools** and **Other**, calibrated against the exact count every 2 minutes.
+
+### Compact and Auto compact
+
 - **Compact** runs `/compact` in one click.
-- **Auto compact** runs at your % (30% by default, 15 to 99), never mid-reply. Each session keeps its own setting; a new session starts with it off.
+- **Auto compact** compacts at your % (30% by default, 15 to 99), only between replies, never during one.
+- Each chat keeps its own setting. A new chat starts with the last setting you chose.
+- If a chat is already past your % when Auto compact turns on, it asks first: **Now** or **After my next compact**.
 
-If the session is already past your % when you turn it on, it asks first:
+### Collapsed
 
-![Auto compact asking what to do, with the context already at 72%](docs/auto-compact-ask-v2.png)
+One row, with the time left until each limit resets. Collapsed or expanded is shared by every chat.
 
-![The same question with the band collapsed](docs/auto-compact-ask-collapsed-v2.png)
+<img src="docs/band-collapsed.png" alt="The band collapsed to one row: 5H 4h 51m at 7%, W 5d 11h at 57%, Context 1M at 38%" width="900">
 
-- **Now** compacts straight away.
-- **After my next compact** waits until the session is compacted some other way (Compact, `/compact`, or Claude Code's own), then takes over.
+## Install
 
-Works in **light and dark** themes and at **every width** down to the narrowest. Collapsed or expanded is shared across all sessions.
+Needs **Claude Code 2.1.287 or later**, signed in with a **Pro or Max** plan. One install covers both the desktop app and the terminal.
 
-> [!NOTE]
-> **MORE SCREENSHOTS**
->
-> Early in a 5 hour window:
->
-> ![The band, expanded, early in a 5 hour window](docs/expanded-dark-early.png)
->
-> ![The band, collapsed, early in a 5 hour window](docs/collapsed-dark-early.png)
->
-> Running out on the Weekly limit:
->
-> ![The band, expanded, on course to run out before the weekly reset](docs/run-out-weekly-expanded.png)
->
-> ![The band, collapsed, on course to run out before the weekly reset](docs/run-out-weekly-collapsed.png)
->
-> | Light theme | Narrowest window |
-> | --- | --- |
-> | ![Light, expanded](docs/expanded-light.png) | ![Narrow, expanded](docs/narrow-expanded.png) |
-> | ![Light, collapsed](docs/collapsed-light.png) | ![Narrow, collapsed](docs/narrow-collapsed.png) |
-
-## WHERE IT WORKS
-
-- **Claude desktop app**, Code tab
-- **Claude Code in a terminal**
-
-> [!NOTE]
-> In the desktop app, the band appears once a session has started. The brand-new *Welcome back* screen has no session yet, so no mod can draw there. Send your first message and it appears.
-
-In the terminal, **▲/▼** expands and collapses it. The `[-]` next to it is Claude Code's own control and hides the band; **ctrl+x ctrl+a** brings it back.
-
-![The band in the terminal, expanded](docs/terminal-expanded.png)
-
-Collapsed:
-
-![The band in the terminal, collapsed](docs/terminal-collapsed.png)
-
-## INSTALL
-
-Needs **Claude Code 2.1.287 or later**, signed in with a **Pro or Max** plan.
-
-**Desktop app:** in the **Code** tab, send this as a message, allow the `claude plugin` commands if asked, then **quit and reopen** the app:
+**Desktop app:** in the **Code** tab, send this as a message, allow the `claude plugin` commands if asked, then quit and reopen the app:
 
 ```text
-Install the usage-quota plugin from the GitHub marketplace anantraghunath/claude-code-usage-quota-mod
+Install the usage-quota plugin from the GitHub marketplace 4anti/claude-usage-quota-mod
 ```
 
 **Terminal:** inside `claude`, run these one at a time:
 
 ```text
-/plugin marketplace add anantraghunath/claude-code-usage-quota-mod
+/plugin marketplace add 4anti/claude-usage-quota-mod
 ```
 
 ```text
-/plugin install usage-quota@claude-code-usage-quota-mod
+/plugin install usage-quota@4anti-mods
 ```
 
 ```text
 /reload-plugins
 ```
 
-The band appears once the plugins reload. If it doesn't, restart Claude Code.
-
-Either way installs it for **both** the desktop app and the terminal.
-
 > [!IMPORTANT]
-> **Installed before v0.1.5?** The plugin was renamed from `claude-code-usage-quota` to **`usage-quota`**, because Claude Code reserves names starting with `claude-` for Anthropic's own plugins. Updating won't pick up the new name, so remove the old one and install again. This gets you the latest version, **v0.1.6**.
->
-> **Desktop app:** in the **Code** tab, send this as a message:
->
-> ```text
-> Run these one at a time: claude plugin uninstall claude-code-usage-quota@claude-code-usage-quota-mod, then claude plugin marketplace update claude-code-usage-quota-mod, then claude plugin install usage-quota@claude-code-usage-quota-mod
-> ```
->
-> **Terminal:** run these in your shell:
+> **Have the original version installed?** Remove it first, or two bands will draw:
 >
 > ```bash
-> claude plugin uninstall claude-code-usage-quota@claude-code-usage-quota-mod
+> claude plugin marketplace remove claude-code-usage-quota-mod
 > ```
 >
-> ```bash
-> claude plugin marketplace update claude-code-usage-quota-mod
-> ```
->
-> ```bash
-> claude plugin install usage-quota@claude-code-usage-quota-mod
-> ```
->
-> Then restart. Your Auto compact settings and learned pace carry over.
-
-**Update:** ask Claude, then restart:
-
-```text
-Update the usage-quota plugin from its marketplace
-```
-
-**Uninstall:** in the desktop app, ask Claude:
-
-```text
-Remove the claude-code-usage-quota-mod plugin marketplace
-```
-
-or in the terminal:
-
-```text
-/plugin marketplace remove claude-code-usage-quota-mod
-```
-
-then restart. This removes it from both. Just want it out of sight? **`/quota`** hides it without uninstalling.
+> Saved settings are kept per marketplace, so Auto compact settings and the learned pace start fresh here.
 
 <details>
-<summary>From your own shell instead</summary>
+<summary>Update, uninstall, or install from your own shell</summary>
+
+Install:
 
 ```bash
-claude plugin marketplace add anantraghunath/claude-code-usage-quota-mod; claude plugin install usage-quota@claude-code-usage-quota-mod
+claude plugin marketplace add 4anti/claude-usage-quota-mod
+claude plugin install usage-quota@4anti-mods
 ```
 
-To update:
+Update, then restart Claude Code:
 
 ```bash
-claude plugin marketplace update claude-code-usage-quota-mod; claude plugin update usage-quota@claude-code-usage-quota-mod
+claude plugin marketplace update 4anti-mods
+claude plugin update usage-quota@4anti-mods
 ```
 
-To uninstall:
+Uninstall, then restart Claude Code:
 
 ```bash
-claude plugin marketplace remove claude-code-usage-quota-mod
+claude plugin marketplace remove 4anti-mods
 ```
 
 </details>
 
-## PRIVACY
+## Usage
 
-**Everything runs on your machine**, with the same access Claude Code has, like any mod, so read the code before installing any mod you don't trust. It **never sees your credentials** and sends nothing anywhere except the one request below.
+| Action | How |
+| --- | --- |
+| Turn the band off or on | `/quota` |
+| Expand or collapse | the **▼ / ▲** button |
+| Compact now | the **Compact** button |
+| Auto compact | the switch, then type a % (it sets on Enter, a click elsewhere, or a 2-second pause) |
+| Hide or show it in the terminal | Claude Code's own `[-]`, or **ctrl+x ctrl+a** |
 
-<details>
-<summary>Exactly what it reads, sends and runs</summary>
+In the desktop app, the band appears once a session has started. The *Welcome back* screen has no session yet, so no mod can draw there.
 
-- **Network:** about every 2 minutes, one request to `https://api.anthropic.com/api/oauth/usage`, Anthropic's usage service, for your 5 Hour and Weekly limits. It goes through your existing Claude login: Claude Code attaches the credential, and the mod never sees it. That is the only host it contacts. The `www.w3.org` address in the code is only the namespace of the drawn bars' SVG images; nothing is sent there.
-- **Your session:** it reads the context size and the limits each reply carries, as Claude Code reports them. It doesn't read or send what you or Claude write.
-- **Commands:** it runs `/compact` when you press **Compact**, or when Auto compact reaches your %. It adds `/quota`, which turns the band off and on.
-- **Programs:** only to match your system's light or dark mode, when the desktop app follows the system: `reg query` for `AppsUseLightTheme` on Windows, `defaults read -g AppleInterfaceStyle` on macOS.
-- **Files:** it reads the desktop app's `config.json` for its theme setting. Once, after the v0.1.5 rename, it copies the old plugin's saved settings from `~/.claude/plugins/store`.
-- **Hooks:** the band's own clicks and focus (`ui.press`, `ui.focus`) and edits to the prompt (`prompt.edit`) only set a % you typed in the band, then pass on unchanged. Turns starting and ending tell it when a reply is running, so Auto compact never interrupts one.
+## Privacy
 
-</details>
+Everything runs on your machine with the same access Claude Code has. The mod **never sees your credentials** and sends nothing anywhere except the one request below.
 
-## FEEDBACK AND CONTRIBUTING
+| | What it does |
+| --- | --- |
+| **Network** | About every 2 minutes, one request to `https://api.anthropic.com/api/oauth/usage` through your existing Claude login. Claude Code attaches the credential; the mod never sees it. This is the only host it contacts. |
+| **Your session** | Reads the context size and the limits each reply carries. It never reads or sends what you or Claude write. |
+| **Commands** | Runs `/compact` when you press **Compact** or Auto compact reaches your %. Adds `/quota`. |
+| **Programs** | Only to match a desktop app that follows the system theme: `reg query` for `AppsUseLightTheme` on Windows, `defaults read -g AppleInterfaceStyle` on macOS. |
+| **Files** | Reads the desktop app's `config.json` for its theme setting, and nothing else. |
 
-First release: I'd love to hear how it works for you. [Open an issue](https://github.com/anantraghunath/claude-code-usage-quota-mod/issues) for bugs or ideas. Pull requests welcome.
+## Development
 
-To work on it, clone the repo, then load it from the folder, or run its tests:
+Clone the repo, then run its tests, or load it into a session from the folder:
 
 ```bash
-claude --plugin-dir ./claude-code-usage-quota-mod
+claude plugin test ./claude-usage-quota-mod
 ```
 
 ```bash
-claude plugin test ./claude-code-usage-quota-mod
+claude --plugin-dir ./claude-usage-quota-mod
 ```
 
-**If you find it useful, a ⭐ helps others find it.**
+| File | Role |
+| --- | --- |
+| `hooks/register.tsx` | Every hook and engine call: refreshing, the usage service, Auto compact, state |
+| `hooks/band.tsx` | The band's layout, from plain values |
+| `hooks/forecast.ts` | The pace forecast and the headline |
+| `hooks/limits.ts` | Reading the usage service's answer and learning your usual pace |
+| `hooks/colors.ts` | The palettes and the grey → yellow → red ramp |
+| `tests/` | UI tests on both surfaces (`band.test.tsx`) and unit tests (`logic.test.ts`) |
 
-## CREDITS
+The engine allows `$` and state atoms only in the hooks module, so everything else is plain, testable code. Issues and pull requests are welcome.
 
-Inspired by [I'm liking the new mods feature](https://www.reddit.com/r/ClaudeCode/comments/1wwjman/im_liking_the_new_mods_feature/) on r/ClaudeCode. Thanks to [u/itsxzy](https://www.reddit.com/user/itsxzy/) for sharing the original prompt that started this project.
+## Credits
 
-## LICENSE
+A fork of [claude-code-usage-quota-mod](https://github.com/anantraghunath/claude-code-usage-quota-mod) by Anant Raghunath. That project was inspired by [I'm liking the new mods feature](https://www.reddit.com/r/ClaudeCode/comments/1wwjman/im_liking_the_new_mods_feature/) on r/ClaudeCode, with thanks to [u/itsxzy](https://www.reddit.com/user/itsxzy/) for the original prompt.
 
-[MIT](LICENSE) © 2026 Anant Raghunath
+## License
+
+[MIT](LICENSE)
