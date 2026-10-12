@@ -1076,6 +1076,43 @@ test("a reopened chat's first reply, re-reading its history, is left out of the 
   await ui.unmount()
 })
 
+test('a newer reply carrying only the 5 hour window never wipes out Weekly, in this chat or the others', async ($, on) => {
+  const clock = mock.clock(on, { now: NOW })
+  // the shared store holds the service's full reading, Weekly at 58%
+  mock.store(on, {
+    limits: {
+      at: NOW - MIN,
+      limits: [
+        { kind: 'five_hour', percentUsed: 10, resetsAt: iso(3 * HOUR) },
+        { kind: 'seven_day', percentUsed: 58, resetsAt: iso(3 * 24 * HOUR) },
+      ],
+    },
+  })
+  // this chat's last reply reported the 5 hour window alone, and Weekly with no reset time
+  const state = { rateLimits: [{ kind: 'five_hour', percentUsed: 12, resetsAt: iso(3 * HOUR) }] as SessionRateLimit[] }
+  on('session.usage', () => ({ value: usage(state.rateLimits) }))
+  answerRest(on, [])
+  await $.session.measure(MEASURE)
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'AbovePrompt', props: PROPS })
+    expect(await ui.find({ type: 'Text', text: '12%' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: '58%' })).toBeDefined()
+    expect(await ui.find({ text: 'starts with your next message' })).toBeUndefined()
+    await ui.unmount()
+  }
+  state.rateLimits = [
+    { kind: 'five_hour', percentUsed: 13, resetsAt: iso(3 * HOUR) },
+    { kind: 'seven_day', percentUsed: 59 },
+  ]
+  await clock.advance(1_000)
+  await $.session.measure(MEASURE)
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  expect(await ui.find({ type: 'Text', text: '13%' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '59%' })).toBeDefined()
+  expect(await ui.find({ text: 'starts with your next message' })).toBeUndefined()
+  await ui.unmount()
+})
+
 test("a newer reply figure below the usage service's never pulls the band under it: 18.6% shows 19%, as the app does", async ($, on) => {
   const clock = mock.clock(on, { now: NOW })
   mock.store(on)

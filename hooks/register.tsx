@@ -131,10 +131,11 @@ async function limitsOf(
       await storeSet($, 'planBackoff', backoff)
     }
   }
-  const { pick, limits } = pickLimits(saved, live, (await storeGet($, 'planLimits')) as Saved | undefined, now)
-  // newer reply figures go to the store too, so other chats get them
-  if (pick && pick === live && (!saved || live.at > saved.at)) await storeSet($, 'limits', live)
-  return { limits, at: pick?.at, error: backoff?.error || undefined }
+  const { merged, limits } = pickLimits(saved, live, (await storeGet($, 'planLimits')) as Saved | undefined, now)
+  // newer reply figures go to the store too, merged whole, so other chats get them
+  // and no chat's partial reply takes a window away from the rest
+  if (merged && live && (!saved || live.at > saved.at)) await storeSet($, 'limits', merged)
+  return { limits, at: merged?.at, error: backoff?.error || undefined }
 }
 
 // A chat reopened with a long history re-reads it all on its first reply: one big jump

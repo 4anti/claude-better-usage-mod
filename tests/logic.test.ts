@@ -3,7 +3,7 @@ import { expect, test } from 'claude-code/testing'
 import { stepAlerts } from '../hooks/alerts'
 import { CONTEXT_RAMP, DARK, LIGHT, LIMIT_RAMP, mix, rampColor } from '../hooks/colors'
 import { forecast, headline } from '../hooks/forecast'
-import { addHistory, stepPace } from '../hooks/limits'
+import { addHistory, pickLimits, stepPace } from '../hooks/limits'
 import { parseRamp, readSettings } from '../hooks/settings'
 
 const NOW = Date.parse('2026-10-04T06:00:00Z')
@@ -57,6 +57,25 @@ test('the pace store learns a finished window\'s peak without changing the store
   expect(isChanged).toBe(true)
   expect(store.finals).toEqual({ five_hour: [30] })
   expect(pace.five_hour?.typical).toBe(30)
+})
+
+test('readings merge window by window: a later window wins, a partial reply takes nothing away', async () => {
+  const week = (p: number, resetsIn: number) => ({ kind: 'seven_day', percentUsed: p, resetsAt: iso(resetsIn) })
+  const saved = { at: NOW - MIN, limits: [{ kind: 'five_hour', percentUsed: 10, resetsAt: iso(HOUR) }, week(58, 3 * 24 * HOUR)] }
+  // newer, but the 5 hour window alone
+  const partial = pickLimits(saved, { at: NOW, limits: [{ kind: 'five_hour', percentUsed: 12, resetsAt: iso(HOUR) }] }, undefined, NOW)
+  expect(partial.limits).toEqual([{ kind: 'five_hour', percentUsed: 12, resetsAt: iso(HOUR) }, week(58, 3 * 24 * HOUR)])
+  expect(partial.merged?.at).toBe(NOW)
+  // an older reading of a later window still beats a newer reading of the one before
+  const later = pickLimits({ at: NOW - MIN, limits: [week(2, 7 * 24 * HOUR)] }, { at: NOW, limits: [week(90, 2 * MIN)] }, undefined, NOW)
+  expect(later.limits).toEqual([week(2, 7 * 24 * HOUR)])
+  // a reading without its reset time moves the known window up, never down
+  const up = pickLimits(saved, { at: NOW, limits: [{ kind: 'seven_day', percentUsed: 60 }] }, undefined, NOW)
+  expect(up.limits.find(l => l.kind === 'seven_day')).toEqual(week(60, 3 * 24 * HOUR))
+  const down = pickLimits(saved, { at: NOW, limits: [{ kind: 'seven_day', percentUsed: 3 }] }, undefined, NOW)
+  expect(down.limits.find(l => l.kind === 'seven_day')).toEqual(week(58, 3 * 24 * HOUR))
+  // once it has reset: 0, not running
+  expect(pickLimits(saved, undefined, undefined, NOW + 2 * HOUR).limits[0]).toEqual({ kind: 'five_hour', percentUsed: 0 })
 })
 
 test('a window that ends is reported once, for the history', async () => {

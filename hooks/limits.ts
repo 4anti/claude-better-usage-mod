@@ -26,22 +26,48 @@ export function retryAfterMs(headers: Record<string, string | string[] | undefin
   return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined
 }
 
-// The newest of the two readings wins: the usage service's (saved) and this chat's
-// reply figures (live). The reply figures run behind the service, which the app's
-// panel reads: whole percents, and seen at 18 for an hour while the service said 19.0.
-// Use only climbs within a window, so a reply figure below the service's last answer
-// (plan) is stale: the higher of the two is kept. Above it, the reply's is news.
-// A window that has reset since stays, at 0: the forecast reads it as not running.
-export function pickLimits(saved: Saved | undefined, live: Saved | undefined, plan: Saved | undefined, now: number): { pick?: Saved; limits: Limit[] } {
-  const pick = [saved, live].filter((r): r is Saved => r !== undefined).sort((x, y) => y.at - x.at)[0]
+type Reading = Limit & { at: number }
+
+// The better of two readings of one window. A later window beats an earlier one,
+// whatever was read last; within one window the later reading wins. A reading with no
+// reset time (a reply may leave it out) cannot say which window it is: it only moves
+// the known window's % up, as use only climbs within a window.
+function better(best: Reading | undefined, r: Reading): Reading {
+  if (!best) return r
+  if (!r.resetsAt) {
+    if (!best.resetsAt) return r.at > best.at ? r : best
+    return r.at > best.at && r.percentUsed >= best.percentUsed ? { ...best, percentUsed: r.percentUsed, at: r.at } : best
+  }
+  if (!best.resetsAt) return r
+  const gap = Date.parse(r.resetsAt) - Date.parse(best.resetsAt)
+  if (Math.abs(gap) > SAME_WINDOW_MS) return gap > 0 ? r : best
+  return r.at > best.at ? r : best
+}
+
+// The two readings, the usage service's (saved, shared by every chat) and this chat's
+// reply figures (live), merged window by window: a reply may carry one window alone,
+// which must never wipe out the other's reading (a chat showed Weekly at 0 while the
+// rest showed 58%). The reply figures also run behind the service, which the app's
+// panel reads: whole percents, seen at 18 for an hour while the service said 19.0, so
+// within a window the service's last answer (plan) is a floor. A window that has reset
+// since stays, at 0: the forecast reads it as not running.
+export function pickLimits(saved: Saved | undefined, live: Saved | undefined, plan: Saved | undefined, now: number): { merged?: Saved; limits: Limit[] } {
+  const sources = [saved, live].filter((s): s is Saved => s !== undefined)
+  if (sources.length === 0) return { limits: [] }
+  const byKind = new Map<string, Reading>()
+  for (const s of sources) for (const l of s.limits) byKind.set(l.kind, better(byKind.get(l.kind), { ...l, at: s.at }))
+  const merged: Saved = {
+    at: Math.max(...sources.map(s => s.at)),
+    limits: [...byKind.values()].map(({ at: _at, ...l }) => l),
+  }
   const finer = (l: Limit): Limit => {
     const p = plan?.limits.find(x => x.kind === l.kind)
     return p && sameWindow(p.resetsAt, l.resetsAt) && p.percentUsed > l.percentUsed ? { ...l, percentUsed: p.percentUsed } : l
   }
-  const limits = (pick?.limits ?? []).map(l =>
+  const limits = merged.limits.map(l =>
     l.resetsAt !== undefined && Date.parse(l.resetsAt) <= now ? { kind: l.kind, percentUsed: 0 } : finer(l),
   )
-  return { pick, limits }
+  return { merged, limits }
 }
 
 // What the forecast learns, shared by every chat through the store: how far each past
