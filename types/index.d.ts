@@ -24,6 +24,9 @@ export type AutoCompact = { isOn: boolean; at: number | null }
 /** what holds auto compact back in a chat: an ask (or "after my next compact"), or a compaction that left it past the % */
 export type Hold = { chat: string; waits: boolean; stuck: boolean }
 
+/** this chat's share of the 5 hour limit: in all, by its last reply, and the reading its running turn started from */
+export type Spend = { chat: string; total: number; last: number | null; from: Limit | null }
+
 declare module 'claude-code' {
   interface PluginState {
     'usage-quota': {
@@ -34,6 +37,7 @@ declare module 'claude-code' {
       /** the choice the band is asking for: the context was already past a new % */
       autoAsk: { at: number; percent: number } | null
       hold: Hold
+      spend: Spend
       /** bumped on every % set: draws the field afresh even when the value is unchanged */
       fieldTick: number
       fieldText: string | null

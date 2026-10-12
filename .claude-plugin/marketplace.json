@@ -1,13 +1,13 @@
 {
-  "name": "claude-code-usage-quota-mod",
-  "owner": { "name": "Anant Raghunath" },
-  "metadata": { "description": "Claude Code mods by Anant Raghunath" },
+  "name": "4anti-mods",
+  "owner": { "name": "4anti" },
+  "metadata": { "description": "Claude Code mods by 4anti" },
   "plugins": [
     {
       "name": "usage-quota",
       "source": "./",
-      "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, context window usage, one-click Compact and per-session Auto compact (30% default).",
-      "version": "0.1.6",
+      "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, what this chat took, context window usage, one-click Compact and Auto compact.",
+      "version": "0.2.0",
       "license": "MIT",
       "keywords": ["usage", "quota", "rate limits", "context window", "compact", "mod"]
     }

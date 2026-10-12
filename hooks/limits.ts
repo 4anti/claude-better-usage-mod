@@ -1,0 +1,91 @@
+// The limits' arithmetic, apart from the engine: what the usage service's answer says,
+// which of two readings to trust, and what the forecast learns from them. The hooks
+// module does the asking and the storing (the engine lets `$` cross no import).
+import type { Limit, PaceOf } from '../types'
+import { median, sameWindow, SAME_WINDOW_MS, TYPICAL_DEFAULT, WINDOWS } from './forecast'
+
+export type Saved = { at: number; limits: Limit[] }
+
+/** the 5 Hour and Weekly limits in the usage service's answer; throws when it has neither */
+export function parsePlan(text: string): Limit[] {
+  const body = JSON.parse(text) as Record<string, { utilization?: number | null; resets_at?: string | null } | null>
+  const limits: Limit[] = []
+  for (const kind of ['five_hour', 'seven_day']) {
+    const w = body[kind]
+    if (!w || typeof w.utilization !== 'number') continue
+    limits.push({ kind, percentUsed: Math.round(w.utilization * 10) / 10, resetsAt: w.resets_at ?? undefined })
+  }
+  if (limits.length === 0) throw new Error('answer had no limits')
+  return limits
+}
+
+/** a Retry-After header, in ms, when it gives a usable number of seconds */
+export function retryAfterMs(headers: Record<string, string | string[] | undefined> | undefined): number | undefined {
+  const header = Object.entries(headers ?? {}).find(([k]) => k.toLowerCase() === 'retry-after')?.[1]
+  const seconds = Number(Array.isArray(header) ? header[0] : header)
+  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined
+}
+
+// The newest of the two readings wins: the usage service's (saved) and this chat's
+// reply figures (live). The reply figures run behind the service, which the app's
+// panel reads: whole percents, and seen at 18 for an hour while the service said 19.0.
+// Use only climbs within a window, so a reply figure below the service's last answer
+// (plan) is stale: the higher of the two is kept. Above it, the reply's is news.
+// A window that has reset since stays, at 0: the forecast reads it as not running.
+export function pickLimits(saved: Saved | undefined, live: Saved | undefined, plan: Saved | undefined, now: number): { pick?: Saved; limits: Limit[] } {
+  const pick = [saved, live].filter((r): r is Saved => r !== undefined).sort((x, y) => y.at - x.at)[0]
+  const finer = (l: Limit): Limit => {
+    const p = plan?.limits.find(x => x.kind === l.kind)
+    return p && sameWindow(p.resetsAt, l.resetsAt) && p.percentUsed > l.percentUsed ? { ...l, percentUsed: p.percentUsed } : l
+  }
+  const limits = (pick?.limits ?? []).map(l =>
+    l.resetsAt !== undefined && Date.parse(l.resetsAt) <= now ? { kind: l.kind, percentUsed: 0 } : finer(l),
+  )
+  return { pick, limits }
+}
+
+// What the forecast learns, shared by every chat through the store: how far each past
+// window got (its peak, the last few kept), and the running one's peak and skipped %.
+type PaceWindow = { resetsAt: number; peak: number; skip: number }
+export type PaceStore = { finals: Record<string, number[]>; windows: Record<string, PaceWindow> }
+const FINALS_KEPT = 8
+
+/** the jump a reopened chat's first reply made, once a reading after it has moved */
+export function spikeOf(from: Saved | undefined, live: Saved | undefined): Record<string, number> | undefined {
+  if (!from || !live || live.at <= from.at) return undefined
+  const jump: Record<string, number> = {}
+  for (const l of live.limits) {
+    const before = from.limits.find(b => b.kind === l.kind)
+    if (before && sameWindow(before.resetsAt, l.resetsAt) && l.percentUsed > before.percentUsed) {
+      jump[l.kind] = l.percentUsed - before.percentUsed
+    }
+  }
+  return Object.keys(jump).length === 0 ? undefined : jump
+}
+
+/** the pace store after these readings, whether it changed, and each window's pace */
+export function stepPace(saved: PaceStore, limits: Limit[], now: number, spike?: Record<string, number>): { store: PaceStore; isChanged: boolean; pace: Record<string, PaceOf> } {
+  let store = saved
+  let isChanged = false
+  const pace: Record<string, PaceOf> = {}
+  for (const l of limits) {
+    const resetsAt = l.resetsAt ? Date.parse(l.resetsAt) : NaN
+    if (!WINDOWS[l.kind] || !Number.isFinite(resetsAt) || resetsAt <= now) continue
+    const old = store.windows[l.kind]
+    let w = old
+    let finals = store.finals[l.kind]
+    if (!w || Math.abs(w.resetsAt - resetsAt) > SAME_WINDOW_MS) {
+      // a new window: the last one's peak is how far it got
+      if (w && w.peak > 0) finals = [...(finals ?? []), w.peak].slice(-FINALS_KEPT)
+      w = { resetsAt, peak: l.percentUsed, skip: 0 }
+    } else if (l.percentUsed > w.peak) w = { ...w, peak: l.percentUsed }
+    const jump = spike?.[l.kind]
+    if (jump) w = { ...w, skip: Math.min(w.peak, w.skip + jump) }
+    if (w !== old) {
+      store = { finals: { ...store.finals, ...(finals ? { [l.kind]: finals } : {}) }, windows: { ...store.windows, [l.kind]: w } }
+      isChanged = true
+    }
+    pace[l.kind] = { typical: median(finals) ?? TYPICAL_DEFAULT, skip: w.skip }
+  }
+  return { store, isChanged, pace }
+}

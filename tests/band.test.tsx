@@ -6,6 +6,11 @@ const MIN = 60_000
 const HOUR = 60 * MIN
 const SURFACES = ['terminal', 'desktop'] as const
 
+// the dark palette's grey, yellow and red (hooks/colors.ts)
+const GREY = '#9b9a96'
+const YELLOW = '#e5b54a'
+const RED = '#e5534b'
+
 const PROPS = {
   hasSurvey: false,
   isWorking: false,
@@ -102,7 +107,7 @@ test('draws the band on track', async ($, on) => {
     // three groups: Messages, Tools (34k + 17k), Other (4k + 6k + 1k), Other in grey
     expect(await ui.find({ type: 'Text', text: 'Tools' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '51k' })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: 'Other' }))?.props.color).toBe('#8b90a0')
+    expect((await ui.find({ type: 'Text', text: 'Other' }))?.props.color).toBe(GREY)
     expect(await ui.find({ type: 'Text', text: '11k' })).toBeDefined()
     expect(await ui.find({ text: 'Memory files' })).toBeUndefined()
     // only the top three categories are listed
@@ -111,8 +116,8 @@ test('draws the band on track', async ($, on) => {
     expect(await ui.find({ text: 'Deferred tools' })).toBeUndefined()
     expect(await ui.find({ text: '5 Hour' })).toBeDefined()
     expect(await ui.find({ text: 'Weekly' })).toBeDefined()
-    expect(await ui.find({ text: 'On pace for about 81% by reset – resets in 3d 7h' })).toBeDefined()
-    expect(await ui.find({ text: 'On pace for about 32% by reset – resets in 3h 24m' })).toBeDefined()
+    expect(await ui.find({ text: 'On pace for about 80% by reset – resets in 3d 7h' })).toBeDefined()
+    expect(await ui.find({ text: 'On pace for about 35% by reset – resets in 3h 24m' })).toBeDefined()
     expect(await ui.find({ text: /·/ })).toBeUndefined()
     // legend runs highest first
     const names = (await ui.findAll({ type: 'Text' })).map(t => t.text)
@@ -138,12 +143,12 @@ test('draws the band on track', async ($, on) => {
       expect(svgs[1]?.props.alt).toMatch(/^Weekly/)
       expect(svgs[2]?.props.alt).toMatch(/^Context/)
       expect(svgs[2]?.props.height).toBe(7.5)
-      expect(String(svgs[0]?.props.source)).toContain('fill="#8b90a0"')
-      expect(String(svgs[1]?.props.source)).toContain('fill="#8b90a0"')
+      expect(String(svgs[0]?.props.source)).toContain(`fill="${GREY}"`)
+      expect(String(svgs[1]?.props.source)).toContain(`fill="${GREY}"`)
       expect(boxes.filter(b => typeof b.props.flexGrow === 'number')).toHaveLength(0)
     } else {
       // 5 hour at 8% (1 cell) with its tick near 32% (cell 5), on the terminal
-      const cells = boxes.filter(b => b.props.backgroundColor === '#8b90a0')
+      const cells = boxes.filter(b => b.props.backgroundColor === GREY)
       expect(cells.length).toBeGreaterThanOrEqual(2)
       // 4 bar segments: Messages, Tools, Other with the buffer as one grey run, free
       expect(boxes.filter(b => typeof b.props.flexGrow === 'number')).toHaveLength(4)
@@ -162,10 +167,17 @@ test('leads with a window that will run out', async ($, on) => {
   for (const surface of SURFACES) {
     const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'AbovePrompt', props: PROPS })
     const head = await ui.find({ type: 'Text', text: /^At this pace you'll run out before the .* reset\.$/ })
-    expect(head?.props.color).toBe('#f87171')
-    // 60% in 1h, blended with the usual pace (50% a window): 40% more takes 74m,
-    // 2h 46m before the reset
-    expect(await ui.find({ text: 'Limit will hit in 1h 14m – resets in 4h' })).toBeDefined()
+    // coloured by what is used (60%: grey turning yellow), never red for a forecast alone
+    expect(head?.props.color).toBe((await ui.find({ type: 'Text', text: '60%' }))?.props.color)
+    expect(head?.props.color).not.toBe(RED)
+    // the forecast tick carries the warning instead: heading for 133%, red
+    if (surface === 'desktop') {
+      const bar = (await ui.findAll({ type: 'Svg' })).find(svg => /^5 Hour/.test(String(svg.props.alt)))
+      expect(String(bar?.props.source)).toContain(`fill="${RED}"`)
+    }
+    // 60% in 1h, blended with the usual pace (50% a window): 40% more takes 2h 11m,
+    // well before the reset
+    expect(await ui.find({ text: 'Limit will hit in 2h 11m – resets in 4h' })).toBeDefined()
     await ui.unmount()
   }
 })
@@ -548,7 +560,7 @@ test('the arrow collapses the band to one row of three bars, and back', async ($
     const times = (await ui.findAll({ type: 'Text' })).filter(t => /^(\d+d )?(\d+h )?\d+[dhm]$/.test(String(t.text)))
     // the 5 hour window is not running: its whole length; Weekly resets in 3 days
     expect(times.map(t => t.text)).toEqual(['5h', '3d'])
-    for (const t of times) expect(t.props.color).toBe('#8b90a0')
+    for (const t of times) expect(t.props.color).toBe(GREY)
     expect(await ui.find({ text: 'Context' })).toBeDefined()
     // and Context with its whole window
     expect(await ui.find({ type: 'Text', text: '1M' })).toBeDefined()
@@ -558,7 +570,7 @@ test('the arrow collapses the band to one row of three bars, and back', async ($
     // the forecast tick stays on the limit bars
     if (surface === 'desktop') {
       const weekly = (await ui.findAll({ type: 'Svg' })).find(svg => /^Weekly/.test(String(svg.props.alt)))
-      expect(String(weekly?.props.source)).toContain('fill="#8b90a0"')
+      expect(String(weekly?.props.source)).toContain(`fill="${GREY}"`)
     }
     await ui.press({ key: 'collapse' })
     expect(await ui.find({ text: 'Messages' })).toBeDefined()
@@ -859,10 +871,10 @@ test('the desktop in light mode draws in the light palette', async ($, on) => {
   await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
   await clock.advance(2_000)
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
-  // green text a shade deeper than the green bars, to read on the pale band
-  expect((await ui.find({ type: 'Text', text: /^On track\./ }))?.props.color).toBe('#16a34a')
+  // the light theme's grey, deep enough to read on the pale band
+  expect((await ui.find({ type: 'Text', text: /^On track\./ }))?.props.color).toBe('#73726c')
   const weeklyBar = (await ui.findAll({ type: 'Svg' })).find(svg => /^Weekly/.test(String(svg.props.alt)))
-  expect(String(weeklyBar?.props.source)).toContain('fill="#22b856"')
+  expect(String(weeklyBar?.props.source)).toContain('fill="#73726c"')
   const before = reads
   await clock.advance(10_000)
   expect(reads).toBe(before)
@@ -872,34 +884,137 @@ test('the desktop in light mode draws in the light palette', async ($, on) => {
   await ui.unmount()
 })
 
-test('the settings saved under the old plugin name are copied over once, never over newer ones', async ($, on) => {
-  const clock = startWorld(on, { value: 10 }, [], [], 'Compact now', { collapsed: false })
-  on('env.get', (_$, e) => ({ value: (e as unknown as { name: string }).name === 'HOME' ? '/home/me' : undefined }) as never)
-  const listed: string[] = []
-  on('fs.list', (_$, e) => {
-    listed.push(String((e as unknown as { path: string }).path))
-    return { value: [{ name: 'claude-code-usage-quota_claude-code-usage-quota-mod-abc123.json', kind: 'file', size: 10, mtimeMs: 1, isLink: false }] } as never
-  })
-  on('fs.read', () => ({ value: JSON.stringify({ 'autoCompact:chat': { isOn: true, at: 40 }, collapsed: true }) }) as never)
+test('a new chat opens with the auto compact last chosen anywhere, and asks before compacting an old chat past it', async ($, on) => {
+  const percent = { value: 50 }
+  const ran: string[] = []
+  // another chat turned it on at 40%; this chat has no setting of its own
+  const clock = startWorld(on, percent, ran, [], 'Compact now', { autoCompactDefault: { isOn: true, at: 40 } })
   await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
   await clock.advance(3_000)
-  // the host gives the path in the platform's own form
-  expect(listed).toEqual([expect.stringMatching(/home[\\/]me[\\/]\.claude[\\/]plugins[\\/]store$/)])
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
   expect((await ui.find({ type: 'Input' }))?.props.value).toBe('40')
-  // collapsed was already set here: kept as it is
-  expect(await ui.find({ text: 'Weekly' })).toBeDefined()
+  // already past it: asked, never compacted unasked
+  expect(await ui.find({ type: 'Text', text: /already at 50%, past 40%/ })).toBeDefined()
+  await $.turn.complete(TURN)
+  await clock.advance(3_000)
+  expect(ran).toEqual([])
   await ui.unmount()
 })
 
+test('a chat with its own auto compact setting keeps it over the default, and its press is the next default', async ($, on) => {
+  const chat = { id: 'first' }
+  const clock = startWorld(on, { value: 10 }, [], [], 'Compact now', { autoCompactDefault: { isOn: true, at: 40 }, 'autoCompact:first': { isOn: false, at: 60 } })
+  on('session.id', () => ({ value: chat.id }) as never)
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
+  await ui.press({ key: 'auto' })
+  // a new chat (a /clear goes on under a new id) starts from that press: on, at 60%
+  chat.id = 'second'
+  await clock.advance(3_000)
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
+  expect((await ui.find({ type: 'Input' }))?.props.value).toBe('60')
+  await ui.unmount()
+})
+
+test('the band says what this chat took of the 5 hour limit, in all and by its last reply', async ($, on) => {
+  const clock = mock.clock(on, { now: NOW })
+  mock.store(on)
+  const state = { percent: 10 }
+  on('session.usage', () => ({ value: usage([{ kind: 'five_hour', percentUsed: state.percent, resetsAt: iso(3 * HOUR) }]) }))
+  answerRest(on, [])
+  on('turn.start', () => ({ turnId: 't1' }))
+  on('turn.complete', () => ({ text: '' }))
+  await $.session.measure(MEASURE)
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  // nothing counted before a reply
+  expect(await ui.find({ text: /^This chat used/ })).toBeUndefined()
+  await $.turn.start({ text: 'go', turnId: 't1' } as never)
+  state.percent = 12.5
+  await clock.advance(1_000)
+  await $.turn.complete(TURN)
+  expect(await ui.find({ text: 'This chat used 2.5% – last reply 2.5%' })).toBeDefined()
+  // use between turns (another chat, claude.ai) is not this chat's
+  state.percent = 20
+  await clock.advance(3_000)
+  await $.turn.start({ text: 'more', turnId: 't2' } as never)
+  state.percent = 20.5
+  await clock.advance(1_000)
+  await $.turn.complete(TURN)
+  expect(await ui.find({ text: 'This chat used 3% – last reply 0.5%' })).toBeDefined()
+  // a reply the whole-percent figures did not move is under 1%, never nothing
+  await $.turn.start({ text: 'again', turnId: 't3' } as never)
+  await $.turn.complete(TURN)
+  expect(await ui.find({ text: 'This chat used 3% – last reply <1%' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a 5 hour window that resets mid-turn starts the chat total over', async ($, on) => {
+  const clock = mock.clock(on, { now: NOW })
+  mock.store(on)
+  const state = { percent: 80, resetsAt: iso(10 * MIN) }
+  on('session.usage', () => ({ value: usage([{ kind: 'five_hour', percentUsed: state.percent, resetsAt: state.resetsAt }]) }))
+  answerRest(on, [])
+  on('turn.start', () => ({ turnId: 't1' }))
+  on('turn.complete', () => ({ text: '' }))
+  await $.session.measure(MEASURE)
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  await $.turn.start({ text: 'go', turnId: 't1' } as never)
+  state.percent = 81
+  await clock.advance(1_000)
+  await $.turn.complete(TURN)
+  expect(await ui.find({ text: 'This chat used 1% – last reply 1%' })).toBeDefined()
+  // the window resets while the next turn runs: 3% of the new one is all this turn's
+  await $.turn.start({ text: 'more', turnId: 't2' } as never)
+  state.percent = 3
+  state.resetsAt = iso(5 * HOUR)
+  await clock.advance(1_000)
+  await $.turn.complete(TURN)
+  expect(await ui.find({ text: 'This chat used 3% – last reply 3%' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('on by the default alone, the first reading past the % asks even when the chat opened below it', async ($, on) => {
+  const percent = { value: 30 }
+  const ran: string[] = []
+  const clock = startWorld(on, percent, ran, [], 'Compact now', { autoCompactDefault: { isOn: true, at: 40 } })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  await clock.advance(3_000)
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
+  expect(await ui.find({ type: 'Text', text: /already at/ })).toBeUndefined()
+  // the exact count lands above the estimate: asked, not compacted
+  percent.value = 45
+  await clock.advance(3_000)
+  expect(await ui.find({ type: 'Text', text: /already at 45%, past 40%/ })).toBeDefined()
+  expect(ran).toEqual([])
+  await ui.unmount()
+})
+
+test('34% a quarter hour into a 5 hour window is no run-out alarm: grey bar, grey headline', async ($, on) => {
+  // alone, 34% in 15 minutes runs to 680%; the window's own pace counts for nothing yet
+  world(on, [
+    { kind: 'five_hour', percentUsed: 34, resetsAt: iso(5 * HOUR - 15 * MIN) },
+    { kind: 'seven_day', percentUsed: 45, resetsAt: iso(5 * 24 * HOUR + 21 * HOUR) },
+  ])
+  await $.session.measure(MEASURE)
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'AbovePrompt', props: PROPS })
+    expect(await ui.find({ text: /run out/ })).toBeUndefined()
+    expect((await ui.find({ type: 'Text', text: /^On track\./ }))?.props.color).toBe(GREY)
+    expect((await ui.find({ type: 'Text', text: '34%' }))?.props.color).toBe(GREY)
+    expect((await ui.find({ type: 'Text', text: '45%' }))?.props.color).toBe(GREY)
+    await ui.unmount()
+  }
+})
+
 test('early in a window the forecast starts from the usual pace: a quick 4% does not turn it red', async ($, on) => {
-  // 4% in the first 10 minutes: alone that runs to 120%; with the usual pace, 60%
+  // 4% in the first 10 minutes: alone that runs to 120%; on the usual pace, 52%
   world(on, [{ kind: 'five_hour', percentUsed: 4, resetsAt: iso(5 * HOUR - 10 * MIN) }])
   await $.session.measure(MEASURE)
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ text: /^On track\./ })).toBeDefined()
-  expect(await ui.find({ text: 'On pace for about 60% by reset – resets in 4h 50m' })).toBeDefined()
+  expect(await ui.find({ text: 'On pace for about 52% by reset – resets in 4h 50m' })).toBeDefined()
   await ui.unmount()
 })
 
@@ -912,8 +1027,8 @@ test('the usual pace is learned from how far past windows got', async ($, on) =>
   await clock.advance(1)
   await $.session.measure(MEASURE)
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
-  // usual 20%: 4% + about 31% more
-  expect(await ui.find({ text: 'On pace for about 35% by reset – resets in 4h 50m' })).toBeDefined()
+  // usual 20%: 4% + about 19% more
+  expect(await ui.find({ text: 'On pace for about 23% by reset – resets in 4h 50m' })).toBeDefined()
   await ui.unmount()
 })
 
@@ -981,14 +1096,15 @@ test("a newer reply figure below the usage service's never pulls the band under 
   await ui.unmount()
 })
 
-test('a limit bar and its % turn amber from 75% used and red from 90%, even on track', async ($, on) => {
+test('a limit bar and its % stay grey to 50% used, turn yellow by 75% and red by 95%, even on track', async ($, on) => {
   const clock = mock.clock(on, { now: NOW })
   mock.store(on)
-  const state = { percent: 74 }
+  const state = { percent: 50 }
   // 2 hours before Weekly resets: on track at any of these
   on('session.usage', () => ({ value: usage([{ kind: 'seven_day', percentUsed: state.percent, resetsAt: iso(2 * HOUR) }]) }))
   answerRest(on, [])
-  for (const [percent, color] of [[74, '#4ade80'], [75, '#fbbf24'], [89, '#fbbf24'], [90, '#f87171']] as const) {
+  // between the stops the colour blends: 60% is 40% of the way to yellow, 85% halfway to red
+  for (const [percent, color] of [[50, GREY], [60, '#b9a578'], [75, YELLOW], [85, '#e5844b'], [95, RED]] as const) {
     state.percent = percent
     await clock.advance(1_000)
     await $.session.measure(MEASURE)
@@ -999,16 +1115,16 @@ test('a limit bar and its % turn amber from 75% used and red from 90%, even on t
   }
 })
 
-test('Context turns amber from 50% and red from 80%', async ($, on) => {
+test('Context stays grey to 25%, turns yellow by 50% and red by 80%', async ($, on) => {
   const clock = mock.clock(on, { now: NOW })
   mock.store(on)
-  const state = { percent: 49 }
+  const state = { percent: 25 }
   on('session.usage', () => {
     const u = usage([])
     return { value: { ...u, context: { ...u.context, percent: state.percent } } }
   })
   answerRest(on, [])
-  for (const [percent, color] of [[49, '#4ade80'], [50, '#fbbf24'], [79, '#fbbf24'], [80, '#f87171']] as const) {
+  for (const [percent, color] of [[25, GREY], [35, '#b9a578'], [50, YELLOW], [65, '#e5844b'], [80, RED]] as const) {
     state.percent = percent
     await clock.advance(1_000)
     await $.session.measure(MEASURE)
