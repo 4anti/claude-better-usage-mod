@@ -909,6 +909,15 @@ test('a chat with its own auto compact setting keeps it over the default, and it
   await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
+  // the switch's whole area is its press: a label of blank glyphs, never whitespace,
+  // which the desktop trims away
+  const press = await ui.find({ type: 'Button', key: 'auto' } as never)
+  expect(String((press as { props: { label?: string } } | undefined)?.props.label)).toMatch(/^⠀+$/)
+  // its name toggles it as well
+  await ui.press({ key: 'autoLabel' })
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
+  await ui.press({ key: 'autoLabel' })
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
   await ui.press({ key: 'auto' })
   // a new chat (a /clear goes on under a new id) starts from that press: on, at 60%
   chat.id = 'second'

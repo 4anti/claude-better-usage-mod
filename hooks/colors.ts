@@ -5,7 +5,7 @@ export type Palette = {
   muted: string; yellow: string; red: string; free: string; buffer: string; track: string
   /** the forecast tick on track: apart from the grey fill it may sit right beside */
   tick: string
-  palette: string[]; named: Record<string, string>; switchOff: string; switchOn: string; switchLit: string; compactLit: string
+  palette: string[]; named: Record<string, string>; switchOff: string; switchOn: string; compactLit: string
 }
 
 export const DARK: Palette = {
@@ -16,7 +16,7 @@ export const DARK: Palette = {
     Tools: '#a78bfa', Other: '#9b9a96', 'System prompt': '#a78bfa', 'System tools': '#60a5fa', 'MCP tools': '#f472b6',
     'Custom agents': '#34d399', 'Memory files': '#fbbf24', Skills: '#fb923c', Messages: '#22d3ee',
   },
-  switchOff: '#4d4d4a', switchOn: '#4ade80', switchLit: '#8a8a86', compactLit: '#555553',
+  switchOff: '#4d4d4a', switchOn: '#4ade80', compactLit: '#555553',
 }
 
 // light: the same hues, deep enough to read as text on the pale band; the tracks pale
@@ -28,7 +28,7 @@ export const LIGHT: Palette = {
     Tools: '#8b5cf6', Other: '#73726c', 'System prompt': '#8b5cf6', 'System tools': '#3b82f6', 'MCP tools': '#ec4899',
     'Custom agents': '#10b981', 'Memory files': '#f59e0b', Skills: '#f97316', Messages: '#0ea5e9',
   },
-  switchOff: '#c4c3be', switchOn: '#22c55e', switchLit: '#d0cfca', compactLit: '#dddcd7',
+  switchOff: '#c4c3be', switchOn: '#22c55e', compactLit: '#dddcd7',
 }
 
 /** grey up to the first %, fully yellow at the second, fully red at the third */

@@ -81,19 +81,20 @@ const SWITCH_PAD = 3
 // app's own button tint can't spill onto the text beside it
 const SWITCH_CELLS = 4
 // the box behind the switch measures a pixel off the drawing (19px tall, 31 wide):
-// the pill is drawn half a pixel down and right so it sits in the light's centre
+// the pill is drawn half a pixel down and right so it sits in the box's centre
 const SWITCH_NUDGE = 0.5
-// fully see-through: the unlit border, and the press's own hover tint, which drew a
-// square frame round the light (the word "transparent" draws white or nothing)
+// fully see-through: the press's own hover tint drew a square frame round the switch
+// (the word "transparent" draws white or nothing)
 const CLEAR = '#00000000'
 // a space a wrap never breaks at
 const NB = ' '
-// the switch's press: figure spaces, each a digit wide, where plain spaces collapsed
-// to one on the desktop and left only the pill's left edge clickable
-const SWITCH_PRESS = ' '.repeat(8)
+// the switch's press: braille blanks, glyphs with no ink that are not whitespace. The
+// desktop trims a label's whitespace (figure spaces too), which left the press empty,
+// only the pill's left edge clickable; wider than the switch, the box clips it
+const SWITCH_PRESS = '\u2800'.repeat(8)
 
 function switchSvg(isOn: boolean, c: Palette): string {
-  // the pill sits inset by PAD: the light under the pointer shows around it
+  // the pill sits inset by PAD within its box
   const w = SWITCH_W - 2 * SWITCH_PAD
   const tall = SWITCH_H - 2 * SWITCH_PAD
   const p = SWITCH_PAD
@@ -215,14 +216,11 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
           then a wide gap so the field reads as the switch's, not Compact's */}
       {Svg ? (
         <Box key="autoSwitch" width={SWITCH_CELLS} height={1} overflow="hidden">
-          {/* three layers, each the box's full size, so all share one centre: the
-              rounded light (unlit: an invisible border), the pill, the press */}
-          <Box position="absolute" top={0} left={0} width={SWITCH_CELLS} height={1} borderStyle="round" borderColor={CLEAR} hover={{ backgroundColor: c.switchLit, borderColor: c.switchLit }} />
+          {/* two layers sharing one centre: the pill, and over it a chromeless button
+              that takes the click */}
           <Box position="absolute" top={0} left={0} width={SWITCH_CELLS} height={1} alignItems="center" justifyContent="center">
             <Svg alt={`Auto compact ${auto.isOn ? 'on' : 'off'}`} source={switchSvg(auto.isOn, c)} width={SWITCH_W} height={SWITCH_H} />
           </Box>
-          {/* a chromeless button over all of it takes the click; wider than the box,
-              which clips it to the switch */}
           <Box position="absolute" top={0} left={0}>
             <Button key="auto" label={SWITCH_PRESS} plain hover={{ backgroundColor: CLEAR }} onPress={() => act.toggleAuto(auto)} />
           </Box>
@@ -230,7 +228,11 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
       ) : (
         <Button key="auto" label={auto.isOn ? '●' : '○'} plain onPress={() => act.toggleAuto(auto)} />
       )}
-      <Text color={auto.isOn ? undefined : c.muted}>Auto compact</Text>
+      {/* the name toggles it too, as a label does its checkbox: a target that is
+          never smaller than its words */}
+      <Button key="autoLabel" plain onPress={() => act.toggleAuto(auto)}>
+        <Text color={auto.isOn ? undefined : c.muted}>Auto compact</Text>
+      </Button>
       {auto.isOn ? (
         // the field (3 digits) sets itself once typing pauses; a plain % right after it
         <Box flexDirection="row" alignItems="center">
