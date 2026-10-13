@@ -4,8 +4,8 @@
 
 <br>
 
-[![Tests](https://img.shields.io/github/actions/workflow/status/4anti/claude-usage-quota-mod/test.yml?branch=main&style=for-the-badge&labelColor=1f1e1d&label=tests&logo=githubactions&logoColor=white)](https://github.com/4anti/claude-usage-quota-mod/actions/workflows/test.yml)
-[![Version](https://img.shields.io/badge/version-0.4.1-d97757?style=for-the-badge&labelColor=1f1e1d)](https://github.com/4anti/claude-usage-quota-mod/releases)
+[![Tests](https://img.shields.io/github/actions/workflow/status/4anti/claude-better-usage-mod/test.yml?branch=main&style=for-the-badge&labelColor=1f1e1d&label=tests&logo=githubactions&logoColor=white)](https://github.com/4anti/claude-better-usage-mod/actions/workflows/test.yml)
+[![Version](https://img.shields.io/badge/version-0.4.1-d97757?style=for-the-badge&labelColor=1f1e1d)](https://github.com/4anti/claude-better-usage-mod/releases)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.287%2B-e5b54a?style=for-the-badge&labelColor=1f1e1d)](https://claude.com/claude-code)
 [![Works in](https://img.shields.io/badge/works_in-Desktop_%2B_Terminal-a78bfa?style=for-the-badge&labelColor=1f1e1d)](#-install)
 [![Languages](https://img.shields.io/badge/languages-16-22d3ee?style=for-the-badge&labelColor=1f1e1d)](#-languages)
@@ -134,13 +134,13 @@ Needs **Claude Code 2.1.287 or later**, signed in with a **Pro or Max** plan. On
 **🖥️ Desktop app:** in the **Code** tab, send this as a message, allow the `claude plugin` commands if asked, then quit and reopen the app:
 
 ```text
-Install the usage-quota plugin from the GitHub marketplace 4anti/claude-usage-quota-mod
+Install the usage-quota plugin from the GitHub marketplace 4anti/claude-better-usage-mod
 ```
 
 **⌨️ Terminal:** inside `claude`, run these one at a time:
 
 ```text
-/plugin marketplace add 4anti/claude-usage-quota-mod
+/plugin marketplace add 4anti/claude-better-usage-mod
 ```
 
 ```text
@@ -166,7 +166,7 @@ Install the usage-quota plugin from the GitHub marketplace 4anti/claude-usage-qu
 Install:
 
 ```bash
-claude plugin marketplace add 4anti/claude-usage-quota-mod
+claude plugin marketplace add 4anti/claude-better-usage-mod
 claude plugin install usage-quota@4anti-mods
 ```
 
@@ -259,11 +259,11 @@ Everything runs on your machine with the same access Claude Code has. The mod **
 Clone the repo, then run its tests, or load it into a session from the folder:
 
 ```bash
-claude plugin test ./claude-usage-quota-mod
+claude plugin test ./claude-better-usage-mod
 ```
 
 ```bash
-claude --plugin-dir ./claude-usage-quota-mod
+claude --plugin-dir ./claude-better-usage-mod
 ```
 
 | File | Role |
