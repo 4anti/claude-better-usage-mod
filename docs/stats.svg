@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="170" viewBox="0 0 1200 170" role="img" aria-label="2 limits tracked, 16 languages, 0 tokens used, 3 second live refresh">
+<style>
+.sans{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif}
+.num{font-size:56px;font-weight:800;letter-spacing:-1px}
+.unit{font-size:30px;font-weight:700;letter-spacing:0}
+.lbl{font-size:19px;font-weight:600;fill:#f3f2ee}
+.sub{font-size:16px;fill:#8a8984}
+.f{opacity:0}
+.fin{opacity:1}
+.blob{transform-box:fill-box;transform-origin:center}
+.b1{animation:drift1 12s ease-in-out infinite}
+.b2{animation:drift2 14s ease-in-out infinite}
+.b3{animation:drift3 11s ease-in-out infinite}
+.b4{animation:drift4 13s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1);opacity:.30}50%{transform:translate(70px,18px) scale(1.15);opacity:.20}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1);opacity:.20}50%{transform:translate(-60px,-14px) scale(.92);opacity:.32}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1);opacity:.26}50%{transform:translate(55px,-16px) scale(1.12);opacity:.18}}
+@keyframes drift4{0%,100%{transform:translate(0,0) scale(.95);opacity:.20}50%{transform:translate(-65px,14px) scale(1.1);opacity:.30}}
+.shine{animation:shine 7s cubic-bezier(.45,0,.25,1) infinite}
+@keyframes shine{0%,62%{transform:translateX(-260px)}100%{transform:translateX(1460px)}}
+.lang{opacity:0;animation:lang 25.6s linear infinite}
+@keyframes lang{0%,0.586%{opacity:0;transform:translateY(6px)}1.758%,6.25%{opacity:1;transform:translateY(0)}7.227%,100%{opacity:0;transform:translateY(-6px)}}
+.hideAnim{animation:hide 1s infinite}
+@keyframes hide{0%,100%{opacity:0}}
+.edge{animation:edge 5.6s ease-in-out infinite}
+@keyframes edge{0%,100%{opacity:.5}50%{opacity:1}}
+.ping{transform-box:fill-box;transform-origin:center;animation:ping 3s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.7}70%,100%{transform:scale(3.2);opacity:0}}
+.mb{transform-box:fill-box;transform-origin:left center}
+.mb1{animation:mb1 10s ease-in-out infinite}
+.mb2{animation:mb2 10s ease-in-out infinite}
+@keyframes mb1{0%{transform:scaleX(.05);fill:#9b9a96}45%{transform:scaleX(.62);fill:#d9bb7c}80%{transform:scaleX(.82);fill:#e5b54a}95%{transform:scaleX(.82);fill:#e5b54a;opacity:1}100%{transform:scaleX(.82);opacity:0}}
+@keyframes mb2{0%{transform:scaleX(.03);fill:#9b9a96}50%{transform:scaleX(.6);fill:#e5b54a}82%{transform:scaleX(.97);fill:#e5534b}95%{transform:scaleX(.97);fill:#e5534b;opacity:1}100%{transform:scaleX(.97);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+
+.t0g{transform-box:fill-box;transform-origin:center;animation:t0g 10s ease-in-out infinite}
+@keyframes t0g{0%{opacity:.12;transform:scale(.8)}9.5%{opacity:.16;transform:scale(.85)}13%{opacity:.5;transform:scale(1.12)}25.5%{opacity:.3;transform:scale(1)}65%{opacity:.38;transform:scale(1.06)}95%{opacity:.28;transform:scale(1)}100%{opacity:.12;transform:scale(.8)}}
+.t0f0{transform-box:fill-box;transform-origin:center;animation:t0f0 10s linear infinite}@keyframes t0f0{0%{opacity:0}2%{opacity:1}4.166%{opacity:1}4.167%,100%{opacity:0}}
+.t0f1{transform-box:fill-box;transform-origin:center;animation:t0f1 10s linear infinite}@keyframes t0f1{0%,4.166%{opacity:0}4.167%,9.499%{opacity:1}9.5%,100%{opacity:0}}
+.t0f2{transform-box:fill-box;transform-origin:center;animation:t0f2 10s linear infinite}@keyframes t0f2{0%,9.499%{opacity:0;transform:scale(1)}9.5%{opacity:1;transform:scale(1.07)}12%{transform:scale(1)}95%{opacity:1;transform:scale(1)}98%,100%{opacity:0}}
+.t1g{transform-box:fill-box;transform-origin:center;animation:t1g 10s ease-in-out infinite}
+@keyframes t1g{0%{opacity:.12;transform:scale(.8)}17%{opacity:.16;transform:scale(.85)}20.5%{opacity:.5;transform:scale(1.12)}33%{opacity:.3;transform:scale(1)}65%{opacity:.38;transform:scale(1.06)}95%{opacity:.28;transform:scale(1)}100%{opacity:.12;transform:scale(.8)}}
+.t1f0{transform-box:fill-box;transform-origin:center;animation:t1f0 10s linear infinite}@keyframes t1f0{0%{opacity:0}2%{opacity:1}5.204%{opacity:1}5.205%,100%{opacity:0}}
+.t1f1{transform-box:fill-box;transform-origin:center;animation:t1f1 10s linear infinite}@keyframes t1f1{0%,5.204%{opacity:0}5.205%,5.927%{opacity:1}5.928%,100%{opacity:0}}
+.t1f2{transform-box:fill-box;transform-origin:center;animation:t1f2 10s linear infinite}@keyframes t1f2{0%,5.927%{opacity:0}5.928%,6.708%{opacity:1}6.709%,100%{opacity:0}}
+.t1f3{transform-box:fill-box;transform-origin:center;animation:t1f3 10s linear infinite}@keyframes t1f3{0%,6.708%{opacity:0}6.709%,7.585%{opacity:1}7.586%,100%{opacity:0}}
+.t1f4{transform-box:fill-box;transform-origin:center;animation:t1f4 10s linear infinite}@keyframes t1f4{0%,7.585%{opacity:0}7.586%,8.596%{opacity:1}8.597%,100%{opacity:0}}
+.t1f5{transform-box:fill-box;transform-origin:center;animation:t1f5 10s linear infinite}@keyframes t1f5{0%,8.596%{opacity:0}8.597%,9.779%{opacity:1}9.78%,100%{opacity:0}}
+.t1f6{transform-box:fill-box;transform-origin:center;animation:t1f6 10s linear infinite}@keyframes t1f6{0%,9.779%{opacity:0}9.78%,11.173%{opacity:1}11.174%,100%{opacity:0}}
+.t1f7{transform-box:fill-box;transform-origin:center;animation:t1f7 10s linear infinite}@keyframes t1f7{0%,11.173%{opacity:0}11.174%,12.815%{opacity:1}12.816%,100%{opacity:0}}
+.t1f8{transform-box:fill-box;transform-origin:center;animation:t1f8 10s linear infinite}@keyframes t1f8{0%,12.815%{opacity:0}12.816%,14.744%{opacity:1}14.745%,100%{opacity:0}}
+.t1f9{transform-box:fill-box;transform-origin:center;animation:t1f9 10s linear infinite}@keyframes t1f9{0%,14.744%{opacity:0}14.745%,16.999%{opacity:1}17%,100%{opacity:0}}
+.t1f10{transform-box:fill-box;transform-origin:center;animation:t1f10 10s linear infinite}@keyframes t1f10{0%,16.999%{opacity:0;transform:scale(1)}17%{opacity:1;transform:scale(1.07)}19.5%{transform:scale(1)}95%{opacity:1;transform:scale(1)}98%,100%{opacity:0}}
+.t2g{transform-box:fill-box;transform-origin:center;animation:t2g 10s ease-in-out infinite}
+@keyframes t2g{0%{opacity:.12;transform:scale(.8)}6.5%{opacity:.16;transform:scale(.85)}10%{opacity:.5;transform:scale(1.12)}22.5%{opacity:.3;transform:scale(1)}65%{opacity:.38;transform:scale(1.06)}95%{opacity:.28;transform:scale(1)}100%{opacity:.12;transform:scale(.8)}}
+.t2f0{transform-box:fill-box;transform-origin:center;animation:t2f0 10s linear infinite}@keyframes t2f0{0%,6.5%{opacity:0;transform:scale(.55)}9.5%{opacity:1;transform:scale(1.1)}11.5%{transform:scale(1)}95%{opacity:1;transform:scale(1)}98%,100%{opacity:0;transform:scale(1)}}
+.t3g{transform-box:fill-box;transform-origin:center;animation:t3g 10s ease-in-out infinite}
+@keyframes t3g{0%{opacity:.12;transform:scale(.8)}15.5%{opacity:.16;transform:scale(.85)}19%{opacity:.5;transform:scale(1.12)}31.5%{opacity:.3;transform:scale(1)}65%{opacity:.38;transform:scale(1.06)}95%{opacity:.28;transform:scale(1)}100%{opacity:.12;transform:scale(.8)}}
+.t3f0{transform-box:fill-box;transform-origin:center;animation:t3f0 10s linear infinite}@keyframes t3f0{0%{opacity:0}2%{opacity:1}10.166%{opacity:1}10.167%,100%{opacity:0}}
+.t3f1{transform-box:fill-box;transform-origin:center;animation:t3f1 10s linear infinite}@keyframes t3f1{0%,10.166%{opacity:0}10.167%,15.499%{opacity:1}15.5%,100%{opacity:0}}
+.t3f2{transform-box:fill-box;transform-origin:center;animation:t3f2 10s linear infinite}@keyframes t3f2{0%,15.499%{opacity:0;transform:scale(1)}15.5%{opacity:1;transform:scale(1.07)}18%{transform:scale(1)}95%{opacity:1;transform:scale(1)}98%,100%{opacity:0}}</style>
+<defs>
+<linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
+<clipPath id="cardClip"><rect x="1" y="1" width="1198" height="168" rx="18"/></clipPath>
+<filter id="blur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="38"/></filter>
+<filter id="eglow" x="-20%" y="-300%" width="140%" height="700%"><feGaussianBlur stdDeviation="3"/></filter>
+<filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="20"/></filter>
+<linearGradient id="shineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".09"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<clipPath id="tilesClip"><rect x="24" y="18" width="276" height="134" rx="14"/><rect x="316" y="18" width="276" height="134" rx="14"/><rect x="608" y="18" width="276" height="134" rx="14"/><rect x="900" y="18" width="276" height="134" rx="14"/></clipPath>
+
+<linearGradient id="t0n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6c3a6"/><stop offset="1" stop-color="#d97757"/></linearGradient>
+<linearGradient id="t0s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d97757" stop-opacity=".6"/><stop offset="1" stop-color="#d97757" stop-opacity=".1"/></linearGradient>
+<linearGradient id="t0e" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d97757" stop-opacity="0"/><stop offset=".5" stop-color="#f6c3a6"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></linearGradient>
+<linearGradient id="t1n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ddd2fe"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+<linearGradient id="t1s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a78bfa" stop-opacity=".6"/><stop offset="1" stop-color="#a78bfa" stop-opacity=".1"/></linearGradient>
+<linearGradient id="t1e" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a78bfa" stop-opacity="0"/><stop offset=".5" stop-color="#ddd2fe"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></linearGradient>
+<linearGradient id="t2n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c1f7d4"/><stop offset="1" stop-color="#4ade80"/></linearGradient>
+<linearGradient id="t2s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4ade80" stop-opacity=".6"/><stop offset="1" stop-color="#4ade80" stop-opacity=".1"/></linearGradient>
+<linearGradient id="t2e" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4ade80" stop-opacity="0"/><stop offset=".5" stop-color="#c1f7d4"/><stop offset="1" stop-color="#4ade80" stop-opacity="0"/></linearGradient>
+<linearGradient id="t3n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b5f5fd"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+<linearGradient id="t3s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".6"/><stop offset="1" stop-color="#22d3ee" stop-opacity=".1"/></linearGradient>
+<linearGradient id="t3e" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee" stop-opacity="0"/><stop offset=".5" stop-color="#b5f5fd"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient></defs>
+<rect x=".5" y=".5" width="1199" height="169" rx="18" fill="url(#cardBg)" stroke="#3a3936"/>
+<g clip-path="url(#cardClip)"><g filter="url(#blur)">
+<circle class="blob b1" opacity=".25" cx="150" cy="40" r="105" fill="#d97757"/>
+<circle class="blob b2" opacity=".25" cx="470" cy="150" r="95" fill="#e5b54a"/>
+<circle class="blob b3" opacity=".25" cx="760" cy="30" r="100" fill="#a78bfa"/>
+<circle class="blob b4" opacity=".25" cx="1080" cy="140" r="105" fill="#22d3ee"/>
+</g></g>
+<rect x="24.5" y="18.5" width="275" height="133" rx="14" fill="#ffffff" fill-opacity=".035" stroke="url(#t0s)"/>
+<g class="edge" style="animation-delay:0s"><rect x="52" y="16" width="220" height="5" rx="2.5" fill="url(#t0e)" filter="url(#eglow)"/><rect x="52" y="17.5" width="220" height="2" rx="1" fill="url(#t0e)"/></g>
+<ellipse class="t0g" cx="162" cy="68" rx="70" ry="34" fill="#d97757" filter="url(#soft)" opacity=".3"/>
+<text class="sans num f t0f0" x="162" y="88" text-anchor="middle" fill="url(#t0n)">0</text>
+<text class="sans num f t0f1" x="162" y="88" text-anchor="middle" fill="url(#t0n)">1</text>
+<text class="sans num fin t0f2" x="162" y="88" text-anchor="middle" fill="url(#t0n)">2</text>
+<text class="sans lbl" x="162" y="118" text-anchor="middle">limits tracked</text>
+<text class="sans sub" x="162" y="140" text-anchor="middle">5 Hour + Weekly</text>
+<rect x="228" y="34" width="52" height="6" rx="3" fill="#333332"/><rect class="mb mb1" x="228" y="34" width="52" height="6" rx="3" fill="#e5b54a" style="transform:scaleX(.82)"/>
+<rect x="228" y="45" width="52" height="6" rx="3" fill="#333332"/><rect class="mb mb2" x="228" y="45" width="52" height="6" rx="3" fill="#e5534b" style="transform:scaleX(.97)"/>
+<rect x="316.5" y="18.5" width="275" height="133" rx="14" fill="#ffffff" fill-opacity=".035" stroke="url(#t1s)"/>
+<g class="edge" style="animation-delay:-1.4s"><rect x="344" y="16" width="220" height="5" rx="2.5" fill="url(#t1e)" filter="url(#eglow)"/><rect x="344" y="17.5" width="220" height="2" rx="1" fill="url(#t1e)"/></g>
+<ellipse class="t1g" cx="454" cy="68" rx="70" ry="34" fill="#a78bfa" filter="url(#soft)" opacity=".3"/>
+<text class="sans num f t1f0" x="454" y="88" text-anchor="middle" fill="url(#t1n)">0</text>
+<text class="sans num f t1f1" x="454" y="88" text-anchor="middle" fill="url(#t1n)">2</text>
+<text class="sans num f t1f2" x="454" y="88" text-anchor="middle" fill="url(#t1n)">4</text>
+<text class="sans num f t1f3" x="454" y="88" text-anchor="middle" fill="url(#t1n)">6</text>
+<text class="sans num f t1f4" x="454" y="88" text-anchor="middle" fill="url(#t1n)">8</text>
+<text class="sans num f t1f5" x="454" y="88" text-anchor="middle" fill="url(#t1n)">10</text>
+<text class="sans num f t1f6" x="454" y="88" text-anchor="middle" fill="url(#t1n)">12</text>
+<text class="sans num f t1f7" x="454" y="88" text-anchor="middle" fill="url(#t1n)">13</text>
+<text class="sans num f t1f8" x="454" y="88" text-anchor="middle" fill="url(#t1n)">14</text>
+<text class="sans num f t1f9" x="454" y="88" text-anchor="middle" fill="url(#t1n)">15</text>
+<text class="sans num fin t1f10" x="454" y="88" text-anchor="middle" fill="url(#t1n)">16</text>
+<text class="sans lbl" x="454" y="118" text-anchor="middle">languages</text>
+<text class="sans sub hideAnim" x="454" y="140" text-anchor="middle">English · Türkçe · 日本語 · +13</text>
+<text class="sans sub lang" style="animation-delay:0s" x="454" y="140" text-anchor="middle">English</text>
+<text class="sans sub lang" style="animation-delay:1.6s" x="454" y="140" text-anchor="middle">Türkçe</text>
+<text class="sans sub lang" style="animation-delay:3.2s" x="454" y="140" text-anchor="middle">Deutsch</text>
+<text class="sans sub lang" style="animation-delay:4.8s" x="454" y="140" text-anchor="middle">Français</text>
+<text class="sans sub lang" style="animation-delay:6.4s" x="454" y="140" text-anchor="middle">Español</text>
+<text class="sans sub lang" style="animation-delay:8s" x="454" y="140" text-anchor="middle">Português</text>
+<text class="sans sub lang" style="animation-delay:9.6s" x="454" y="140" text-anchor="middle">Italiano</text>
+<text class="sans sub lang" style="animation-delay:11.2s" x="454" y="140" text-anchor="middle">Nederlands</text>
+<text class="sans sub lang" style="animation-delay:12.8s" x="454" y="140" text-anchor="middle">Polski</text>
+<text class="sans sub lang" style="animation-delay:14.4s" x="454" y="140" text-anchor="middle">Русский</text>
+<text class="sans sub lang" style="animation-delay:16s" x="454" y="140" text-anchor="middle">Українська</text>
+<text class="sans sub lang" style="animation-delay:17.6s" x="454" y="140" text-anchor="middle">日本語</text>
+<text class="sans sub lang" style="animation-delay:19.2s" x="454" y="140" text-anchor="middle">한국어</text>
+<text class="sans sub lang" style="animation-delay:20.8s" x="454" y="140" text-anchor="middle">简体中文</text>
+<text class="sans sub lang" style="animation-delay:22.4s" x="454" y="140" text-anchor="middle">繁體中文</text>
+<text class="sans sub lang" style="animation-delay:24s" x="454" y="140" text-anchor="middle">Bahasa Indonesia</text>
+<rect x="608.5" y="18.5" width="275" height="133" rx="14" fill="#ffffff" fill-opacity=".035" stroke="url(#t2s)"/>
+<g class="edge" style="animation-delay:-2.8s"><rect x="636" y="16" width="220" height="5" rx="2.5" fill="url(#t2e)" filter="url(#eglow)"/><rect x="636" y="17.5" width="220" height="2" rx="1" fill="url(#t2e)"/></g>
+<ellipse class="t2g" cx="746" cy="68" rx="70" ry="34" fill="#4ade80" filter="url(#soft)" opacity=".3"/>
+<text class="sans num fin t2f0" x="746" y="88" text-anchor="middle" fill="url(#t2n)">0</text>
+<text class="sans lbl" x="746" y="118" text-anchor="middle">tokens used</text>
+<text class="sans sub" x="746" y="140" text-anchor="middle">never counts toward limits</text>
+<rect x="900.5" y="18.5" width="275" height="133" rx="14" fill="#ffffff" fill-opacity=".035" stroke="url(#t3s)"/>
+<g class="edge" style="animation-delay:-4.199999999999999s"><rect x="928" y="16" width="220" height="5" rx="2.5" fill="url(#t3e)" filter="url(#eglow)"/><rect x="928" y="17.5" width="220" height="2" rx="1" fill="url(#t3e)"/></g>
+<ellipse class="t3g" cx="1038" cy="68" rx="70" ry="34" fill="#22d3ee" filter="url(#soft)" opacity=".3"/>
+<text class="sans num f t3f0" x="1038" y="88" text-anchor="middle" fill="url(#t3n)">1<tspan class="unit"> s</tspan></text>
+<text class="sans num f t3f1" x="1038" y="88" text-anchor="middle" fill="url(#t3n)">2<tspan class="unit"> s</tspan></text>
+<text class="sans num fin t3f2" x="1038" y="88" text-anchor="middle" fill="url(#t3n)">3<tspan class="unit"> s</tspan></text>
+<text class="sans lbl" x="1038" y="118" text-anchor="middle">live refresh</text>
+<text class="sans sub" x="1038" y="140" text-anchor="middle">context · plan every 2 min</text>
+<circle class="ping" cx="1152" cy="40" r="5" fill="#22d3ee"/><circle cx="1152" cy="40" r="5" fill="#22d3ee"/>
+<g clip-path="url(#tilesClip)"><g transform="skewX(-18)"><rect class="shine" x="0" y="0" width="220" height="170" fill="url(#shineG)" style="transform:translateX(-260px)"/></g></g>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Compact and Auto compact: the switch turns on, the context bar fills to the 30% marker and squeezes down</title>
+<style>
+.blob{transform-box:fill-box;transform-origin:center;animation:drift 12s ease-in-out infinite alternate}
+.b1{animation-duration:10s;animation-delay:-4s}.b2{animation-duration:14s;animation-delay:-7s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-14px) scale(1.12)}100%{transform:translate(-22px,12px) scale(.94)}}
+.sheen{animation:sheen 7s ease-in-out infinite}
+@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}
+
+.sw{fill:#4ade80;animation:sw 9s ease-in-out infinite -3.6s}
+@keyframes sw{0%,3%{fill:#4d4d4a}7%,92%{fill:#4ade80}96%,100%{fill:#4d4d4a}}
+.kn{transform:translateX(20px);animation:kn 9s ease-in-out infinite -3.6s}
+@keyframes kn{0%,3%{transform:translateX(0)}7%,92%{transform:translateX(20px)}96%,100%{transform:translateX(0)}}
+.swg{animation:swg 9s ease-in-out infinite -3.6s}
+@keyframes swg{0%,3%{opacity:0}8%,92%{opacity:1}96%,100%{opacity:0}}
+.cf{transform:scaleX(.26);transform-origin:32px 107px;animation:cf 9s linear infinite -3.6s}
+@keyframes cf{0%,10%{transform:scaleX(.08)}48%,53%{transform:scaleX(.3);animation-timing-function:cubic-bezier(.5,0,.3,1.2)}60%,64%{transform:scaleX(.06)}92%,100%{transform:scaleX(.08)}}
+.sq{transform-origin:280px 107px;animation:sq 9s ease-in-out infinite -3.6s}
+@keyframes sq{0%,53%{transform:scale(1,1)}55%{transform:scale(1,.45)}57.5%{transform:scale(1,1.3)}60%{transform:scale(1,.9)}62%,100%{transform:scale(1,1)}}
+.num{transform:translateY(-480px);animation:num 9s linear infinite -3.6s}
+@keyframes num{0%,10%{transform:translateY(-48px);animation-timing-function:steps(22,end)}48%,53%{transform:translateY(-576px);animation-timing-function:steps(24,end)}60%,64%{transform:translateY(0);animation-timing-function:steps(2,end)}92%,100%{transform:translateY(-48px)}}
+.mk{opacity:0;animation:mk 9s ease-out infinite -3.6s}
+@keyframes mk{0%,45%{opacity:0}50%{opacity:1}60%,100%{opacity:0}}
+.done{opacity:0;animation:done 9s ease-out infinite -3.6s}
+@keyframes done{0%,58%{opacity:0;transform:translateY(6px)}62%,86%{opacity:1;transform:translateY(0)}90%,100%{opacity:0;transform:translateY(0)}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+<defs>
+<linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
+<clipPath id="cc"><rect x="1" y="1" width="558" height="298" rx="18"/></clipPath>
+<linearGradient id="tg" x1="32" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0a483"/><stop offset=".45" stop-color="#d97757"/><stop offset="1" stop-color="#e5b54a"/></linearGradient>
+<linearGradient id="sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<clipPath id="tc"><text x="32" y="212" font-size="27" font-weight="700">Compact &amp; Auto compact</text></clipPath>
+<radialGradient id="bl0"><stop offset="0" stop-color="#4ade80" stop-opacity="0.2"/><stop offset="1" stop-color="#4ade80" stop-opacity="0"/></radialGradient><radialGradient id="bl1"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.26"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient><radialGradient id="bl2"><stop offset="0" stop-color="#a78bfa" stop-opacity="0.22"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
+<clipPath id="trk"><rect x="32" y="100" width="496" height="14" rx="7"/></clipPath>
+<clipPath id="nclip"><rect x="330" y="70" width="202" height="24"/></clipPath>
+<radialGradient id="gg"><stop offset="0" stop-color="#4ade80" stop-opacity=".45"/><stop offset="1" stop-color="#4ade80" stop-opacity="0"/></radialGradient>
+</defs>
+<rect x=".5" y=".5" width="559" height="299" rx="18" fill="url(#card)" stroke="#3a3936"/>
+<g clip-path="url(#cc)"><circle class="blob b0" cx="60" cy="40" r="150" fill="url(#bl0)"/><circle class="blob b1" cx="300" cy="110" r="230" fill="url(#bl1)"/><circle class="blob b2" cx="520" cy="260" r="180" fill="url(#bl2)"/></g>
+<circle class="swg" cx="55" cy="43" r="36" fill="url(#gg)"/>
+<rect class="sw" x="32" y="30" width="46" height="26" rx="13"/>
+<circle class="kn" cx="45" cy="43" r="10" fill="#fff"/>
+<text x="90" y="49" font-size="17" fill="#b8b6b0">Auto compact</text>
+<rect x="200" y="31" width="52" height="24" rx="7" fill="#1c1b1a" stroke="#4a4946"/>
+<text x="226" y="48.5" text-anchor="middle" font-size="16" font-weight="700" fill="#f3f2ee">30%</text>
+<rect x="436" y="29" width="92" height="28" rx="8" fill="#2f2e2c" stroke="#4a4946"/>
+<text x="482" y="48.5" text-anchor="middle" font-size="16" font-weight="700" fill="#f3f2ee">Compact</text>
+<text x="32" y="88" font-size="19" font-weight="700" fill="#f3f2ee">Context</text>
+<g clip-path="url(#nclip)"><g class="num" font-size="17" fill="#b8b6b0"><text x="528" y="88" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">6%</tspan> used</text><text x="528" y="112" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">7%</tspan> used</text><text x="528" y="136" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">8%</tspan> used</text><text x="528" y="160" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">9%</tspan> used</text><text x="528" y="184" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">10%</tspan> used</text><text x="528" y="208" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">11%</tspan> used</text><text x="528" y="232" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">12%</tspan> used</text><text x="528" y="256" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">13%</tspan> used</text><text x="528" y="280" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">14%</tspan> used</text><text x="528" y="304" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">15%</tspan> used</text><text x="528" y="328" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">16%</tspan> used</text><text x="528" y="352" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">17%</tspan> used</text><text x="528" y="376" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">18%</tspan> used</text><text x="528" y="400" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">19%</tspan> used</text><text x="528" y="424" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">20%</tspan> used</text><text x="528" y="448" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">21%</tspan> used</text><text x="528" y="472" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">22%</tspan> used</text><text x="528" y="496" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">23%</tspan> used</text><text x="528" y="520" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">24%</tspan> used</text><text x="528" y="544" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">25%</tspan> used</text><text x="528" y="568" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">26%</tspan> used</text><text x="528" y="592" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">27%</tspan> used</text><text x="528" y="616" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">28%</tspan> used</text><text x="528" y="640" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">29%</tspan> used</text><text x="528" y="664" text-anchor="end"><tspan font-weight="700" fill="#f3f2ee">30%</tspan> used</text></g></g>
+<g class="sq"><rect x="32" y="100" width="496" height="14" rx="7" fill="#333332"/>
+<g clip-path="url(#trk)"><g class="cf"><rect x="32" y="100" width="307.5" height="14" fill="#22d3ee"/><rect x="339.5" y="100" width="89.3" height="14" fill="#a78bfa"/><rect x="428.8" y="100" width="99.2" height="14" fill="#9b9a96"/><rect x="32" y="100" width="496" height="14" fill="url(#gloss)"/></g></g></g>
+<circle class="mk" cx="180.8" cy="107" r="22" fill="url(#gg)"/>
+<line x1="180.8" y1="94" x2="180.8" y2="120" stroke="#dcdbd6" stroke-width="2.5" stroke-linecap="round"/>
+<text x="180.8" y="140" text-anchor="middle" font-size="16" fill="#8a8984">auto at <tspan font-weight="700" fill="#dcdbd6">30%</tspan></text>
+<g class="done"><path d="M422 134 l4.5 4.5 l8.5 -9" fill="none" stroke="#4ade80" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="528" y="140" text-anchor="end" font-size="16" font-weight="700" fill="#4ade80">Compacted</text></g>
+<circle cx="38" cy="163" r="5" fill="#22d3ee"/><text x="49" y="169" font-size="16" fill="#8a8984">Messages</text>
+<circle cx="140" cy="163" r="5" fill="#a78bfa"/><text x="151" y="169" font-size="16" fill="#8a8984">Tools</text>
+<circle cx="210" cy="163" r="5" fill="#9b9a96"/><text x="221" y="169" font-size="16" fill="#8a8984">Other</text>
+<text x="32" y="212" font-size="27" font-weight="700" fill="url(#tg)">Compact &amp; Auto compact</text>
+<g clip-path="url(#tc)"><rect class="sheen" x="-140" y="180" width="120" height="40" fill="url(#sh)" style="animation-delay:4.8s"/></g>
+<text x="32" y="244" font-size="18" fill="#b8b6b0">One click, or automatically at your % —</text><text x="32" y="268" font-size="18" fill="#b8b6b0">never mid-reply.</text>
+</svg>

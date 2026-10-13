@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="24" viewBox="0 0 1200 24">
+<title>Section divider</title>
+<style>
+.glow{animation:breathe 10s ease-in-out infinite alternate}
+@keyframes breathe{0%{opacity:.45}100%{opacity:.95}}
+.run{animation:run 6s ease-in-out infinite}
+@keyframes run{0%{transform:translateX(-160px)}65%,100%{transform:translateX(1480px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<defs>
+<linearGradient id="line" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#d97757" stop-opacity="0"/>
+ <stop offset=".1" stop-color="#d97757"/>
+ <stop offset=".5" stop-color="#e5b54a"/>
+ <stop offset=".9" stop-color="#a78bfa"/>
+ <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="edge" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+ <stop offset=".1" stop-color="#fff"/>
+ <stop offset=".9" stop-color="#fff"/>
+ <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+ <stop offset="0" stop-color="#fff3dc" stop-opacity="0"/>
+ <stop offset=".5" stop-color="#fff3dc" stop-opacity=".95"/>
+ <stop offset="1" stop-color="#fff3dc" stop-opacity="0"/>
+</linearGradient>
+<radialGradient id="halo">
+ <stop offset="0" stop-color="#f0a483" stop-opacity=".75"/>
+ <stop offset="1" stop-color="#f0a483" stop-opacity="0"/>
+</radialGradient>
+<filter id="blur" filterUnits="userSpaceOnUse" x="-20" y="0" width="1240" height="24"><feGaussianBlur stdDeviation="3.5"/></filter>
+<clipPath id="core"><rect x="0" y="10" width="1200" height="4" rx="2"/></clipPath>
+<mask id="fade" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="24"><rect width="1200" height="24" fill="url(#edge)"/></mask>
+</defs>
+<rect class="glow" x="0" y="8" width="1200" height="8" rx="4" fill="url(#line)" filter="url(#blur)"/>
+<rect x="0" y="10" width="1200" height="4" rx="2" fill="url(#line)"/>
+<g mask="url(#fade)">
+ <g class="run"><ellipse cx="-120" cy="12" rx="150" ry="12" fill="url(#halo)"/></g>
+ <g clip-path="url(#core)"><g class="run"><rect x="-260" y="10" width="280" height="4" fill="url(#shine)"/></g></g>
+</g>
+</svg>
