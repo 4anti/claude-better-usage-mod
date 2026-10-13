@@ -22,6 +22,8 @@ const SETTINGS_PANE = 'usage-settings'
 let t = stringsOf('en')
 // the desktop app's own language, from its settings (read beside its theme)
 let appLocale: string | undefined
+// the switch's click region failed to load or draw (ui.fault): a Button takes its place
+let isHitDown = false
 
 // the engine reads these where they are made: the state they name stays in this file
 const snapshot = atom({ plugin: 'usage-quota', key: 'snapshot' } as const, null as Snapshot | null)
@@ -33,8 +35,7 @@ const fieldTick = atom({ plugin: 'usage-quota', key: 'fieldTick' } as const, 0)
 const fieldText = atom({ plugin: 'usage-quota', key: 'fieldText' } as const, null as string | null)
 const theme = atom({ plugin: 'usage-quota', key: 'theme' } as const, 'dark' as 'dark' | 'light')
 const autoAsk = atom({ plugin: 'usage-quota', key: 'autoAsk' } as const, null as { at: number; percent: number } | null)
-// what holds auto compact back, and in which chat: kept in state so a reload (an
-// update, /reload-plugins) keeps it, where a module variable would start over
+// what holds auto compact back, and in which chat: in state, so a reload keeps it
 const hold = atom({ plugin: 'usage-quota', key: 'hold' } as const, { chat: '', waits: false, stuck: false } as Hold)
 // how much of the 5 hour limit this chat's replies took, kept in state for the same reason
 const spend = atom({ plugin: 'usage-quota', key: 'spend' } as const, { chat: '', total: 0, last: null, from: null } as Spend)
@@ -84,9 +85,8 @@ async function fetchPlan($: EngineInterface): Promise<Limit[] | null> {
 // this chat's own reading from its replies, and when it last changed
 let live: Saved | undefined
 
-// Two sources, and the newest wins (pickLimits): the usage service (asked seldom,
-// shared by every chat through the store) and the figures each reply from Claude
-// carries (this chat's, stamped when they last changed).
+// Two sources merged, newest first (pickLimits): the usage service (asked seldom, shared
+// through the store) and the figures each reply carries (this chat's, stamped on change)
 async function limitsOf(
   $: EngineInterface,
   rateLimits: { kind: string; percentUsed: number; resetsAt?: string }[],
@@ -124,8 +124,7 @@ async function limitsOf(
   return { limits, at: merged?.at, error: backoff?.error || undefined }
 }
 
-// A chat reopened with a long history re-reads it all on its first reply: that jump is
-// left out of the pace. Only for a chat opened with this much in it (spikeOf).
+// a chat reopened with this much history re-reads it on its first reply: left out of the pace (spikeOf)
 const RESUME_MIN_TOKENS = 20_000
 let isOpening = true
 let openMessages = 0
@@ -146,8 +145,7 @@ async function trackPace($: EngineInterface, limits: Limit[], now: number): Prom
   return pace
 }
 
-// A notification through the person's own channel; the desktop app has none for
-// plugins, so there (and wherever it is not sent) it is a toast in the app instead.
+// a notification through the person's channel; where none sends it (the desktop app), a toast
 async function notify($: EngineInterface, text: string): Promise<void> {
   const sent = await $.ui.notify(text, { title: 'Claude usage' }).catch(() => undefined)
   if (!sent?.isSent) $.ui.toast(text, { timeoutMs: 10_000 })
@@ -188,15 +186,13 @@ function showStatus($: EngineInterface, text: string | undefined): void {
   $.ui.status(text)
 }
 
-// The free local breakdown ('summary') reads tools ~1.3-1.6x heavy; the exact count
-// ('full', as /context shows) costs no tokens but one token-count request per tool and
-// memory file. So it runs every 2 minutes, and its exact/estimate ratio of Tools and
-// Other scales the live 3s estimate; Messages is the API's real total less those two.
+// The local breakdown ('summary') reads tools ~1.3-1.6x heavy; the exact one ('full', as
+// /context) costs a token-count request per tool and memory file, so it runs every 2
+// minutes and its ratios scale Tools and Other (Messages: the API's total less those)
 const CALIBRATE_EVERY_MS = 2 * 60_000
 let calib: Partial<Record<Group, number>> = {}
 let isCalibrating = false
-// Right after /compact there is no API reply yet, so the window's real total is unknown
-// and the local estimate is all there is. The exact count fills that gap until the next reply.
+// right after /compact no reply has a real total yet: the exact count fills in till one does
 let exactCount: { at: number; sums: Record<Group, number> } | undefined
 let noReplySince: number | undefined
 
@@ -223,10 +219,10 @@ async function calibrate($: EngineInterface): Promise<void> {
   await refresh($, 'due')
 }
 
-// Auto compact fires when the chat is idle and the context (rounded) is at or past the
-// %, held back only by `waits` (the band asks, or "after my next compact", cleared by a
-// real compaction) and `stuck` (it compacted and is still past: cleared by dropping below).
-// a reply has been seen since the chat opened or was last compacted
+// Auto compact fires when the chat is idle and the context (rounded) is at or past the %,
+// held back by `waits` (asked, or "after my next compact": a real compaction clears it)
+// and `stuck` (compacted and still past: dropping below clears it). Below: a reply seen
+// since the chat opened or last compacted
 let hadReply = false
 async function setHold($: EngineInterface, patch: Partial<Hold>): Promise<void> {
   await update($, hold, held => ({ ...held, ...patch }))
@@ -251,8 +247,7 @@ function compactNow($: EngineInterface): void {
   })
 }
 
-// Auto compact compacts through the session (a /compact run from a turn's end is refused
-// while it winds down), tried again a few times, 2 seconds apart, while a turn runs.
+// through the session (a /compact at a turn's end is refused), retried 2s apart mid-turn
 const AUTO_TRIES = 6
 let canCompactDirectly = true
 const AUTO_RETRY_MS = 2_000
@@ -353,16 +348,14 @@ async function loadAuto($: EngineInterface): Promise<void> {
   await update($, spend, () => ({ chat: id, total: 0, last: null, from: null }))
 }
 
-// the % field sets on Enter, or when the focus leaves it with a draft; 15 to 99, outside
-// is pulled in. After a set the field is drawn afresh (fieldTick), dropping its focus
+// the % field sets on Enter, when the focus leaves it with a draft, or once typing rests (no
+// event says a click landed outside the band); 15 to 99, outside is pulled in. After a set
+// the field is drawn afresh (fieldTick), dropping its focus
 const AT_MIN = 15
 const AT_MAX = 99
-let draftAt: string | null = null
-
-// no event says a click landed outside the band: a draft sets itself once typing rests
 const AT_REST_MS = 2_000
+let draftAt: string | null = null
 let restTimer: { cancel(): void } | null = null
-
 // the field takes 3 digits at most: anything else is dropped by redrawing it cleaned
 const AT_DIGITS = 3
 // a mark of no width, so a cleaned text equal to the one drawn still redraws (an
@@ -410,8 +403,7 @@ async function commitAt($: EngineInterface, value: string): Promise<void> {
   await update($, fieldTick, n => n + 1)
 }
 
-// a new threshold: armed when the context is below it, else the band asks, in its
-// own buttons (never the chat's question dialog, which runs through the chat)
+// a new threshold: armed when the context is below it, else the band asks (never the chat's dialog)
 async function setThreshold($: EngineInterface, at: number): Promise<void> {
   await saveAuto($, { isOn: true, at })
   await askIfPast($, at)
@@ -435,15 +427,13 @@ async function answerAsk($: EngineInterface, choice: 'now' | 'next'): Promise<vo
 }
 
 // What a turn took of the 5 hour limit: how far it moved across the turn.
-// shortcut: the limit is the whole account's, so another chat's use during the turn
-// counts too, and between the service's answers the figures are whole percents; exact
-// per-reply cost needs token counts priced per model
+// shortcut: the limit is the account's, so another chat's use mid-turn counts too, in whole
+// percents between the service's answers; exact cost needs token counts priced per model
 async function countSpend($: EngineInterface): Promise<void> {
   const { from } = await read($, spend)
   const after = (await read($, snapshot))?.limits.find(l => l.kind === 'five_hour')
   if (!from || !after) return
-  // a window that reset mid-turn: all of the new one's use is this turn's, and the
-  // chat's total starts over with the window
+  // a window that reset mid-turn: the new one's use is all this turn's; the total starts over
   const isSame = sameWindow(from.resetsAt, after.resetsAt)
   const cost = isSame ? Math.max(0, after.percentUsed - from.percentUsed) : after.percentUsed
   await update($, spend, s => ({ ...s, total: (isSame ? s.total : 0) + cost, last: cost, from: null }))
@@ -493,9 +483,8 @@ async function osTheme($: EngineInterface): Promise<'dark' | 'light'> {
   systemTheme = { at: now, value }
   return value
 }
-// the settings file is read again only when it has changed since the last look: a
-// look is otherwise one file-time check, no read, no parse
-// (the app's language is read from the same file, so a switch there shows at once too)
+// the settings file (theme and language) is read again only when it changed since the
+// last look: a look is otherwise one file-time check
 let themeFile: { mtimeMs: number; mode: string | undefined } | undefined
 async function syncTheme($: EngineInterface): Promise<void> {
   let mode: string | undefined
@@ -546,8 +535,7 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
         $.clock.after(0, () => void calibrate($))
       }
     } else noReplySince = undefined
-    // what the chat opened with, before its first turn here (a reopened chat may
-    // already carry its last reply's total, so not only while that is blank)
+    // what the chat opened with, before its first turn here (its last reply's total, if any)
     if (isOpening) openMessages = Math.max(rough.Messages, context.tokens ?? 0)
     // the reply total going blank after a reply: the chat was compacted (or cleared)
     if (context.tokens !== undefined) hadReply = true
@@ -562,11 +550,8 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
     const useExact = context.tokens === undefined && exactCount !== undefined && noReplySince !== undefined && exactCount.at >= noReplySince
     let tools = Math.round(rough.Tools * (calib.Tools ?? 1))
     let other = Math.round(rough.Other * (calib.Other ?? 1))
-    // Messages is what the window holds beyond everything else, as /context counts it:
-    // the API's real input total less the other groups, not the local estimate
-    let messages = context.tokens !== undefined && context.tokens - tools - other > 0
-      ? context.tokens - tools - other
-      : rough.Messages
+    // Messages as /context counts it: the API's real input total less the other groups
+    let messages = context.tokens !== undefined && context.tokens - tools - other > 0 ? context.tokens - tools - other : rough.Messages
     if (useExact) ({ Messages: messages, Tools: tools, Other: other } = exactCount!.sums)
     const used = context.tokens ?? (useExact ? messages + tools + other : breakdown?.totalTokens ?? 0)
     const categories: Category[] = [
@@ -616,8 +601,7 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
   return true
 }
 
-// a reading taken after this call: a 3s tick already running may have read the
-// figures before the turn this caller is about started or ended
+// a reading taken after this call: a 3s tick already running may predate the caller's turn
 async function refreshAfter($: EngineInterface): Promise<void> {
   while (!(await refresh($))) await inFlight
 }
@@ -698,6 +682,21 @@ export const register: Register = (on, options) => {
 
   on('ui.press', { component: 'AbovePrompt' }, async ($, e, next) => {
     await commitDraft($)
+    return next(e)
+  })
+
+  // a press on the switch's pill, from its click region (switch-hit.tsx)
+  on('ui.message', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.element === 'autoHit' && e.data === 'toggle') {
+      await commitDraft($)
+      bandActions($).toggleAuto(await read($, autoCompact))
+    }
+    return next(e)
+  })
+
+  // the region failed on this surface: the band redraws with a Button over the pill
+  on('ui.fault', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.element === 'autoHit') isHitDown = true
     return next(e)
   })
 
@@ -795,6 +794,7 @@ export const register: Register = (on, options) => {
       contextRamp: settings.contextRamp,
       chatCost: settings.chatCost,
       t: stringsOf(await read($, language)),
+      isHitDown,
     }, bandActions($))
   })
 }

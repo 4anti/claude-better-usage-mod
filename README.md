@@ -7,7 +7,7 @@
 A live band above the Claude Code prompt: your 5 Hour and Weekly limits with a forecast to the next reset, alerts before you run out, what each chat costs, and how full your context window is. Compact in one click, or let it compact for you.
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/4anti/claude-usage-quota-mod/test.yml?branch=main&style=flat-square&labelColor=212121&label=tests)](https://github.com/4anti/claude-usage-quota-mod/actions/workflows/test.yml)
-[![Version](https://img.shields.io/badge/version-0.4.0-9b9a96?style=flat-square&labelColor=212121)](https://github.com/4anti/claude-usage-quota-mod/releases)
+[![Version](https://img.shields.io/badge/version-0.4.1-9b9a96?style=flat-square&labelColor=212121)](https://github.com/4anti/claude-usage-quota-mod/releases)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.287%2B-9b9a96?style=flat-square&labelColor=212121)](https://claude.com/claude-code)
 [![Works in](https://img.shields.io/badge/works_in-Desktop_%2B_Terminal-9b9a96?style=flat-square&labelColor=212121)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-9b9a96?style=flat-square&labelColor=212121)](LICENSE)

@@ -28,6 +28,8 @@ export type BandView = {
   chatCost: boolean
   /** the band's words, in the language set or detected */
   t: Strings
+  /** the switch's click region failed on this surface: a Button takes the press instead */
+  isHitDown?: boolean
 }
 
 /** the band in one line, for the status line while it is off: "5H 7% · Weekly 57% · Context 38%" */
@@ -95,14 +97,12 @@ const SWITCH_CELLS = 4
 // the box behind the switch measures a pixel off the drawing (19px tall, 31 wide):
 // the pill is drawn half a pixel down and right so it sits in the box's centre
 const SWITCH_NUDGE = 0.5
-// fully see-through: the press's own hover tint drew a square frame round the switch
-// (the word "transparent" draws white or nothing)
+// fully see-through (the word "transparent" draws white or nothing)
 const CLEAR = '#00000000'
 // a space a wrap never breaks at
 const NB = ' '
-// the switch's press: braille blanks, glyphs with no ink that are not whitespace. The
-// desktop trims a label's whitespace (figure spaces too), which left the press empty,
-// only the pill's left edge clickable; wider than the switch, the box clips it
+// the fallback press over the pill, should its click region fail: braille blanks, glyphs
+// with no ink that are not whitespace (a label of spaces collapses to nothing)
 const SWITCH_PRESS = '\u2800'.repeat(8)
 
 function switchSvg(isOn: boolean, c: Palette): string {
@@ -167,7 +167,7 @@ function cellRuns(f: Forecast, cells: number, fill: string, c: Palette): { color
 
 export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: RenderSurface, width: number, view: BandView, act: BandActions) {
   const { snap, now, collapsed, auto, ask, tick, spent, drawnAt, t } = view
-  const { Box, Text, Button, Input } = table
+  const { Box, Text, Button, Input, Client } = table
   // thin Svg bars on the desktop alone: the terminal draws coloured cells
   const Svg = surface === 'desktop' && 'Svg' in table ? table.Svg : undefined
   // the light palette is the desktop's alone: the terminal keeps its own colours
@@ -232,13 +232,18 @@ export function bandTree(table: ElementTable<'terminal' | 'desktop'>, surface: R
           then a wide gap so the field reads as the switch's, not Compact's */}
       {Svg ? (
         <Box key="autoSwitch" width={SWITCH_CELLS} height={1} overflow="hidden">
-          {/* two layers sharing one centre: the pill, and over it a chromeless button
-              that takes the click */}
+          {/* two layers sharing one corner: the pill, and over it an empty region that
+              takes every click on it. A Button there drew its own hover fill and
+              focus ring round the pill; a region draws nothing */}
           <Box position="absolute" top={0} left={0} width={SWITCH_CELLS} height={1} alignItems="center" justifyContent="center">
             <Svg alt={auto.isOn ? t.switchOn : t.switchOff} source={switchSvg(auto.isOn, c)} width={SWITCH_W} height={SWITCH_H} />
           </Box>
           <Box position="absolute" top={0} left={0}>
-            <Button key="auto" label={SWITCH_PRESS} plain hover={{ backgroundColor: CLEAR }} onPress={() => act.toggleAuto(auto)} />
+            {view.isHitDown ? (
+              <Button key="auto" label={SWITCH_PRESS} plain hover={{ backgroundColor: CLEAR }} onPress={() => act.toggleAuto(auto)} />
+            ) : (
+              <Client key="autoHit" module="./switch-hit.tsx" width={SWITCH_CELLS} height={1} />
+            )}
           </Box>
         </Box>
       ) : (

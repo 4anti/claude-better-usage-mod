@@ -1,6 +1,6 @@
 {
   "name": "usage-quota",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, 16 languages, what this chat took, context window usage, one-click Compact and Auto compact.",
   "author": { "name": "Anant Raghunath", "url": "https://github.com/anantraghunath" },
   "homepage": "https://github.com/4anti/claude-usage-quota-mod",

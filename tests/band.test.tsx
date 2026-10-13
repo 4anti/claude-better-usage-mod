@@ -5,6 +5,8 @@ const NOW = Date.parse('2026-10-04T06:00:00Z')
 const MIN = 60_000
 const HOUR = 60 * MIN
 const SURFACES = ['terminal', 'desktop'] as const
+// a click on the desktop switch's pill, as its click region (a Client) hears it
+const PILL = { type: 'down', x: 1, y: 0, button: 'left' } as const
 
 // the dark palette's grey, yellow and red (hooks/colors.ts)
 const GREY = '#9b9a96'
@@ -602,7 +604,7 @@ test('auto compact: the switch shows the field, and it compacts between turns on
 
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ type: 'Input' })).toBeUndefined()
-  await ui.press({ key: 'auto' })
+  await ui.pointer(PILL)
   expect((await ui.find({ type: 'Svg', alt: 'Auto compact on' }))).toBeDefined()
   // the field takes digits; the % sits beside it
   expect((await ui.find({ type: 'Input' }))?.props.submitLabel).not.toBe('set')
@@ -697,7 +699,7 @@ test('"After my next compact" holds through a % flickering below, until a real c
   await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
-  await ui.press({ key: 'auto' })
+  await ui.pointer(PILL)
   await ui.input({ key: await fieldKey(ui), text: '19' })
   expect(await ui.find({ type: 'Text', text: /already at/ })).toBeUndefined()
   await ui.input({ key: await fieldKey(ui), text: '17' })
@@ -740,7 +742,7 @@ test('auto compact is per chat: another chat opens with it off, at 30%; turned o
 
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
-  await ui.press({ key: 'auto' })
+  await ui.pointer(PILL)
   expect((await ui.find({ type: 'Input' }))?.props.value).toBe('30')
   expect(await ui.find({ type: 'Text', text: /already at 35%, past 30%/ })).toBeDefined()
   // left unanswered: as "after my next compact"
@@ -909,16 +911,23 @@ test('a chat with its own auto compact setting keeps it over the default, and it
   await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'AbovePrompt', props: PROPS })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
-  // the switch's whole area is its press: a label of blank glyphs, never whitespace,
-  // which the desktop trims away
-  const press = await ui.find({ type: 'Button', key: 'auto' } as never)
-  expect(String((press as { props: { label?: string } } | undefined)?.props.label)).toMatch(/^⠀+$/)
+  // the pill takes a click anywhere on it through an empty region, never a Button, whose
+  // hover fill and focus ring drew a frame round it
+  expect(await ui.find({ type: 'Button', key: 'auto' } as never)).toBeUndefined()
+  await ui.pointer(PILL)
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
+  // only a press: the pointer moving over it, or another button, changes nothing
+  await ui.pointer({ type: 'move', x: 2, y: 0 })
+  await ui.pointer({ type: 'down', x: 1, y: 0, button: 'right' })
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
+  await ui.pointer(PILL)
+  expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
   // its name toggles it as well
   await ui.press({ key: 'autoLabel' })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact on' })).toBeDefined()
   await ui.press({ key: 'autoLabel' })
   expect(await ui.find({ type: 'Svg', alt: 'Auto compact off' })).toBeDefined()
-  await ui.press({ key: 'auto' })
+  await ui.pointer(PILL)
   // a new chat (a /clear goes on under a new id) starts from that press: on, at 60%
   chat.id = 'second'
   await clock.advance(3_000)
