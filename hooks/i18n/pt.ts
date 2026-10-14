@@ -55,6 +55,8 @@ export const pt: Strings = {
   historyTitle: 'Histórico de uso',
   noPast: 'Janelas encerradas aparecem aqui depois do reinício.',
   average: 'Média {percent}% · limite atingido {hits}/{count}',
+  otherUse: 'Outro / não registrado',
+  noChatUse: 'Sem registro por conversa para este período.',
   settingsTitle: 'Configurações de uso',
   language: 'Idioma',
   sameAsApp: 'Igual ao app',

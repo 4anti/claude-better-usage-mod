@@ -55,6 +55,8 @@ export const zhCN: Strings = {
   historyTitle: '用量历史',
   noPast: '结束的窗口会在重置后显示在这里。',
   average: '平均 {percent}% · 达到上限 {hits}/{count}',
+  otherUse: '其他 / 未记录',
+  noChatUse: '此时段没有按对话的记录。',
   settingsTitle: '用量设置',
   language: '语言',
   sameAsApp: '与应用一致',

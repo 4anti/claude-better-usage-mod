@@ -68,7 +68,7 @@ function tokens(n: number): string {
 
 // a share of a limit: a decimal under 10% (0.5%), whole above it; no movement is
 // under what the figures show, never nothing (a reply always costs something)
-const share = (n: number) => (n <= 0 ? '<1%' : `${n < 10 ? Math.round(n * 10) / 10 : Math.round(n)}%`)
+export const share = (n: number) => (n <= 0 ? '<1%' : `${n < 10 ? Math.round(n * 10) / 10 : Math.round(n)}%`)
 
 function colorOf(category: Category, index: number, c: Palette): string {
   if (category.kind === 'free') return c.free

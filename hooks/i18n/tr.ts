@@ -55,6 +55,8 @@ export const tr: Strings = {
   historyTitle: 'Kullanım geçmişi',
   noPast: 'Biten dönemler sıfırlandıkça burada görünür.',
   average: 'Ortalama {percent}% · limit doldu {hits}/{count}',
+  otherUse: 'Diğer / kayıtsız',
+  noChatUse: 'Bu dönem için sohbet kaydı yok.',
   settingsTitle: 'Kullanım ayarları',
   language: 'Dil',
   sameAsApp: 'Uygulamayla aynı',

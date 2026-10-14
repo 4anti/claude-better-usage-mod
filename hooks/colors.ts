@@ -6,6 +6,8 @@ export type Palette = {
   /** the forecast tick on track: apart from the grey fill it may sit right beside */
   tick: string
   palette: string[]; named: Record<string, string>; switchOff: string; switchOn: string; compactLit: string
+  /** the history's chat colours: no yellow, orange or red (the limit ramp's), neighbours far apart in hue */
+  chats: string[]
 }
 
 export const DARK: Palette = {
@@ -17,6 +19,7 @@ export const DARK: Palette = {
     'Custom agents': '#34d399', 'Memory files': '#fbbf24', Skills: '#fb923c', Messages: '#22d3ee',
   },
   switchOff: '#4d4d4a', switchOn: '#4ade80', compactLit: '#555553',
+  chats: ['#60a5fa', '#f472b6', '#4ade80', '#a78bfa', '#22d3ee', '#a3e635', '#e879f9', '#2dd4bf'],
 }
 
 // light: the same hues, deep enough to read as text on the pale band; the tracks pale
@@ -29,6 +32,21 @@ export const LIGHT: Palette = {
     'Custom agents': '#10b981', 'Memory files': '#f59e0b', Skills: '#f97316', Messages: '#0ea5e9',
   },
   switchOff: '#c4c3be', switchOn: '#22c55e', compactLit: '#dddcd7',
+  chats: ['#2563eb', '#db2777', '#16a34a', '#7c3aed', '#0891b2', '#65a30d', '#c026d3', '#0d9488'],
+}
+
+// each chat's colour, the same in every window: its id hashed to a slot, the next free one when
+// another chat holds it. Given newest first, so the chats of recent windows are the ones apart
+// (with more chats than colours, the oldest share)
+export function chatColors(chats: string[], c: Palette): Map<string, string> {
+  const n = c.chats.length
+  const taken = new Set<number>()
+  return new Map(chats.map(chat => {
+    let slot = [...chat].reduce((h, ch) => Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0, 2166136261) % n
+    for (let i = 0; i < n && taken.has(slot); i++) slot = (slot + 1) % n
+    taken.add(slot)
+    return [chat, c.chats[slot]!] as const
+  }))
 }
 
 /** grey up to the first %, fully yellow at the second, fully red at the third */

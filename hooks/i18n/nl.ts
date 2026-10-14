@@ -55,6 +55,8 @@ export const nl: Strings = {
   historyTitle: 'Gebruiksgeschiedenis',
   noPast: 'Afgelopen vensters verschijnen hier na hun reset.',
   average: 'Gemiddeld {percent}% · limiet bereikt {hits}/{count}',
+  otherUse: 'Overig / niet vastgelegd',
+  noChatUse: 'Geen gegevens per chat voor deze periode.',
   settingsTitle: 'Gebruiksinstellingen',
   language: 'Taal',
   sameAsApp: 'Zoals de app',

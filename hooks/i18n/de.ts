@@ -55,6 +55,8 @@ export const de: Strings = {
   historyTitle: 'Nutzungsverlauf',
   noPast: 'Abgelaufene Fenster erscheinen hier nach ihrem Reset.',
   average: 'Schnitt {percent}% · Limit erreicht {hits}/{count}',
+  otherUse: 'Sonstiges / nicht erfasst',
+  noChatUse: 'Für dieses Fenster gibt es keine Aufzeichnung pro Chat.',
   settingsTitle: 'Nutzungseinstellungen',
   language: 'Sprache',
   sameAsApp: 'Wie die App',

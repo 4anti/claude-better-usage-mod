@@ -43,3 +43,9 @@ export function readSettings(options: Readonly<Record<string, unknown>> = {}): S
     contextRamp: parseRamp(options.contextColors, CONTEXT_RAMP),
   }
 }
+
+/** the /config rows a setting sits in: "<plugin>.<field>", or one "<plugin>@<source>.<field>" per
+ *  copy when two enabled plugins share the name (the desktop app loads an inline copy beside the
+ *  installed one) */
+export const settingKeys = (keys: readonly string[], plugin: string, field: string): string[] =>
+  keys.filter(k => k === `${plugin}.${field}` || (k.startsWith(`${plugin}@`) && k.endsWith(`.${field}`)))

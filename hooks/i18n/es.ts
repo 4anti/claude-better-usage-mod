@@ -55,6 +55,8 @@ export const es: Strings = {
   historyTitle: 'Historial de uso',
   noPast: 'Las ventanas terminadas aparecen aquí al reiniciarse.',
   average: 'Media {percent}% · límite alcanzado {hits}/{count}',
+  otherUse: 'Otro / sin registrar',
+  noChatUse: 'No hay registro por chat para este periodo.',
   settingsTitle: 'Ajustes de uso',
   language: 'Idioma',
   sameAsApp: 'Igual que la app',

@@ -1,7 +1,7 @@
 // The limits' arithmetic, apart from the engine: what the usage service's answer says,
 // which of two readings to trust, and what the forecast learns from them. The hooks
 // module does the asking and the storing (the engine lets `$` cross no import).
-import type { Limit, PaceOf } from '../types'
+import type { Category, Limit, PaceOf } from '../types'
 import { median, sameWindow, SAME_WINDOW_MS, TYPICAL_DEFAULT, WINDOWS } from './forecast'
 
 export type Saved = { at: number; limits: Limit[] }
@@ -67,6 +67,31 @@ export function sumGroups(categories: readonly { name: string; tokens: number; k
   const sums: Record<Group, number> = { Messages: 0, Tools: 0, Other: 0 }
   for (const c of categories) if (c.kind === 'used') sums[groupOf(c.name)] += c.tokens
   return sums
+}
+
+/** the context as the band draws it: Messages, Tools and Other (the local estimate scaled
+ *  by the exact count's ratios, or the exact count itself), the free space, the total and its % */
+export function contextFigures(
+  context: { window: number; tokens?: number; percent?: number },
+  breakdown: { totalTokens: number; percentage: number } | undefined,
+  all: readonly { name: string; tokens: number; kind: string }[],
+  calib: Partial<Record<Group, number>>,
+  exact: Record<Group, number> | undefined,
+): { categories: Category[]; used: number; percent: number } {
+  const rough = sumGroups(all)
+  const tools = exact?.Tools ?? Math.round(rough.Tools * (calib.Tools ?? 1))
+  const other = exact?.Other ?? Math.round(rough.Other * (calib.Other ?? 1))
+  // Messages as /context counts it: the API's real input total less the other groups
+  const messages = exact?.Messages ?? (context.tokens !== undefined && context.tokens - tools - other > 0 ? context.tokens - tools - other : rough.Messages)
+  const used = context.tokens ?? (exact ? messages + tools + other : breakdown?.totalTokens ?? 0)
+  const categories: Category[] = [
+    { name: 'Messages', tokens: messages, kind: 'used' as const },
+    { name: 'Tools', tokens: tools, kind: 'used' as const },
+    { name: 'Other', tokens: other, kind: 'used' as const },
+    ...all.filter(c => c.kind === 'buffer' || c.kind === 'free').map(c => ({ name: c.name, tokens: c.tokens, kind: c.kind as Category['kind'] })),
+  ].filter(c => c.tokens > 0)
+  const percent = exact ? Math.round((used / context.window) * 100) : context.percent ?? breakdown?.percentage ?? Math.round((used / context.window) * 100)
+  return { categories, used, percent }
 }
 
 /** a Retry-After header, in ms, when it gives a usable number of seconds */
@@ -182,4 +207,56 @@ export function addHistory(history: Past[], closed: Past[]): Past[] {
   if (fresh.length === 0) return history
   const all = [...fresh, ...history].sort((a, b) => b.resetsAt - a.resetsAt)
   return Object.keys(HISTORY_KEPT).flatMap(kind => all.filter(p => p.kind === kind).slice(0, HISTORY_KEPT[kind]))
+}
+
+/** one chat's share of one window: what its turns moved the account's %, summed */
+export type ChatUse = { kind: string; resetsAt: number; chat: string; name: string; percent: number }
+/** what one turn took of one window */
+export type TurnCost = { kind: string; resetsAt: number; cost: number; isSame: boolean }
+
+/** what a turn took of each window: how far each moved across it; one that reset mid-turn, all the new one's use */
+export function turnCosts(from: Limit[], after: Limit[]): TurnCost[] {
+  return after.flatMap(a => {
+    const before = from.find(l => l.kind === a.kind)
+    if (!before || !WINDOWS[a.kind]) return []
+    // a reading with no reset time (the window just expired) is a new window, as the band counts it
+    const resetsAt = a.resetsAt ? Date.parse(a.resetsAt) : NaN
+    const isSame = sameWindow(before.resetsAt, a.resetsAt)
+    return [{ kind: a.kind, resetsAt, cost: isSame ? Math.max(0, a.percentUsed - before.percentUsed) : a.percentUsed, isSame }]
+  })
+}
+
+/** a chat's stand-in name while its prompt could not be read: its id's start */
+export const idName = (chat: string) => chat.slice(0, 8)
+
+/** the chat list with these moves added: a chat's moves in one window summed under the name
+ *  it was first recorded by (its id's start only until a real one comes), and only the
+ *  running window and those the history keeps */
+export function addChatUse(list: ChatUse[], moves: ChatUse[]): ChatUse[] {
+  let next = list
+  for (const m of moves) {
+    if (!(m.percent > 0)) continue
+    // one window, one resetsAt: the first chat to record it sets it for the rest
+    const resetsAt = next.find(u => u.kind === m.kind && Math.abs(u.resetsAt - m.resetsAt) <= SAME_WINDOW_MS)?.resetsAt ?? m.resetsAt
+    const name = next.find(u => u.chat === m.chat && u.name !== idName(m.chat))?.name ?? m.name
+    const i = next.findIndex(u => u.kind === m.kind && u.chat === m.chat && u.resetsAt === resetsAt)
+    const named = next.map(u => (u.chat === m.chat && u.name !== name ? { ...u, name } : u))
+    next = i < 0 ? [...named, { ...m, resetsAt, name }] : named.map((u, j) => (j === i ? { ...u, percent: u.percent + m.percent } : u))
+  }
+  if (next === list) return list
+  const kept = new Set(Object.keys(HISTORY_KEPT).flatMap(kind =>
+    [...new Set(next.filter(u => u.kind === kind).map(u => u.resetsAt))].sort((a, b) => b - a).slice(0, HISTORY_KEPT[kind]! + 1).map(at => `${kind}:${at}`)))
+  return next.filter(u => kept.has(`${u.kind}:${u.resetsAt}`))
+}
+
+// a chat's name: the first prompt typed in it, on one line, cut to fit a row. A compacted
+// chat opens on its summary and a slash command on its tags: those are passed over
+const NAME_MAX = 48
+const isTyped = (text: string) => text.trim() !== '' && !/^\s*(<|This session is being continued)/.test(text)
+
+export function chatLabel(texts: string[], fallback: string): string {
+  const pick = texts.find(isTyped) ?? texts.find(x => x.trim() !== '') ?? ''
+  const line = pick.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  if (line === '') return fallback
+  return line.length > NAME_MAX ? `${line.slice(0, NAME_MAX - 1).trimEnd()}…` : line
 }

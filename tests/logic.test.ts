@@ -1,10 +1,11 @@
 import { expect, test } from 'claude-code/testing'
 
 import { stepAlerts } from '../hooks/alerts'
-import { CONTEXT_RAMP, DARK, LIGHT, LIMIT_RAMP, mix, rampColor } from '../hooks/colors'
-import { forecast, headline } from '../hooks/forecast'
+import { chatColors, CONTEXT_RAMP, DARK, LIGHT, LIMIT_RAMP, mix, rampColor } from '../hooks/colors'
+import { forecast, headline, spanOf } from '../hooks/forecast'
 import { en } from '../hooks/i18n/en'
-import { addHistory, pickLimits, stepPace } from '../hooks/limits'
+import { tr } from '../hooks/i18n/tr'
+import { addChatUse, addHistory, chatLabel, idName, pickLimits, stepPace, turnCosts } from '../hooks/limits'
 import { parseRamp, readSettings } from '../hooks/settings'
 
 const NOW = Date.parse('2026-10-04T06:00:00Z')
@@ -131,4 +132,84 @@ test('settings fall back to the defaults when out of range or unreadable', async
   expect(parseRamp('60 40 85', LIMIT_RAMP)).toBe(LIMIT_RAMP)
   expect(parseRamp('a b c', LIMIT_RAMP)).toBe(LIMIT_RAMP)
   expect(parseRamp('10 20', LIMIT_RAMP)).toBe(LIMIT_RAMP)
+})
+
+test("a chat's moves in one window are summed under one window time and the name it was first recorded by", async () => {
+  const at = Date.parse('2026-10-04T10:00:00Z')
+  const one = addChatUse([], [{ kind: 'five_hour', resetsAt: at, chat: 'a', name: 'First', percent: 2 }])
+  // a reading a few seconds off is the same window; a later name never replaces the first
+  const two = addChatUse(one, [
+    { kind: 'five_hour', resetsAt: at + 5_000, chat: 'a', name: 'Summary after compact', percent: 3 },
+    { kind: 'five_hour', resetsAt: at + 9_000, chat: 'b', name: 'Other chat', percent: 1 },
+  ])
+  expect(two).toEqual([
+    { kind: 'five_hour', resetsAt: at, chat: 'a', name: 'First', percent: 5 },
+    { kind: 'five_hour', resetsAt: at, chat: 'b', name: 'Other chat', percent: 1 },
+  ])
+  // nothing used, nothing written
+  expect(addChatUse(two, [{ kind: 'five_hour', resetsAt: at, chat: 'a', name: 'First', percent: 0 }])).toBe(two)
+  expect(one).toHaveLength(1)
+})
+
+test('the chat list keeps the running window and the ones the history keeps, no older', async () => {
+  const at = Date.parse('2026-10-04T10:00:00Z')
+  const moves = Array.from({ length: 13 }, (_, i) => ({ kind: 'five_hour', resetsAt: at + i * 5 * 3_600_000, chat: 'a', name: 'A', percent: 1 }))
+  const kept = moves.reduce((list, m) => addChatUse(list, [m]), [] as ReturnType<typeof addChatUse>)
+  // 10 past windows and the running one
+  expect(kept).toHaveLength(11)
+  expect(kept[0]!.resetsAt).toBe(moves[2]!.resetsAt)
+})
+
+test("a chat's name is its first typed prompt on one line, cut to fit; a summary or command is passed over", async () => {
+  expect(chatLabel(['This session is being continued from a previous conversation', '<command-name>/x</command-name>', 'Fix  the\nbug'], 'id')).toBe('Fix the bug')
+  expect(chatLabel(['x'.repeat(80)], 'id')).toBe(`${'x'.repeat(47)}…`)
+  expect(chatLabel([], 'abc12345')).toBe('abc12345')
+  // only injected text: it stands in, tags taken out
+  expect(chatLabel(['<command-name>/quota</command-name>'], 'id')).toBe('/quota')
+})
+
+test("a turn's cost is how far each window moved; a window that reset mid-turn costs all its use", async () => {
+  const later = '2026-10-04T12:00:00Z'
+  const next = '2026-10-04T17:00:00Z'
+  expect(turnCosts([{ kind: 'five_hour', percentUsed: 10, resetsAt: later }], [{ kind: 'five_hour', percentUsed: 12.5, resetsAt: later }]))
+    .toEqual([{ kind: 'five_hour', resetsAt: Date.parse(later), cost: 2.5, isSame: true }])
+  expect(turnCosts([{ kind: 'five_hour', percentUsed: 90, resetsAt: later }], [{ kind: 'five_hour', percentUsed: 3, resetsAt: next }]))
+    .toEqual([{ kind: 'five_hour', resetsAt: Date.parse(next), cost: 3, isSame: false }])
+  // no reading from the turn's start: nothing to count
+  expect(turnCosts([], [{ kind: 'five_hour', percentUsed: 3, resetsAt: next }])).toEqual([])
+})
+
+test('a 5 hour window reads as its span: two-digit hours on a 24-hour clock, a week as its days', async () => {
+  const end = new Date(2026, 9, 14, 0, 40).getTime()
+  expect(spanOf(end, 'five_hour', tr)).toBe('19:40 – 00:40')
+  expect(spanOf(end, 'five_hour', en)).toMatch(/^7:40\sPM – 12:40\sAM$/u)
+  expect(spanOf(new Date(2026, 9, 11, 9, 0).getTime(), 'seven_day', tr)).toBe('4 – 11 Eki')
+})
+
+test("chat colours are their own, none the limit ramp's, and the newest eight chats never share one", async () => {
+  for (const c of [DARK, LIGHT]) {
+    expect(c.chats).toHaveLength(8)
+    expect(c.chats).not.toContain(c.yellow)
+    expect(c.chats).not.toContain(c.red)
+  }
+  const chats = Array.from({ length: 14 }, (_, i) => `session-${i}`)
+  const colors = chatColors(chats, DARK)
+  expect(new Set(chats.slice(0, 8).map(id => colors.get(id))).size).toBe(8)
+  // the same chat keeps its colour whatever else is listed after it
+  expect(chatColors(chats.slice(0, 3), DARK).get('session-0')).toBe(colors.get('session-0'))
+})
+
+test("a chat recorded under its id's start takes its real name once one is read, in every window", async () => {
+  const at = Date.parse('2026-10-04T10:00:00Z')
+  const chat = 'a1b2c3d4-e5f6'
+  const early = addChatUse([], [{ kind: 'five_hour', resetsAt: at, chat, name: idName(chat), percent: 2 }])
+  const later = addChatUse(early, [{ kind: 'seven_day', resetsAt: at + 86_400_000, chat, name: 'Fix the login bug', percent: 1 }])
+  expect(later.map(u => u.name)).toEqual(['Fix the login bug', 'Fix the login bug'])
+  // a real name is never replaced by the stand-in
+  expect(addChatUse(later, [{ kind: 'five_hour', resetsAt: at, chat, name: idName(chat), percent: 1 }]).map(u => u.name)).toEqual(['Fix the login bug', 'Fix the login bug'])
+})
+
+test("a reading with no reset time (the window just expired) counts as a new window's use", async () => {
+  expect(turnCosts([{ kind: 'five_hour', percentUsed: 12, resetsAt: '2026-10-04T12:00:00Z' }], [{ kind: 'five_hour', percentUsed: 0 }]))
+    .toEqual([{ kind: 'five_hour', resetsAt: NaN, cost: 0, isSame: false }])
 })

@@ -55,6 +55,8 @@ export const zhTW: Strings = {
   historyTitle: '用量紀錄',
   noPast: '結束的區間會在重設後顯示於此。',
   average: '平均 {percent}% · 達到上限 {hits}/{count}',
+  otherUse: '其他 / 未記錄',
+  noChatUse: '此時段沒有依對話的紀錄。',
   settingsTitle: '用量設定',
   language: '語言',
   sameAsApp: '與應用程式相同',

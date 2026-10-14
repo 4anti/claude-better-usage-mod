@@ -1,6 +1,7 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { On, SessionRateLimit, SessionUsage } from 'claude-code'
 
+import { chatColors, DARK } from '../hooks/colors'
 import { LANGUAGES } from '../hooks/i18n'
 import { en } from '../hooks/i18n/en'
 
@@ -24,7 +25,11 @@ function usage(rateLimits: SessionRateLimit[]): SessionUsage {
 }
 
 // the engine beneath the plugin; what it was asked to say and pin is kept
-function world(on: On, state: { limits: SessionRateLimit[] }, seed: Record<string, unknown> = {}, isSent = true) {
+// the /config rows of the manifest's fields, keyed as the menu keys them
+const FIELDS = ['language', 'notify', 'alertAt', 'chatCost', 'statusLine', 'autoCompactAt', 'limitColors', 'contextColors']
+const rowsOf = (...plugins: string[]) => plugins.flatMap(p => FIELDS.map(f => ({ key: `${p}.${f}`, label: f, kind: 'text', value: '', provider: { plugin: p, tier: 'plugin' }, isLocked: false })))
+
+function world(on: On, state: { limits: SessionRateLimit[]; plugins?: string[] }, seed: Record<string, unknown> = {}, isSent = true) {
   const said = {
     notes: [] as string[], toasts: [] as string[], status: [] as (string | undefined)[], opened: [] as string[],
     commands: [] as { name: string; description: string }[], configs: [] as { key: string; value: unknown }[],
@@ -39,6 +44,7 @@ function world(on: On, state: { limits: SessionRateLimit[] }, seed: Record<strin
     said.commands.push({ name: command.name, description: command.description })
     return { value: { command: command.name } } as never
   })
+  on('config.list', () => ({ value: rowsOf(...(state.plugins ?? ['usage-quota'])) }) as never)
   on('config.set', (_$, e) => {
     said.configs.push({ key: e.key, value: e.value })
     return { value: e.value } as never
@@ -108,7 +114,7 @@ test('with the band off, the status line carries the usage, and goes when it is 
   expect(said.status.at(-1)).toBeUndefined()
 })
 
-test('/quota history opens the history pane: the running window, then the past ones', async ($, on) => {
+test('/quota history opens the history pane: the running window, then the past ones under the day each began', async ($, on) => {
   const state = { limits: [{ kind: 'five_hour', percentUsed: 7, resetsAt: iso(4 * HOUR) }] as SessionRateLimit[] }
   const history = [
     { kind: 'five_hour', resetsAt: NOW - HOUR, peak: 100 },
@@ -120,8 +126,14 @@ test('/quota history opens the history pane: the running window, then the past o
   expect(said.opened).toEqual(['usage-history'])
   for (const surface of SURFACES) {
     const ui = await $.ui.mount({ plugin: 'usage-quota', surface, component: 'Pane', props: PANE_PROPS, requestId: 'usage-history' })
-    expect(await ui.find({ type: 'Text', text: '5 Hour' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: 'Now' })).toBeDefined()
+    // a blank row between groups: two of the desktop's half rows, one terminal row
+    expect((await ui.drawn()) as unknown).toMatchObject({ props: { rowGap: surface === 'desktop' ? 2 : 1 } })
+    expect(await ui.find({ type: 'Text', text: '5 HOUR' })).toBeDefined()
+    expect(await ui.find({ key: 'open-five_hour-now' })).toBeDefined()
+    // each past window by its span, under the day it began (the second began the day before)
+    expect(await ui.find({ key: `open-five_hour-${NOW - HOUR}` })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Today · / })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Yesterday · / })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '100%' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '40%' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: 'Average 70% · limit reached 1/2' })).toBeDefined()
@@ -129,6 +141,90 @@ test('/quota history opens the history pane: the running window, then the past o
     expect(await ui.find({ type: 'Text', text: 'Finished windows show here once they reset.' })).toBeDefined()
     await ui.unmount()
   }
+})
+
+test("each window's bar is split by the chats that used it, each in its own colour; a row unfolds them", async ($, on) => {
+  const running = NOW + 4 * HOUR
+  const state = { limits: [{ kind: 'five_hour', percentUsed: 30, resetsAt: iso(4 * HOUR) }] as SessionRateLimit[] }
+  const chatUse = [
+    { kind: 'five_hour', resetsAt: running, chat: 'a', name: 'Fix the login bug', percent: 18 },
+    { kind: 'five_hour', resetsAt: running + MIN, chat: 'b', name: 'Write the README', percent: 9 },
+  ]
+  const history = [{ kind: 'five_hour', resetsAt: NOW - HOUR, peak: 40 }]
+  world(on, state, { history, chatUse })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  const colors = chatColors(['a', 'b'], DARK)
+  expect(colors.get('a')).not.toBe(colors.get('b'))
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'Pane', props: PANE_PROPS, requestId: 'usage-history' })
+  const bar = await ui.find({ type: 'Svg', text: 'Now: 30%' }) ?? (await ui.findAll({ type: 'Svg' }))[0]
+  const source = String(bar?.props.source)
+  expect(source).toContain(colors.get('a')!)
+  expect(source).toContain(colors.get('b')!)
+  // folded: no names yet
+  expect(await ui.find({ type: 'Text', text: 'Fix the login bug' })).toBeUndefined()
+  await ui.press({ key: 'open-five_hour-now' })
+  expect(await ui.find({ type: 'Text', text: 'Fix the login bug' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Write the README' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '18%' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '9%' })).toBeDefined()
+  // what no chat here recorded (claude.ai, another device) is grey, as Other
+  expect(await ui.find({ type: 'Text', text: 'Other / not recorded' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '3%' })).toBeDefined()
+  // a window from before any chat was recorded says so
+  await ui.press({ key: `open-five_hour-${NOW - HOUR}` })
+  expect(await ui.find({ type: 'Text', text: 'No per-chat record for this window.' })).toBeDefined()
+  // pressed again, the running window folds
+  await ui.press({ key: 'open-five_hour-now' })
+  expect(await ui.find({ type: 'Text', text: 'Fix the login bug' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('chats that ran at once (each move counting the other) are scaled to the window, in the bar and the list', async ($, on) => {
+  const running = NOW + 4 * HOUR
+  const state = { limits: [{ kind: 'five_hour', percentUsed: 4, resetsAt: iso(4 * HOUR) }] as SessionRateLimit[] }
+  const chatUse = [
+    { kind: 'five_hour', resetsAt: running, chat: 'a', name: 'First', percent: 4 },
+    { kind: 'five_hour', resetsAt: running, chat: 'b', name: 'Second', percent: 4 },
+  ]
+  world(on, state, { chatUse })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'Pane', props: PANE_PROPS, requestId: 'usage-history' })
+  await ui.press({ key: 'open-five_hour-now' })
+  expect(await ui.findAll({ type: 'Text', text: '2%' })).toHaveLength(2)
+  expect(await ui.find({ type: 'Text', text: 'Other / not recorded' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test("a turn's share of each limit is recorded for the history under the chat's first typed prompt", async ($, on) => {
+  const state = { limits: [
+    { kind: 'five_hour', percentUsed: 10, resetsAt: iso(4 * HOUR) },
+    { kind: 'seven_day', percentUsed: 50, resetsAt: iso(3 * 24 * HOUR) },
+  ] as SessionRateLimit[] }
+  const { clock } = world(on, state)
+  on('session.id', () => ({ value: 'chat-1' }) as never)
+  on('session.messages', () => ({ value: [
+    { role: 'user', text: '<command-name>/quota</command-name>', toolUses: [] },
+    { role: 'user', text: 'Make   the history' + String.fromCharCode(10) + ' pane nicer', toolUses: [] },
+  ] }) as never)
+  on('turn.start', () => ({ turnId: 't1' }))
+  on('turn.complete', () => ({ text: '' }))
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  await $.session.measure(MEASURE)
+  await $.turn.start({ text: 'go', turnId: 't1' } as never)
+  state.limits = [
+    { kind: 'five_hour', percentUsed: 14, resetsAt: iso(4 * HOUR) },
+    { kind: 'seven_day', percentUsed: 51, resetsAt: iso(3 * 24 * HOUR) },
+  ]
+  await clock.advance(1_000)
+  await $.turn.complete({ answer: 'done', durationMs: 1_000, isAborted: false, turnId: 't1', reason: 'answer' } as never)
+  // the history pane shows it: this chat by its first typed prompt, 4% of the 5 hour, 1% of the week
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'Pane', props: PANE_PROPS, requestId: 'usage-history' })
+  await ui.press({ key: 'open-five_hour-now' })
+  await ui.press({ key: 'open-seven_day-now' })
+  expect(await ui.findAll({ type: 'Text', text: 'Make the history pane nicer' })).toHaveLength(2)
+  expect(await ui.find({ type: 'Text', text: '4%' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '1%' })).toBeDefined()
+  await ui.unmount()
 })
 
 test('typing /quota lists all three commands: the band, its history and its settings', async ($, on) => {
@@ -193,6 +289,20 @@ test('the settings pane changes a setting through the config, as the menu would'
     { key: 'usage-quota.notify', value: false },
     { key: 'usage-quota.limitColors', value: '40 60 85' },
   ])
+})
+
+test("with the desktop app loading a second copy, a setting changes in every copy's row", async ($, on) => {
+  // two enabled plugins share the name: the menu keys each row by the plugin's id
+  const { said } = world(on, { limits: [], plugins: ['usage-quota@4anti-mods', 'usage-quota@inline'] })
+  await $.session.start({ cwd: '.', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ plugin: 'usage-quota', surface: 'desktop', component: 'Pane', props: { ...PANE_PROPS, title: 'Usage settings' }, requestId: 'usage-settings' })
+  await ui.select({ key: 'autoCompactAt', value: '50' })
+  await ui.unmount()
+  expect(said.configs).toEqual([
+    { key: 'usage-quota@4anti-mods.autoCompactAt', value: 50 },
+    { key: 'usage-quota@inline.autoCompactAt', value: 50 },
+  ])
+  expect(said.toasts).toEqual([])
 })
 
 test('every language has every word, and its placeholders', async () => {

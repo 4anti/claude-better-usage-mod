@@ -55,6 +55,8 @@ export const id: Strings = {
   historyTitle: 'Riwayat penggunaan',
   noPast: 'Jendela yang selesai muncul di sini setelah reset.',
   average: 'Rata-rata {percent}% · batas tercapai {hits}/{count}',
+  otherUse: 'Lainnya / tidak tercatat',
+  noChatUse: 'Tidak ada catatan per obrolan untuk periode ini.',
   settingsTitle: 'Pengaturan penggunaan',
   language: 'Bahasa',
   sameAsApp: 'Sama dengan aplikasi',

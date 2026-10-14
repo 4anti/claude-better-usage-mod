@@ -55,6 +55,8 @@ export const fr: Strings = {
   historyTitle: 'Historique d’usage',
   noPast: 'Les fenêtres terminées s’affichent ici après leur réinitialisation.',
   average: 'Moyenne {percent} % · limite atteinte {hits}/{count}',
+  otherUse: 'Autre / non enregistré',
+  noChatUse: 'Aucun relevé par conversation pour cette période.',
   settingsTitle: 'Réglages d’usage',
   language: 'Langue',
   sameAsApp: 'Comme l’application',

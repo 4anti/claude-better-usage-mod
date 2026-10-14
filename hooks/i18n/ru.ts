@@ -55,6 +55,8 @@ export const ru: Strings = {
   historyTitle: 'История использования',
   noPast: 'Завершённые окна появятся здесь после сброса.',
   average: 'В среднем {percent}% · лимит исчерпан {hits}/{count}',
+  otherUse: 'Прочее / не учтено',
+  noChatUse: 'Нет данных по чатам за этот период.',
   settingsTitle: 'Настройки использования',
   language: 'Язык',
   sameAsApp: 'Как в приложении',

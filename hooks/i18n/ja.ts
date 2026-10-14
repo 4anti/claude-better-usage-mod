@@ -55,6 +55,8 @@ export const ja: Strings = {
   historyTitle: '使用履歴',
   noPast: '終了したウィンドウはリセット後にここに表示されます。',
   average: '平均{percent}% · 上限到達 {hits}/{count}',
+  otherUse: 'その他 / 未記録',
+  noChatUse: 'この期間のチャット別の記録はありません。',
   settingsTitle: '使用量の設定',
   language: '言語',
   sameAsApp: 'アプリと同じ',

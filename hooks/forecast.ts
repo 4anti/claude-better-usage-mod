@@ -81,11 +81,32 @@ const isSameDay = (a: number, b: number) => new Date(a).toDateString() === new D
 export const resumesAt = (at: number, now: number, t: Strings) =>
   isSameDay(at, now) ? time(at, t.locale) : `${weekday(at, t.locale)} ${time(at, t.locale)}`
 
-/** a past window by its end: "Sun 4:40 PM" for a 5 hour one, "Oct 5" for a week */
-export const endedAt = (at: number, kind: string, t: Strings) =>
-  kind === 'five_hour'
-    ? `${new Date(at).toLocaleDateString(t.locale, { weekday: 'short' })} ${time(at, t.locale)}`
-    : new Date(at).toLocaleDateString(t.locale, { month: 'short', day: 'numeric' })
+// a span's ends: two-digit hours on a 24-hour clock ("00:40", not "0:40"), none on a 12-hour one
+function clock(at: number, locale: string): string {
+  const text = new Date(at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+  return /\p{L}/u.test(text) ? text.replace(/^0(?=\d)/, '') : text
+}
+
+/** a window by its span: "21:39 – 02:39" for a 5 hour one, "Oct 7 – Oct 14" for a week */
+export function spanOf(resetsAt: number, kind: string, t: Strings): string {
+  const start = resetsAt - (WINDOWS[kind]?.ms ?? 0)
+  if (kind === 'five_hour') return `${clock(start, t.locale)} – ${clock(resetsAt, t.locale)}`
+  // the language's own short range: "Oct 7 – 14", "7–14 Eki", "10月7日～14日"
+  const days = new Intl.DateTimeFormat(t.locale, { month: 'short', day: 'numeric' })
+  return typeof days.formatRange === 'function' ? days.formatRange(start, resetsAt) : `${days.format(start)} – ${days.format(resetsAt)}`
+}
+
+const startOfDay = (at: number) => new Date(at).setHours(0, 0, 0, 0)
+
+/** the day a window began, as a heading: "Today · Tuesday, October 14", else "Sunday, October 12" */
+export function dayOf(at: number, now: number, t: Strings): string {
+  const date = new Date(at).toLocaleDateString(t.locale, { weekday: 'long', day: 'numeric', month: 'long' })
+  // rounded: a day across a clock change is 23 or 25 hours
+  const days = Math.round((startOfDay(now) - startOfDay(at)) / (24 * HOUR))
+  if (days < 0 || days > 1 || typeof Intl.RelativeTimeFormat !== 'function') return date
+  const word = new Intl.RelativeTimeFormat(t.locale, { numeric: 'auto' }).format(-days, 'day')
+  return `${word.charAt(0).toLocaleUpperCase(t.locale)}${word.slice(1)} · ${date}`
+}
 
 /** the headline and the window it speaks for (its colour follows that window's %) */
 export function headline(list: Forecast[], now: number, t: Strings): { text: string; lead: Forecast } | null {

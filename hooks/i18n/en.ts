@@ -55,6 +55,8 @@ export const en = {
   historyTitle: 'Usage history',
   noPast: 'Finished windows show here once they reset.',
   average: 'Average {percent}% · limit reached {hits}/{count}',
+  otherUse: 'Other / not recorded',
+  noChatUse: 'No per-chat record for this window.',
   settingsTitle: 'Usage settings',
   language: 'Language',
   sameAsApp: 'Same as the app',

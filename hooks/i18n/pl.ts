@@ -55,6 +55,8 @@ export const pl: Strings = {
   historyTitle: 'Historia użycia',
   noPast: 'Zakończone okna pojawią się tu po resecie.',
   average: 'Średnio {percent}% · limit osiągnięty {hits}/{count}',
+  otherUse: 'Inne / niezarejestrowane',
+  noChatUse: 'Brak zapisu dla poszczególnych czatów w tym okresie.',
   settingsTitle: 'Ustawienia użycia',
   language: 'Język',
   sameAsApp: 'Jak w aplikacji',

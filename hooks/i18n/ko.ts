@@ -55,6 +55,8 @@ export const ko: Strings = {
   historyTitle: '사용 기록',
   noPast: '끝난 구간은 초기화 후 여기에 표시됩니다.',
   average: '평균 {percent}% · 한도 도달 {hits}/{count}',
+  otherUse: '기타 / 기록 없음',
+  noChatUse: '이 기간의 채팅별 기록이 없습니다.',
   settingsTitle: '사용량 설정',
   language: '언어',
   sameAsApp: '앱과 같게',

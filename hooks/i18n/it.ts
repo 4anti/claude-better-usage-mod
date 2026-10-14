@@ -55,6 +55,8 @@ export const it: Strings = {
   historyTitle: 'Cronologia utilizzo',
   noPast: 'Le finestre concluse compaiono qui dopo il reset.',
   average: 'Media {percent}% · limite raggiunto {hits}/{count}',
+  otherUse: 'Altro / non registrato',
+  noChatUse: 'Nessun dato per chat per questa finestra.',
   settingsTitle: 'Impostazioni utilizzo',
   language: 'Lingua',
   sameAsApp: 'Come l’app',

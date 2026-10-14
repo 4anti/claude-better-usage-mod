@@ -55,6 +55,8 @@ export const uk: Strings = {
   historyTitle: 'Історія використання',
   noPast: 'Завершені вікна з’являться тут після скидання.',
   average: 'У середньому {percent}% · ліміт вичерпано {hits}/{count}',
+  otherUse: 'Інше / не враховано',
+  noChatUse: 'Немає даних за чатами для цього періоду.',
   settingsTitle: 'Налаштування використання',
   language: 'Мова',
   sameAsApp: 'Як у застосунку',

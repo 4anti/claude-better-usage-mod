@@ -24,8 +24,8 @@ export type AutoCompact = { isOn: boolean; at: number | null }
 /** what holds auto compact back in a chat: an ask (or "after my next compact"), or a compaction that left it past the % */
 export type Hold = { chat: string; waits: boolean; stuck: boolean }
 
-/** this chat's share of the 5 hour limit: in all, by its last reply, and the reading its running turn started from */
-export type Spend = { chat: string; total: number; last: number | null; from: Limit | null }
+/** this chat's share of the 5 hour limit: in all, by its last reply, and the readings its running turn started from */
+export type Spend = { chat: string; total: number; last: number | null; from: Limit[] | null }
 
 declare module 'claude-code' {
   interface PluginState {
@@ -45,6 +45,8 @@ declare module 'claude-code' {
       fieldText: string | null
       /** the desktop app's theme, as its settings (or the OS) have it */
       theme: 'dark' | 'light'
+      /** the history pane's rows unfolded to show their chats, by row key */
+      openRows: string[]
     }
   }
 }

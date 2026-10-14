@@ -1,17 +1,16 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { AutoCompact, Category, Hold, Limit, PaceOf, Snapshot, Spend } from '../types'
+import type { AutoCompact, Hold, Limit, PaceOf, Snapshot, Spend } from '../types'
 import { stepAlerts } from './alerts'
 import type { Alerts } from './alerts'
 import { bandTree, summary } from './band'
 import type { BandActions } from './band'
-import { sameWindow } from './forecast'
 import { historyTree } from './history'
-import { addHistory, AskError, isPlanDue, nextBackoff, parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace, sumGroups } from './limits'
-import type { Ask, Backoff, Group, PaceStore, Past, Saved } from './limits'
+import { addChatUse, addHistory, AskError, chatLabel, contextFigures, idName, isPlanDue, nextBackoff, parsePlan, pickLimits, retryAfterMs, spikeOf, stepPace, sumGroups, turnCosts } from './limits'
+import type { Ask, Backoff, ChatUse, Group, PaceStore, Past, Saved, TurnCost } from './limits'
 import { fmt, resolveLanguage, stringsOf } from './i18n'
-import { readSettings } from './settings'
+import { readSettings, settingKeys } from './settings'
 import { settingsTree } from './settings-pane'
 
 // what the config menu set, read again on every load (a change there reloads)
@@ -41,6 +40,8 @@ const hold = atom({ plugin: 'usage-quota', key: 'hold' } as const, { chat: '', w
 const spend = atom({ plugin: 'usage-quota', key: 'spend' } as const, { chat: '', total: 0, last: null, from: null } as Spend)
 // the language the band draws in, as a code: a change redraws it
 const language = atom({ plugin: 'usage-quota', key: 'language' } as const, 'en')
+// the history pane's rows unfolded to show their chats
+const openRows = atom({ plugin: 'usage-quota', key: 'openRows' } as const, [] as string[])
 
 // the setting's language, else the app's, else the shell's (LC_ALL, LANG), else English
 let shellLocale: string | undefined
@@ -52,20 +53,15 @@ async function applyLanguage($: EngineInterface): Promise<void> {
 
 const LOCAL_EVERY_MS = 3_000
 
-async function storeGet($: EngineInterface, key: string): Promise<unknown> {
-  try {
-    return await $.store.get(key)
-  } catch {
-    return undefined
-  }
+// the shared store without a throw (one at the call included): a failed write leaves this chat with it
+function storeGet($: EngineInterface, key: string): Promise<unknown> {
+  return Promise.resolve().then(() => $.store.get(key)).catch(() => undefined)
 }
-
-async function storeSet($: EngineInterface, key: string, value: unknown): Promise<void> {
-  try {
-    await $.store.set(key, value)
-  } catch {
-    // this chat still has it
-  }
+function storeSet($: EngineInterface, key: string, value: unknown): Promise<void> {
+  return Promise.resolve().then(() => $.store.set(key, value)).then(() => {}, () => {})
+}
+function chatId($: EngineInterface): Promise<string> {
+  return Promise.resolve().then(() => $.session.id()).catch(() => 'chat')
 }
 
 // The plan's limits, as the app's "Plan usage limits" panel reads them: the account's
@@ -168,11 +164,15 @@ async function openPane($: EngineInterface, id: string, title: string): Promise<
   return fmt(opened.isPlaced ? t.paneOpened : t.paneWaits, { title })
 }
 
-// a setting changed from the pane as the config menu would: the mod reloads with it
+// a setting changed from the pane as the menu would (the mod reloads), in every copy's row (settingKeys)
 async function setSetting($: EngineInterface, field: string, value: string | number | boolean): Promise<void> {
   try {
-    const result = await $.config.set({ key: `usage-quota.${field}`, value })
-    if ('deny' in result && result.deny) $.ui.toast(fmt(t.settingFailed, { reason: result.deny }))
+    const keys = settingKeys((await $.config.list()).map(r => r.key), 'usage-quota', field)
+    if (keys.length === 0) throw new Error(`no /config row for usage-quota.${field}`)
+    for (const key of keys) {
+      const result = await $.config.set({ key, value })
+      if ('deny' in result && result.deny) $.ui.toast(fmt(t.settingFailed, { reason: result.deny }))
+    }
   } catch (error) {
     $.ui.toast(fmt(t.settingFailed, { reason: error instanceof Error ? error.message : String(error) }))
   }
@@ -323,13 +323,6 @@ async function saveAuto($: EngineInterface, next: AutoCompact): Promise<void> {
 // auto compact is set per chat; a chat with none opens with the last setting chosen
 // anywhere. Read again whenever the chat's id changes (a /clear goes on under a new one)
 let autoChat: string | undefined
-async function chatId($: EngineInterface): Promise<string> {
-  try {
-    return await $.session.id()
-  } catch {
-    return 'chat'
-  }
-}
 async function loadAuto($: EngineInterface): Promise<void> {
   const id = await chatId($)
   if (id === autoChat) return
@@ -426,17 +419,33 @@ async function answerAsk($: EngineInterface, choice: 'now' | 'next'): Promise<vo
   }
 }
 
-// What a turn took of the 5 hour limit: how far it moved across the turn.
+// What a turn took of each limit, for the band (the 5 hour one) and the history (each, by chat).
 // shortcut: the limit is the account's, so another chat's use mid-turn counts too, in whole
 // percents between the service's answers; exact cost needs token counts priced per model
 async function countSpend($: EngineInterface): Promise<void> {
-  const { from } = await read($, spend)
-  const after = (await read($, snapshot))?.limits.find(l => l.kind === 'five_hour')
-  if (!from || !after) return
+  const { from } = await read($, spend) // a turn begun before this version: one reading, not a list
+  const costs = turnCosts(Array.isArray(from) ? from : from ? [from] : [], (await read($, snapshot))?.limits ?? [])
+  const five = costs.find(m => m.kind === 'five_hour')
   // a window that reset mid-turn: the new one's use is all this turn's; the total starts over
-  const isSame = sameWindow(from.resetsAt, after.resetsAt)
-  const cost = isSame ? Math.max(0, after.percentUsed - from.percentUsed) : after.percentUsed
-  await update($, spend, s => ({ ...s, total: (isSame ? s.total : 0) + cost, last: cost, from: null }))
+  await update($, spend, s => (five ? { ...s, total: (five.isSame ? s.total : 0) + five.cost, last: five.cost, from: null } : { ...s, from: null }))
+  await recordChatUse($, costs)
+}
+
+// each turn's share joins the shared list the history splits its bars by, under the chat's
+// first typed prompt (the app gives no title). shortcut: two chats ending a turn in the same
+// instant may drop one's share (read, add, write)
+async function recordChatUse($: EngineInterface, costs: TurnCost[]): Promise<void> {
+  const used = costs.filter(m => m.cost > 0 && Number.isFinite(m.resetsAt))
+  if (used.length === 0) return
+  const chat = await chatId($)
+  // a failed read is not an empty list: written back, it would wipe every other chat's share
+  const list = await Promise.resolve().then(() => $.store.get('chatUse')).then(v => (v as ChatUse[] | undefined) ?? [], () => null)
+  if (list === null) return
+  const known = list.find(u => u.chat === chat && u.name !== idName(chat))?.name
+  const texts = known ? [] : await Promise.resolve().then(() => $.session.messages()).then(ms => ms.filter(m => m.role === 'user').map(m => m.text), () => [])
+  const name = known ?? chatLabel(texts, idName(chat))
+  const next = addChatUse(list, used.map(m => ({ kind: m.kind, resetsAt: m.resetsAt, chat, name, percent: m.cost })))
+  if (next !== list) await storeSet($, 'chatUse', next)
 }
 
 let isRefreshing = false
@@ -548,27 +557,14 @@ async function refresh($: EngineInterface, ask: Ask = 'no'): Promise<boolean> {
       }
     }
     const useExact = context.tokens === undefined && exactCount !== undefined && noReplySince !== undefined && exactCount.at >= noReplySince
-    let tools = Math.round(rough.Tools * (calib.Tools ?? 1))
-    let other = Math.round(rough.Other * (calib.Other ?? 1))
-    // Messages as /context counts it: the API's real input total less the other groups
-    let messages = context.tokens !== undefined && context.tokens - tools - other > 0 ? context.tokens - tools - other : rough.Messages
-    if (useExact) ({ Messages: messages, Tools: tools, Other: other } = exactCount!.sums)
-    const used = context.tokens ?? (useExact ? messages + tools + other : breakdown?.totalTokens ?? 0)
-    const categories: Category[] = [
-      { name: 'Messages', tokens: messages, kind: 'used' as const },
-      { name: 'Tools', tokens: tools, kind: 'used' as const },
-      { name: 'Other', tokens: other, kind: 'used' as const },
-      ...all
-        .filter(c => c.kind === 'buffer' || c.kind === 'free')
-        .map(c => ({ name: c.name, tokens: c.tokens, kind: c.kind as Category['kind'] })),
-    ].filter(c => c.tokens > 0)
+    const { categories, used, percent } = contextFigures(context, breakdown, all, calib, useExact ? exactCount!.sums : undefined)
     const { limits, at: limitsAt, error: limitsError } = await limitsOf($, usage.rateLimits, now, ask)
     const pace = await trackPace($, limits, now)
     await checkAlerts($, limits, now)
     const next: Snapshot = {
       window: context.window,
       tokens: used,
-      percent: useExact ? Math.round((used / context.window) * 100) : context.percent ?? breakdown?.percentage ?? Math.round((used / context.window) * 100),
+      percent,
       total: categories.reduce((sum, c) => sum + c.tokens, 0) || context.window,
       categories,
       limits,
@@ -716,15 +712,16 @@ export const register: Register = (on, options) => {
       isOpening = false
       if (snap && snap.limits.length > 0 && openMessages >= RESUME_MIN_TOKENS) spikeFrom = { at: await $.clock.now(), limits: snap.limits }
     }
-    // where the 5 hour limit stood as this turn began, to count what it takes
-    const five = snap?.limits.find(l => l.kind === 'five_hour') ?? null
-    await update($, spend, s => ({ ...s, from: five }))
+    // where the limits stood as this turn began, to count what it takes
+    await update($, spend, s => ({ ...s, from: snap?.limits ?? null }))
     await commitDraft($)
     return next(e)
   })
 
   on('turn.complete', async ($, e, next) => {
     const result = await next(e)
+    // a subagent's run ends inside the main turn: the turn is not over, nor counted yet
+    if (e.agentId !== undefined) return result
     await refreshAfter($)
     await countSpend($)
     // the first reply is done: whatever it used, the jump is behind it
@@ -756,11 +753,13 @@ export const register: Register = (on, options) => {
     return historyTree($.ui.resolve(e), e.surface, Math.max(30, e.props.bodyColumns), {
       past: ((await storeGet($, 'history')) as Past[] | undefined) ?? [],
       limits: snap?.limits ?? [],
+      chatUse: ((await storeGet($, 'chatUse')) as ChatUse[] | undefined) ?? [],
+      open: await read($, openRows),
       now: await $.clock.now(),
       isLight: (await read($, theme)) === 'light',
       ramp: settings.limitRamp,
       t: stringsOf(await read($, language)),
-    })
+    }, key => void update($, openRows, rows => (rows.includes(key) ? rows.filter(r => r !== key) : [...rows, key])))
   })
 
   on('ui.render', { component: 'Pane', requestId: SETTINGS_PANE }, async ($, e, next) => {

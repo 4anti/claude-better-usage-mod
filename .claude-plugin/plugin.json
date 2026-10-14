@@ -1,13 +1,13 @@
 {
   "name": "usage-quota",
-  "version": "0.4.1",
+  "version": "0.5.1",
   "description": "Know your Claude limits before they hit you (Live band above the Claude Code prompt): 5 Hour and Weekly usage (whole account) with a live usage forecast against limit resets, alerts, usage history, 16 languages, what this chat took, context window usage, one-click Compact and Auto compact.",
   "author": { "name": "Anant Raghunath", "url": "https://github.com/anantraghunath" },
   "homepage": "https://github.com/4anti/claude-better-usage-mod",
   "repository": "https://github.com/4anti/claude-better-usage-mod",
   "license": "MIT",
   "keywords": ["usage", "quota", "rate limits", "context window", "compact", "mod"],
-  "privacyPolicyUrl": "https://github.com/4anti/claude-better-usage-mod#-privacy",
+  "privacyPolicyUrl": "https://github.com/4anti/claude-better-usage-mod#privacy",
   "types": "./types/index.d.ts",
   "userConfig": {
     "language": {
