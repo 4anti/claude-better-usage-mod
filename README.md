@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/hero.svg" width="100%" alt="Usage Quota for Claude Code: the band above the prompt, with the 5 Hour and Weekly limits, a forecast tick for each reset, context window usage, Compact and Auto compact">
+<img src="docs/hero.svg" width="100%" alt="Usage Quota inside a Claude Code chat: the band sits directly above the prompt box. The 5 Hour bar fills from grey through yellow to red as the limit runs out, next to the Weekly limit, forecast ticks, context window usage, Compact and Auto compact">
 
 <br>
 
@@ -41,7 +41,7 @@ Collapsed, it is one row with the time left until each limit resets. Every chat 
   <img src="docs/card-alerts.svg" width="49%" alt="Alerts: at 90%, when a limit is reached, and when a 5 Hour window resets">
   <img src="docs/card-history.svg" width="49%" alt="Usage history: past windows as bars, each split by the chats that used it">
   <img src="docs/card-chat-cost.svg" width="49%" alt="What this chat used: This chat used 3% – last reply 0.5%">
-  <img src="docs/card-compact.svg" width="49%" alt="Compact and Auto compact: the context bar and the 30% Auto compact marker">
+  <img src="docs/card-compact.svg" width="49%" alt="Compact and Auto compact: with Auto compact on, the context fills to the 30% marker, compacts automatically and drops back to 6%">
   <img src="docs/card-languages.svg" width="49%" alt="16 languages: the Weekly row of the band in English, Türkçe, Deutsch, Français, Русский, 日本語, 한국어 and 中文 in turn, above the list of all 16">
 </p>
 

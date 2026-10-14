@@ -1,45 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-<title>Compact and Auto compact: the switch is on at 30%, the context fills to 30%, auto compacts down and fills again</title>
+<title>Compact and Auto compact: Auto compact is switched on at 30%, the context fills from 18% to 30%, auto compacts down to 6% and the loop starts again</title>
 <style>
-.ctx{transform-box:fill-box;transform-origin:left center;animation:ctx 12s cubic-bezier(.2,.7,.2,1) infinite}
-.s30{animation:s30 12s ease infinite}
-.s6,.s12,.s18,.s24{opacity:0}
-.s6{animation:s6 12s ease infinite}.s12{animation:s12 12s ease infinite}
-.s18{animation:s18 12s ease infinite}.s24{animation:s24 12s ease infinite}
-.note{animation:note 12s ease infinite}
-@keyframes ctx{0%,28%{transform:scaleX(1)}34%{transform:scaleX(.28)}40%{transform:scaleX(.28);animation-timing-function:linear}88%,100%{transform:scaleX(1)}}
-@keyframes s30{0%,29%{opacity:1}31%,87%{opacity:0}89%,100%{opacity:1}}
-@keyframes s6{0%,31%{opacity:0}33%,51%{opacity:1}53%,100%{opacity:0}}
-@keyframes s12{0%,51%{opacity:0}53%,63%{opacity:1}65%,100%{opacity:0}}
-@keyframes s18{0%,63%{opacity:0}65%,75%{opacity:1}77%,100%{opacity:0}}
-@keyframes s24{0%,75%{opacity:0}77%,87%{opacity:1}89%,100%{opacity:0}}
-@keyframes note{0%,28%{opacity:1}31%,89%{opacity:0}94%,100%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.ctx,.s30,.s6,.s12,.s18,.s24,.note{animation:none}}
+.pill{animation:pill 12s ease infinite}
+.knob{animation:knob 12s ease infinite}
+.mark{animation:mark 12s ease infinite}
+.btn{animation:btn 12s ease infinite}
+.msg{transform-box:fill-box;transform-origin:left center;animation:msg 12s ease-in-out infinite}
+.tail{animation:tail 12s ease-in-out infinite}
+.u18{animation:u18 12s ease infinite}.u22{animation:u22 12s ease infinite}.u26{animation:u26 12s ease infinite}
+.u30{animation:u30 12s ease infinite}.u6{animation:u6 12s ease infinite}
+.armed{animation:armed 12s ease infinite}.cmp{animation:cmp 12s ease infinite}
+/* 1s = 8.333%: switch on 1.0-1.4s, fills 18-22-26-30 at 2.2, 3.2, 4.2s, pressed 5.6-7.3s, compacts to 6% at 7.0s, resets at 11.2s */
+@keyframes pill{0%,8.333%{fill:#4d4d4a}11.667%,93.333%{fill:#4ade80}95.833%,100%{fill:#4d4d4a}}
+@keyframes knob{0%,8.333%{transform:translateX(-12px)}11.667%,93.333%{transform:translateX(0)}95.833%,100%{transform:translateX(-12px)}}
+@keyframes mark{0%,10%{opacity:0}12.5%,93.333%{opacity:1}95.833%,100%{opacity:0}}
+@keyframes btn{0%,46.667%{fill:#373838}49.167%,58.333%{fill:#4d4d4a}60.833%,100%{fill:#373838}}
+@keyframes msg{0%,18.333%{transform:scaleX(.5636)}21.667%,26.667%{transform:scaleX(.7091)}30%,35%{transform:scaleX(.8545)}38.333%,58.333%{transform:scaleX(1)}63.333%,94.167%{transform:scaleX(.1273)}98.333%,100%{transform:scaleX(.5636)}}
+@keyframes tail{0%,18.333%{transform:translateX(-60.96px)}21.667%,26.667%{transform:translateX(-40.64px)}30%,35%{transform:translateX(-20.32px)}38.333%,58.333%{transform:translateX(0)}63.333%,94.167%{transform:translateX(-121.92px)}98.333%,100%{transform:translateX(-60.96px)}}
+@keyframes u18{0%,18.75%{opacity:1}21.25%,95%{opacity:0}97.5%,100%{opacity:1}}
+@keyframes u22{0%,18.75%{opacity:0}21.25%,27.083%{opacity:1}29.583%,100%{opacity:0}}
+@keyframes u26{0%,27.083%{opacity:0}29.583%,35.417%{opacity:1}37.917%,100%{opacity:0}}
+@keyframes u30{0%,35.417%{opacity:0}37.917%,59.167%{opacity:1}61.667%,100%{opacity:0}}
+@keyframes u6{0%,59.167%{opacity:0}61.667%,95%{opacity:1}97.5%,100%{opacity:0}}
+@keyframes armed{0%,11.667%{opacity:0}14.167%,32.5%{opacity:1}35%,100%{opacity:0}}
+@keyframes cmp{0%,40%{opacity:0}42.5%,80%{opacity:1}82.5%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.pill,.knob,.mark,.btn,.msg,.tail,.u18,.u22,.u26,.u30,.u6,.armed,.cmp{animation:none}}
 </style>
 <defs><clipPath id="track"><rect x="26" y="168" width="508" height="8" rx="4"/></clipPath></defs>
 <rect x=".5" y=".5" width="559" height="299" rx="12" fill="#212121" stroke="#2c2c2b"/>
 <text x="26" y="44" fill="#efefec" font-size="19" font-weight="600">Compact &amp; Auto compact</text>
 <text x="26" y="72" fill="#9a9a96" font-size="14.5">One click, or automatically at your % – never mid-reply.</text>
-<rect x="26" y="115" width="30" height="18" rx="9" fill="#4ade80"/><circle cx="47" cy="124" r="6" fill="#efefec"/>
+<rect class="pill" x="26" y="115" width="30" height="18" rx="9" fill="#4ade80"/><circle class="knob" cx="47" cy="124" r="6" fill="#efefec"/>
 <text x="68" y="129" fill="#efefec" font-size="15">Auto compact</text>
 <rect x="174.5" y="112.5" width="38" height="23" rx="5" fill="#151515" stroke="#333332"/>
 <text x="193.5" y="129" fill="#efefec" font-size="14" text-anchor="middle">30</text>
 <text x="218" y="129" fill="#9a9a96" font-size="15">%</text>
-<rect x="258" y="111" width="86" height="26" rx="6" fill="#373838"/>
+<rect class="btn" x="258" y="111" width="86" height="26" rx="6" fill="#373838"/>
 <text x="301" y="129" fill="#efefec" font-size="14" text-anchor="middle">Compact</text>
 <text x="356" y="129" fill="#efefec" font-size="13">▼</text>
 <rect x="26" y="168" width="508" height="8" rx="4" fill="#333332"/>
-<g clip-path="url(#track)"><g class="ctx">
-  <rect x="26" y="168" width="127" height="8" fill="#78d0ea"/>
-  <rect x="153" y="168" width="13" height="8" fill="#a48ef2"/>
-  <rect x="166" y="168" width="29" height="8" fill="#4d4d4a"/>
-</g></g>
+<!-- 1M window, 0.508px per 1k: Messages grow, Tools 25k and the 33k buffer ride after them -->
+<g clip-path="url(#track)">
+  <rect class="msg" x="26" y="168" width="139.7" height="8" fill="#78d0ea"/>
+  <g class="tail"><rect x="165.7" y="168" width="12.7" height="8" fill="#a48ef2"/><rect x="178.4" y="168" width="16.764" height="8" fill="#4d4d4a"/></g>
+  <rect class="mark" x="177" y="168" width="3" height="8" fill="#dcdbd6"/>
+</g>
 <text x="26" y="206" fill="#efefec" font-size="16" font-weight="600">Context</text>
-<g class="s30"><text x="106" y="206" fill="#aca285" font-size="16" font-weight="600">30% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">667k free of 1M</text></g>
-<g class="s6"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">6% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">907k free of 1M</text></g>
-<g class="s12"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">12% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">847k free of 1M</text></g>
-<g class="s18"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">18% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">787k free of 1M</text></g>
-<g class="s24"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">24% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">727k free of 1M</text></g>
+<g class="u18" opacity="0"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">18% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">787k free of 1M</text></g>
+<g class="u22" opacity="0"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">22% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">747k free of 1M</text></g>
+<g class="u26" opacity="0"><text x="106" y="206" fill="#9e9b93" font-size="16" font-weight="600">26% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">707k free of 1M</text></g>
+<g class="u30"><text x="106" y="206" fill="#aa9f87" font-size="16" font-weight="600">30% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">667k free of 1M</text></g>
+<g class="u6" opacity="0"><text x="106" y="206" fill="#9a9a96" font-size="16" font-weight="600">6% used</text><text x="534" y="206" fill="#9a9a96" font-size="15" text-anchor="end">907k free of 1M</text></g>
 <rect x="26" y="232" width="508" height="1" fill="#2c2c2b"/>
-<text class="note" x="26" y="264" fill="#9a9a96" font-size="14.5">Context at 30%: auto compacting (set at 30%)</text>
+<text class="armed" x="26" y="264" fill="#9a9a96" font-size="14.5" opacity="0">Auto compact at 30% context</text>
+<text class="cmp" x="26" y="264" fill="#9a9a96" font-size="14.5">Context at 30%: auto compacting (set at 30%)</text>
 </svg>

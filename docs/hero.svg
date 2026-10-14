@@ -1,13 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Usage Quota for Claude Code: a live band showing 5 Hour and Weekly limits, a forecast to the reset, and context window usage">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Usage Quota for Claude Code: a live band drawn above the Claude Code prompt, showing 5 Hour and Weekly limits, a forecast to the reset, and context window usage">
 <style>
-.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
-.tick{animation:tick 10s cubic-bezier(.2,.7,.2,1) infinite both}
-.fade{animation:fade 10s cubic-bezier(.2,.7,.2,1) infinite both}
-.d1{animation-delay:.15s}.d2{animation-delay:.3s}.d3{animation-delay:.45s}
-@keyframes grow{0%{transform:scaleX(0)}18%,100%{transform:scaleX(1)}}
-@keyframes tick{0%,14%{opacity:0}26%,100%{opacity:1}}
-@keyframes fade{0%,3%{opacity:0}14%,100%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.grow,.tick,.fade{animation:none}}
+.f5{transform-box:fill-box;transform-origin:left center}
+.f5{animation:s5 14s linear infinite,c5 14s linear infinite}
+.t5{animation:tm 14s linear infinite,tc 14s linear infinite,tf 14s infinite}
+.n7{animation:on7 14s infinite}
+.n30{animation:on30 14s infinite}
+.n50{animation:on50 14s infinite}
+.n62{animation:on62 14s infinite}
+.n75{animation:on75 14s infinite}
+.n88{animation:on88 14s infinite}
+.n95{animation:on95 14s infinite}
+.n100{animation:on100 14s infinite}
+.h1{animation:oh1 14s infinite}
+.h2{animation:oh2 14s infinite,c5 14s linear infinite}
+.h3{animation:oh3 14s infinite}
+.s1{animation:os1 14s infinite}
+.s2{animation:os2 14s infinite}
+.s3{animation:os3 14s infinite}
+.s4{animation:os4 14s infinite}
+.r2{animation:or2 14s infinite}
+.r3{animation:or3 14s infinite}
+@keyframes s5{0%{transform:scaleX(1.0000)}10.714%{transform:scaleX(1.0000)}11.429%{transform:scaleX(1.1153)}12.143%{transform:scaleX(1.2396)}12.857%{transform:scaleX(1.3730)}13.571%{transform:scaleX(1.5154)}14.286%{transform:scaleX(1.6667)}15%{transform:scaleX(1.8268)}15.714%{transform:scaleX(1.9956)}16.429%{transform:scaleX(2.1729)}17.143%{transform:scaleX(2.3584)}17.857%{transform:scaleX(2.5521)}18.571%{transform:scaleX(2.7537)}19.286%{transform:scaleX(2.9629)}20%{transform:scaleX(3.1795)}20.714%{transform:scaleX(3.4031)}21.429%{transform:scaleX(3.6335)}22.143%{transform:scaleX(3.8704)}22.857%{transform:scaleX(4.1133)}23.571%{transform:scaleX(4.3620)}24.286%{transform:scaleX(4.6160)}25%{transform:scaleX(4.8750)}25.714%{transform:scaleX(5.1385)}26.429%{transform:scaleX(5.4062)}27.143%{transform:scaleX(5.6776)}27.857%{transform:scaleX(5.9522)}28.571%{transform:scaleX(6.2296)}29.286%{transform:scaleX(6.5094)}30%{transform:scaleX(6.7911)}30.714%{transform:scaleX(7.0742)}30.887%{transform:scaleX(7.1429)}31.429%{transform:scaleX(7.3583)}32.143%{transform:scaleX(7.6429)}32.857%{transform:scaleX(7.9274)}33.571%{transform:scaleX(8.2115)}34.286%{transform:scaleX(8.4946)}35%{transform:scaleX(8.7763)}35.714%{transform:scaleX(9.0561)}36.429%{transform:scaleX(9.3335)}37.143%{transform:scaleX(9.6082)}37.857%{transform:scaleX(9.8795)}38.571%{transform:scaleX(10.1472)}39.286%{transform:scaleX(10.4107)}40%{transform:scaleX(10.6697)}40.124%{transform:scaleX(10.7143)}40.714%{transform:scaleX(10.9237)}41.429%{transform:scaleX(11.1724)}42.143%{transform:scaleX(11.4153)}42.857%{transform:scaleX(11.6522)}43.571%{transform:scaleX(11.8826)}44.286%{transform:scaleX(12.1062)}45%{transform:scaleX(12.3228)}45.714%{transform:scaleX(12.5320)}46.429%{transform:scaleX(12.7336)}47.143%{transform:scaleX(12.9273)}47.857%{transform:scaleX(13.1128)}48.571%{transform:scaleX(13.2901)}49.286%{transform:scaleX(13.4589)}49.784%{transform:scaleX(13.5714)}50%{transform:scaleX(13.6190)}50.714%{transform:scaleX(13.7703)}51.429%{transform:scaleX(13.9127)}52.143%{transform:scaleX(14.0461)}52.857%{transform:scaleX(14.1704)}53.571%{transform:scaleX(14.2857)}75%{transform:scaleX(14.2857)}75.714%{transform:scaleX(13.9606)}76.064%{transform:scaleX(13.5714)}76.429%{transform:scaleX(13.0170)}77.143%{transform:scaleX(11.5474)}77.479%{transform:scaleX(10.7143)}77.857%{transform:scaleX(9.6956)}78.571%{transform:scaleX(7.6429)}78.743%{transform:scaleX(7.1429)}79.286%{transform:scaleX(5.5901)}80%{transform:scaleX(3.7383)}80.714%{transform:scaleX(2.2687)}81.429%{transform:scaleX(1.3251)}82.143%{transform:scaleX(1.0000)}100%{transform:scaleX(1.0000)}}
+@keyframes c5{0%{fill:#9a9a96}30.714%{fill:#9a9a96}30.887%{fill:#9b9a96}31.429%{fill:#9f9c91}32.143%{fill:#a59e8b}32.857%{fill:#aba085}33.571%{fill:#b1a27f}34.286%{fill:#b7a479}35%{fill:#bda673}35.714%{fill:#c3a86d}36.429%{fill:#c8ab67}37.143%{fill:#cead62}37.857%{fill:#d4af5c}38.571%{fill:#d9b156}39.286%{fill:#dfb350}40%{fill:#e4b54b}40.124%{fill:#e5b54a}40.714%{fill:#e5ae4a}41.429%{fill:#e5a54a}42.143%{fill:#e59d4a}42.857%{fill:#e5954a}43.571%{fill:#e58d4a}44.286%{fill:#e5854a}45%{fill:#e57e4b}45.714%{fill:#e5774b}46.429%{fill:#e5704b}47.143%{fill:#e5694b}47.857%{fill:#e5634b}48.571%{fill:#e55d4b}49.286%{fill:#e5574b}49.784%{fill:#e5534b}76.064%{fill:#e5534b}76.429%{fill:#e5664b}77.143%{fill:#e5984a}77.479%{fill:#e5b54a}77.857%{fill:#d0ad60}78.571%{fill:#a59e8b}78.743%{fill:#9a9a96}100%{fill:#9a9a96}}
+@keyframes tm{0%{transform:translateX(0.00px)}10.714%{transform:translateX(0.00px)}11.429%{transform:translateX(1.98px)}12.143%{transform:translateX(4.12px)}12.857%{transform:translateX(6.41px)}13.571%{transform:translateX(8.86px)}14.286%{transform:translateX(11.46px)}15%{transform:translateX(14.21px)}15.714%{transform:translateX(17.11px)}16.429%{transform:translateX(20.15px)}17.143%{transform:translateX(23.34px)}17.857%{transform:translateX(26.67px)}18.571%{transform:translateX(30.13px)}19.286%{transform:translateX(33.73px)}20%{transform:translateX(37.45px)}20.714%{transform:translateX(41.29px)}21.429%{transform:translateX(45.25px)}22.143%{transform:translateX(49.32px)}22.857%{transform:translateX(53.49px)}23.571%{transform:translateX(57.77px)}24.286%{transform:translateX(62.13px)}25%{transform:translateX(66.58px)}25.714%{transform:translateX(71.11px)}26.429%{transform:translateX(75.71px)}27.143%{transform:translateX(80.37px)}27.857%{transform:translateX(85.09px)}28.571%{transform:translateX(89.85px)}29.286%{transform:translateX(94.66px)}30%{transform:translateX(99.50px)}30.714%{transform:translateX(104.37px)}30.887%{transform:translateX(105.55px)}31.429%{transform:translateX(109.25px)}32.143%{transform:translateX(114.14px)}32.857%{transform:translateX(119.03px)}33.571%{transform:translateX(123.91px)}34.286%{transform:translateX(128.77px)}35%{transform:translateX(133.00px)}35.206%{transform:translateX(133.00px)}78.571%{transform:translateX(133px)}78.929%{transform:translateX(0px)}100%{transform:translateX(0px)}}
+@keyframes tc{0%{fill:#dcdbd6}34.492%{fill:#dcdbd6}35.92%{fill:#e5b54a}38.231%{fill:#e5b54a}39.66%{fill:#e5534b}78.571%{fill:#e5534b}78.929%{fill:#dcdbd6}100%{fill:#dcdbd6}}
+@keyframes tf{0%{opacity:1}51.429%{opacity:1}53.214%{opacity:0}80.714%{opacity:0}82.857%{opacity:1}100%{opacity:1}}
+@keyframes on7{0%{opacity:1}22.283%{opacity:1}24.425%{opacity:0}77.5%{opacity:0}79.643%{opacity:1}100%{opacity:1}}
+@keyframes on30{0%{opacity:0}22.283%{opacity:0}24.425%{opacity:1}29.816%{opacity:1}31.958%{opacity:0}100%{opacity:0}}
+@keyframes on50{0%{opacity:0}29.816%{opacity:0}31.958%{opacity:1}34.134%{opacity:1}36.277%{opacity:0}100%{opacity:0}}
+@keyframes on62{0%{opacity:0}34.134%{opacity:0}36.277%{opacity:1}39.053%{opacity:1}41.196%{opacity:0}100%{opacity:0}}
+@keyframes on75{0%{opacity:0}39.053%{opacity:0}41.196%{opacity:1}44.78%{opacity:1}46.923%{opacity:0}100%{opacity:0}}
+@keyframes on88{0%{opacity:0}44.78%{opacity:0}46.923%{opacity:1}48.712%{opacity:1}50.855%{opacity:0}100%{opacity:0}}
+@keyframes on95{0%{opacity:0}48.712%{opacity:0}50.855%{opacity:1}52.5%{opacity:1}54.643%{opacity:0}100%{opacity:0}}
+@keyframes on100{0%{opacity:0}52.5%{opacity:0}54.643%{opacity:1}77.5%{opacity:1}79.643%{opacity:0}100%{opacity:0}}
+@keyframes oh1{0%{opacity:1}34.134%{opacity:1}36.277%{opacity:0}77.5%{opacity:0}79.643%{opacity:1}100%{opacity:1}}
+@keyframes oh2{0%{opacity:0}34.134%{opacity:0}36.277%{opacity:1}52.5%{opacity:1}54.643%{opacity:0}100%{opacity:0}}
+@keyframes oh3{0%{opacity:0}52.5%{opacity:0}54.643%{opacity:1}77.5%{opacity:1}79.643%{opacity:0}100%{opacity:0}}
+@keyframes os1{0%{opacity:1}20.167%{opacity:1}22.309%{opacity:0}77.5%{opacity:0}79.643%{opacity:1}100%{opacity:1}}
+@keyframes os2{0%{opacity:0}20.167%{opacity:0}22.309%{opacity:1}34.134%{opacity:1}36.277%{opacity:0}100%{opacity:0}}
+@keyframes os3{0%{opacity:0}34.134%{opacity:0}36.277%{opacity:1}52.5%{opacity:1}54.643%{opacity:0}100%{opacity:0}}
+@keyframes os4{0%{opacity:0}52.5%{opacity:0}54.643%{opacity:1}77.5%{opacity:1}79.643%{opacity:0}100%{opacity:0}}
+@keyframes or2{0%{opacity:0}17.143%{opacity:0}20%{opacity:1}75.714%{opacity:1}78.571%{opacity:0}100%{opacity:0}}
+@keyframes or3{0%{opacity:0}44.286%{opacity:0}47.143%{opacity:1}75.714%{opacity:1}78.571%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 <defs>
 <clipPath id="bars">
@@ -16,13 +51,26 @@
   <rect x="520" y="68" width="546" height="8" rx="4"/>
 </clipPath>
 </defs>
-<rect width="1200" height="440" rx="16" fill="#151515"/>
-<text x="56" y="70" fill="#9a9a96" font-size="13" letter-spacing="2.4">CLAUDE CODE MOD</text>
-<text x="56" y="118" fill="#efefec" font-size="42" font-weight="600">Usage Quota</text>
-<text x="56" y="152" fill="#9a9a96" font-size="18">Know your Claude limits before they hit you.</text>
-<g transform="translate(56,192)">
+<rect width="1200" height="660" rx="16" fill="#151515"/>
+<text x="56" y="58" fill="#9a9a96" font-size="13" letter-spacing="2.4">CLAUDE CODE MOD</text>
+<text x="56" y="104" fill="#efefec" font-size="42" font-weight="600">Usage Quota</text>
+<text x="56" y="136" fill="#9a9a96" font-size="18">Know your Claude limits before they hit you.</text>
+
+<text x="1160" y="136" fill="#9a9a96" font-size="12.5" letter-spacing="1.6" text-anchor="end">USAGE-QUOTA DRAWS HERE, ABOVE THE PROMPT</text>
+<path d="M1168 131.5H1182.5V516.5H1172M1182.5 312.5H1172" fill="none" stroke="#4d4d4a"/>
+
+<rect x="36.5" y="160.5" width="1127" height="467" rx="12" fill="#212121" stroke="#2c2c2b"/>
+<rect x="915" y="178" width="229" height="36" rx="12" fill="#2c2c2b"/>
+<text x="1128" y="201" fill="#efefec" font-size="15" text-anchor="end">Add tests for the history pane</text>
+<text x="56" y="238" fill="#efefec" font-size="15">I’ll cover the window list, the day headings and each chat’s colour.</text>
+<text class="r2" x="56" y="262" fill="#9a9a96" font-size="14">Edited 3 files<tspan dx="10">+39 −26</tspan></text>
+<text class="r3" x="56" y="286" fill="#efefec" font-size="15">All 24 tests pass.</text>
+
+<g transform="translate(56,312)">
   <rect x=".5" y=".5" width="1087" height="203" rx="12" fill="#212121" stroke="#2c2c2b"/>
-  <text class="fade" x="22" y="38" fill="#aca285" font-size="16" font-weight="600">At this pace you’ll run out before Sunday’s reset.</text>
+  <text class="h1" x="22" y="38" fill="#aca285" font-size="16" font-weight="600">At this pace you’ll run out before Sunday’s reset.</text>
+  <text class="h2" opacity="0" x="22" y="38" fill="#bfa772" font-size="16" font-weight="600">At this pace you’ll run out before the 4:40 PM reset.</text>
+  <text class="h3" opacity="0" x="22" y="38" fill="#e5534b" font-size="16" font-weight="600">Limit reached. Usage resumes at 4:40 PM.</text>
   <rect x="740" y="24" width="30" height="18" rx="9" fill="#4d4d4a"/><circle cx="749" cy="33" r="6" fill="#efefec"/>
   <text x="782" y="38" fill="#9a9a96" font-size="15">Auto compact</text>
   <rect x="960" y="21" width="84" height="25" rx="6" fill="#373838"/>
@@ -32,36 +80,57 @@
   <text x="22" y="77" fill="#efefec" font-size="16" font-weight="600">5 Hour</text>
   <g clip-path="url(#bars)">
     <rect x="100" y="68" width="300" height="8" fill="#333332"/>
-    <rect class="grow" x="100" y="68" width="21" height="8" fill="#9a9a96"/>
-    <rect class="tick" x="264" y="68" width="3" height="8" fill="#dcdbd6"/>
+    <rect class="f5" x="100" y="68" width="21" height="8" fill="#9a9a96"/>
+    <rect class="t5" x="264" y="68" width="3" height="8" fill="#dcdbd6"/>
   </g>
-  <text x="440" y="77" fill="#9a9a96" font-size="16" text-anchor="end">7%</text>
-  <text class="tick" x="22" y="102" fill="#9a9a96" font-size="14.5">On pace for about 55% by reset – resets in 4h 50m</text>
+  <text class="n7" x="414" y="77" fill="#9a9a96" font-size="16">7%</text>
+  <text class="n30" opacity="0" x="414" y="77" fill="#9a9a96" font-size="16" font-weight="600">30%</text>
+  <text class="n50" opacity="0" x="414" y="77" fill="#9a9a96" font-size="16" font-weight="600">50%</text>
+  <text class="n62" opacity="0" x="414" y="77" fill="#bfa772" font-size="16" font-weight="600">62%</text>
+  <text class="n75" opacity="0" x="414" y="77" fill="#e5b54a" font-size="16" font-weight="600">75%</text>
+  <text class="n88" opacity="0" x="414" y="77" fill="#e5754b" font-size="16" font-weight="600">88%</text>
+  <text class="n95" opacity="0" x="414" y="77" fill="#e5534b" font-size="16" font-weight="600">95%</text>
+  <text class="n100" opacity="0" x="414" y="77" fill="#e5534b" font-size="16" font-weight="600">100%</text>
+  <text class="s1" x="22" y="102" fill="#9a9a96" font-size="14.5">On pace for about 55% by reset – resets in 4h 50m</text>
+  <text class="s2" opacity="0" x="22" y="102" fill="#9a9a96" font-size="14.5">On pace for about 85% by reset – resets in 4h 25m</text>
+  <text class="s3" opacity="0" x="22" y="102" fill="#9a9a96" font-size="14.5">Limit will hit in 35m – resets in 4h 5m</text>
+  <text class="s4" opacity="0" x="22" y="102" fill="#9a9a96" font-size="14.5">Limit reached – resets in 3h 30m</text>
 
   <text x="22" y="147" fill="#efefec" font-size="16" font-weight="600">Weekly</text>
   <g clip-path="url(#bars)">
     <rect x="100" y="138" width="300" height="8" fill="#333332"/>
-    <rect class="grow d1" x="100" y="138" width="171" height="8" fill="#aca285"/>
-    <rect class="tick d1" x="397" y="138" width="3" height="8" fill="#e5534b"/>
+    <rect x="100" y="138" width="171" height="8" fill="#aca285"/>
+    <rect x="397" y="138" width="3" height="8" fill="#e5534b"/>
   </g>
-  <text x="440" y="147" fill="#aca285" font-size="16" font-weight="600" text-anchor="end">57%</text>
-  <text class="tick d1" x="22" y="172" fill="#9a9a96" font-size="14.5">Limit will hit in 3d 3h – resets in 5d 11h</text>
+  <text x="414" y="147" fill="#aca285" font-size="16" font-weight="600">57%</text>
+  <text x="22" y="172" fill="#9a9a96" font-size="14.5">Limit will hit in 3d 3h – resets in 5d 11h</text>
 
   <g clip-path="url(#bars)">
     <rect x="520" y="68" width="546" height="8" fill="#333332"/>
-    <g class="grow d2">
-      <rect x="520" y="68" width="175" height="8" fill="#78d0ea"/>
-      <rect x="695" y="68" width="19" height="8" fill="#a48ef2"/>
-      <rect x="714" y="68" width="33" height="8" fill="#4d4d4a"/>
-    </g>
+    <rect x="520" y="68" width="175" height="8" fill="#78d0ea"/>
+    <rect x="695" y="68" width="19" height="8" fill="#a48ef2"/>
+    <rect x="714" y="68" width="33" height="8" fill="#4d4d4a"/>
   </g>
   <text x="520" y="108" fill="#efefec" font-size="16" font-weight="600">Context</text>
   <text x="600" y="108" fill="#aca285" font-size="16" font-weight="600">38% used</text>
   <text x="1066" y="108" fill="#9a9a96" font-size="15" text-anchor="end">583k free of 1M</text>
-  <g class="fade d3">
-    <text x="520" y="134" fill="#78d0ea" font-size="15">Messages</text><text x="1066" y="134" fill="#9a9a96" font-size="15" text-anchor="end">321k</text>
-    <text x="520" y="158" fill="#a48ef2" font-size="15">Tools</text><text x="1066" y="158" fill="#9a9a96" font-size="15" text-anchor="end">35k</text>
-    <text x="520" y="182" fill="#9a9a96" font-size="15">Other</text><text x="1066" y="182" fill="#9a9a96" font-size="15" text-anchor="end">28k</text>
-  </g>
+  <text x="520" y="134" fill="#78d0ea" font-size="15">Messages</text><text x="1066" y="134" fill="#9a9a96" font-size="15" text-anchor="end">321k</text>
+  <text x="520" y="158" fill="#a48ef2" font-size="15">Tools</text><text x="1066" y="158" fill="#9a9a96" font-size="15" text-anchor="end">35k</text>
+  <text x="520" y="182" fill="#9a9a96" font-size="15">Other</text><text x="1066" y="182" fill="#9a9a96" font-size="15" text-anchor="end">28k</text>
 </g>
+
+<rect x="56.5" y="528.5" width="1087" height="50" rx="12" fill="#151515" stroke="#2c2c2b"/>
+<text x="76" y="558.5" fill="#9a9a96" font-size="15">Type / for commands</text>
+<circle cx="1117" cy="553.5" r="13" fill="#373838"/>
+<path d="M1117 559.5v-12m-5 5 5-5 5 5" fill="none" stroke="#efefec" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g fill="none" stroke="#9a9a96" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M68 596v12M62 602h12"/>
+  <rect x="88.5" y="594" width="7" height="11" rx="3.5"/>
+  <path d="M85 602a7 7 0 0 0 14 0M92 609v3"/>
+  <path d="M106 600.5l3.5 3.5 3.5-3.5"/>
+  <circle cx="1137" cy="602" r="6"/>
+</g>
+<text x="126" y="607" fill="#9a9a96" font-size="14">Bypass permissions</text>
+<text x="1120" y="607" fill="#9a9a96" font-size="14" text-anchor="end">Opus 5.5</text>
 </svg>
