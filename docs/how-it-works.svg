@@ -1,262 +1,103 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
 <title id="t">How it works</title>
 <desc id="d">Anthropic's usage service (about every 2 minutes) and each reply's limits (every 3 seconds) are merged per window, newest reading wins, and drawn as the band above your prompt. No tokens used, never sees your credentials, one host: api.anthropic.com.</desc>
-<defs>
-  <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
-  <linearGradient id="node" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#282725"/><stop offset="1" stop-color="#1e1d1b"/></linearGradient>
-  <linearGradient id="head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d97757"/><stop offset="1" stop-color="#e5b54a"/></linearGradient>
-  <linearGradient id="g1" gradientUnits="userSpaceOnUse" x1="378" y1="0" x2="470" y2="0"><stop offset="0" stop-color="#e5b54a"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
-  <linearGradient id="g2" gradientUnits="userSpaceOnUse" x1="378" y1="0" x2="470" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
-  <linearGradient id="g3" gradientUnits="userSpaceOnUse" x1="706" y1="0" x2="798" y2="0"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#d97757"/></linearGradient>
-  <linearGradient id="trace" gradientUnits="userSpaceOnUse" x1="798" y1="104" x2="1152" y2="352"><stop offset="0" stop-color="#f0a483"/><stop offset=".5" stop-color="#e5b54a"/><stop offset="1" stop-color="#d97757"/></linearGradient>
-  <radialGradient id="vio" cx=".5" cy=".25" r=".8"><stop offset="0" stop-color="#a78bfa" stop-opacity=".16"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
-  <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".07"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-  <filter id="blob" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1800" height="1080"><feGaussianBlur stdDeviation="55"/></filter>
-  <filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="1200" height="480"><feGaussianBlur stdDeviation="7"/></filter>
-  <filter id="spark" filterUnits="userSpaceOnUse" x="0" y="0" width="1200" height="480"><feGaussianBlur stdDeviation="3.5"/></filter>
-  <clipPath id="cardClip"><rect x="1" y="1" width="1198" height="478" rx="18"/></clipPath>
-  <clipPath id="stripClip"><rect x="48" y="378" width="1104" height="64" rx="14"/></clipPath>
-  <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#fff" fill-opacity=".045"/></pattern>
-</defs>
 <style>
-  text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  .h{font-weight:700;fill:#f3f2ee}
-  .s{fill:#b8b6b0;font-size:16px}
-  .m{fill:#8a8984}
-  .hi{fill:#f0a483}
-  .fx{transform-box:fill-box;transform-origin:center}
-  .bar{transform-box:fill-box;transform-origin:left center}
-
-  .b1{animation:dA 13s ease-in-out infinite alternate}
-  .b2{animation:dB 11s ease-in-out infinite alternate}
-  .b3{animation:dC 14s ease-in-out infinite alternate}
-  .b4{animation:dD 9s ease-in-out infinite alternate}
-  @keyframes dA{0%{transform:translate(0,0);opacity:.26}100%{transform:translate(-50px,22px);opacity:.35}}
-  @keyframes dB{0%{transform:translate(0,0);opacity:.22}100%{transform:translate(60px,30px);opacity:.32}}
-  @keyframes dC{0%{transform:translate(0,0);opacity:.2}100%{transform:translate(40px,-40px);opacity:.3}}
-  @keyframes dD{0%{transform:translate(0,0);opacity:.18}100%{transform:translate(-40px,-24px);opacity:.3}}
-
-  .flow{stroke-dasharray:5 7;animation:flow 1.2s linear infinite}
-  @keyframes flow{to{stroke-dashoffset:-12}}
-  .neon{opacity:.45}
-  .spin{animation:spin 12s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .bd{opacity:.15;animation:bd 6s ease-in-out infinite}
-  .bd2{animation-delay:2s}.bd3{animation-delay:4s}
-  @keyframes bd{0%,100%{opacity:.15}15%{opacity:.6}35%{opacity:.15}}
-
-  .cm{stroke-dasharray:9 200;stroke-dashoffset:9;opacity:0;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
-  .cA{animation-name:cA;animation-duration:10s}
-  .cB{animation-name:cB;animation-duration:2.5s}
-  .cC{animation-name:cC;animation-duration:2.5s}
-  @keyframes cA{0%,1.5%{stroke-dashoffset:9;opacity:0}3%{opacity:1}10%{opacity:1}10.5%{stroke-dashoffset:-100;opacity:0}100%{stroke-dashoffset:-100;opacity:0}}
-  @keyframes cB{0%,6%{stroke-dashoffset:9;opacity:0}11%{opacity:1}40%{opacity:1}42%{stroke-dashoffset:-100;opacity:0}100%{stroke-dashoffset:-100;opacity:0}}
-  @keyframes cC{0%,44%{stroke-dashoffset:9;opacity:0}49%{opacity:1}72%{opacity:1}74%{stroke-dashoffset:-100;opacity:0}100%{stroke-dashoffset:-100;opacity:0}}
-
-  .halo{opacity:0}
-  .pS1{animation:p10 10s ease-out infinite}
-  .pS2{animation:p25 2.5s ease-out infinite}
-  .pM{animation:p25 2.5s ease-out 1s infinite}
-  .pO{animation:pO 2.5s ease-out 1.8s infinite}
-  @keyframes p10{0%{opacity:0}2.5%{opacity:1}9%{opacity:0}100%{opacity:0}}
-  @keyframes p25{0%{opacity:0}9%{opacity:1}34%{opacity:0}100%{opacity:0}}
-  .oglow{opacity:.55}
-  @keyframes pO{0%{opacity:.55}10%{opacity:1}45%{opacity:.55}100%{opacity:.55}}
-  .ring{opacity:0;animation:ring 2.5s ease-out 1.8s infinite}
-  @keyframes ring{0%{transform:scale(1);opacity:.7}60%{transform:scale(3.2);opacity:0}100%{transform:scale(3.2);opacity:0}}
-
-  .tr{stroke-dasharray:16 84;animation:trace 7s linear infinite}
-  @keyframes trace{to{stroke-dashoffset:-100}}
-
-  .caret{animation:blink 1.2s ease-in-out infinite alternate}
-  @keyframes blink{0%,30%{opacity:1}100%{opacity:.1}}
-
-  .sweep{transform:translateX(-320px);animation:sweep 10s ease-in-out infinite}
-  @keyframes sweep{0%{transform:translateX(-320px)}45%,100%{transform:translateX(1180px)}}
-
-  /* mini band: 4 readings per 10 s loop, local 0% = the 1.85 s arrival */
-  .q{animation-duration:10s;animation-iteration-count:infinite;animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:-8.15s}
-  .h5{transform:scaleX(.37);fill:#9b9a96;animation-name:h5}
-  @keyframes h5{0%{transform:scaleX(.79);fill:#e5a14a}6%,25%{transform:scaleX(.18);fill:#9b9a96}31%,50%{transform:scaleX(.37);fill:#9b9a96}56%,75%{transform:scaleX(.58);fill:#b3a37e}81%,100%{transform:scaleX(.79);fill:#e5a14a}}
-  .tk{transform:translateX(93px);fill:#dcdbd6;animation-name:tk}
-  @keyframes tk{0%{transform:translateX(146px);fill:#e5534b}6%,25%{transform:translateX(60px);fill:#dcdbd6}31%,50%{transform:translateX(93px);fill:#dcdbd6}56%,75%{transform:translateX(124px);fill:#dcdbd6}81%,100%{transform:translateX(146px);fill:#e5534b}}
-  .wk{transform:scaleX(.72);fill:#dcb253;animation-name:wk}
-  @keyframes wk{0%{transform:scaleX(.97);fill:#e5534b}6%,25%{transform:scaleX(.57);fill:#b0a281}31%,50%{transform:scaleX(.72);fill:#dcb253}56%,75%{transform:scaleX(.86);fill:#e57f4b}81%,100%{transform:scaleX(.97);fill:#e5534b}}
-  .cx{transform:scaleX(.45);animation-name:cx}
-  @keyframes cx{0%{transform:scaleX(.62)}6%,25%{transform:scaleX(.38)}31%,50%{transform:scaleX(.45)}56%,75%{transform:scaleX(.53)}81%,100%{transform:scaleX(.62)}}
-
-  .f{opacity:0;animation:fr 10s ease-out infinite}
-  .f.on{opacity:1}
-  .k0{animation-delay:-8.15s}.k1{animation-delay:-5.65s}.k2{animation-delay:-3.15s}.k3{animation-delay:-.65s}
-  @keyframes fr{0%{opacity:0;transform:translateY(6px)}4%,24%{opacity:1;transform:translateY(0)}27%,100%{opacity:0;transform:translateY(0)}}
-
-  @media (prefers-reduced-motion: reduce){*{animation:none !important}}
+.in{animation:in 1.4s cubic-bezier(.2,.7,.2,1) both}
+.i2{animation-delay:.2s}.i3{animation-delay:.45s}.i4{animation-delay:.7s}.i5{animation-delay:.95s}
+.flow{stroke-dasharray:2 12;animation:flow 9s linear infinite}
+.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.g2{animation-delay:.15s}.g3{animation-delay:.3s}
+.tick{animation:tick 10s cubic-bezier(.2,.7,.2,1) infinite both}
+@keyframes in{0%{opacity:0}100%{opacity:1}}
+@keyframes flow{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-56}}
+@keyframes grow{0%{transform:scaleX(0)}16%,100%{transform:scaleX(1)}}
+@keyframes tick{0%,10%{opacity:0}22%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.in,.flow,.grow,.tick{animation:none}}
 </style>
+<defs><clipPath id="ctx"><rect x="890" y="278" width="194" height="8" rx="4"/></clipPath></defs>
+<rect width="1200" height="480" rx="16" fill="#151515"/>
 
-<!-- card -->
-<rect x="1" y="1" width="1198" height="478" rx="18" fill="url(#card)"/>
-<g clip-path="url(#cardClip)">
-  <g filter="url(#blob)">
-    <circle class="b1" cx="990" cy="230" r="180" fill="#d97757" opacity=".3"/>
-    <circle class="b2" cx="150" cy="110" r="140" fill="#e5b54a" opacity=".22"/>
-    <circle class="b3" cx="190" cy="380" r="130" fill="#22d3ee" opacity=".2"/>
-    <circle class="b4" cx="600" cy="320" r="140" fill="#a78bfa" opacity=".18"/>
-  </g>
-  <rect width="1200" height="480" fill="url(#dots)"/>
+<text x="48" y="56" fill="#9a9a96" font-size="13" letter-spacing="2.4">HOW IT WORKS</text>
+<text x="48" y="92" fill="#efefec" font-size="26" font-weight="600">Two live sources, merged on your machine</text>
+
+<!-- connectors: thin lines, small arrowheads, slow dashes riding along -->
+<g class="in i3">
+<g fill="none" stroke-width="1.5">
+  <path d="M368 182 C408 182 404 250 441 250" stroke="#4d4d4a"/>
+  <path d="M368 318 C408 318 404 250 441 250" stroke="#4d4d4a"/>
+  <path d="M708 250 H781" stroke="#4d4d4a"/>
+  <path class="flow" d="M368 182 C408 182 404 250 441 250" stroke="#9a9a96"/>
+  <path class="flow" d="M368 318 C408 318 404 250 441 250" stroke="#9a9a96"/>
+  <path class="flow" d="M708 250 H781" stroke="#9a9a96"/>
 </g>
-<rect x="1" y="1" width="1198" height="478" rx="18" fill="none" stroke="#3a3936"/>
-
-<!-- header -->
-<text x="48" y="66" font-size="32" font-weight="700" fill="url(#head)">How it works</text>
-<text x="1152" y="64" font-size="17" text-anchor="end" class="m">Two live sources, merged on your machine</text>
-
-<!-- connectors -->
-<g fill="none" stroke-linecap="round">
-  <path d="M378 162 C428 162 420 228 470 228" stroke="#3a3936" stroke-width="2"/>
-  <path d="M378 294 C428 294 420 228 470 228" stroke="#3a3936" stroke-width="2"/>
-  <path d="M706 228 H798" stroke="#3a3936" stroke-width="2"/>
-  <g class="neon" filter="url(#spark)" stroke-width="7">
-    <path d="M378 162 C428 162 420 228 470 228" stroke="url(#g1)"/>
-    <path d="M378 294 C428 294 420 228 470 228" stroke="url(#g2)"/>
-    <path d="M706 228 H798" stroke="url(#g3)"/>
-  </g>
-  <path class="flow" d="M378 162 C428 162 420 228 470 228" stroke="url(#g1)" stroke-width="3"/>
-  <path class="flow" d="M378 294 C428 294 420 228 470 228" stroke="url(#g2)" stroke-width="3"/>
-  <path class="flow" d="M706 228 H798" stroke="url(#g3)" stroke-width="3"/>
-  <g filter="url(#spark)">
-    <path class="cm cA" pathLength="100" d="M378 162 C428 162 420 228 470 228" stroke="#e5b54a" stroke-width="16"/>
-    <path class="cm cB" pathLength="100" d="M378 294 C428 294 420 228 470 228" stroke="#22d3ee" stroke-width="16"/>
-    <path class="cm cC" pathLength="100" d="M706 228 H798" stroke="#f0a483" stroke-width="16"/>
-  </g>
-  <path class="cm cA" pathLength="100" d="M378 162 C428 162 420 228 470 228" stroke="#fff4d6" stroke-width="5"/>
-  <path class="cm cB" pathLength="100" d="M378 294 C428 294 420 228 470 228" stroke="#d6fbff" stroke-width="5"/>
-  <path class="cm cC" pathLength="100" d="M706 228 H798" stroke="#ffe6da" stroke-width="5"/>
-</g>
-
-<!-- halos (pulse as data arrives) -->
-<g filter="url(#soft)" fill="none" stroke-width="5">
-  <rect class="halo pS1" x="48" y="112" width="330" height="100" rx="14" stroke="#e5b54a"/>
-  <rect class="halo pS2" x="48" y="244" width="330" height="100" rx="14" stroke="#22d3ee"/>
-  <rect class="halo pM" x="470" y="148" width="236" height="160" rx="14" stroke="#a78bfa"/>
-  <rect class="oglow pO" x="798" y="104" width="354" height="248" rx="16" stroke="#d97757" stroke-width="8"/>
+<path d="M441 246 L448 250 L441 254 Z" fill="#4d4d4a"/>
+<path d="M781 246 L788 250 L781 254 Z" fill="#4d4d4a"/>
 </g>
 
 <!-- source 1 -->
-<rect x="48" y="112" width="330" height="100" rx="14" fill="url(#node)" stroke="#3a3936"/>
-<rect class="halo pS1" x="48" y="112" width="330" height="100" rx="14" fill="none" stroke="#e5b54a" stroke-opacity=".8"/>
-<rect x="66" y="140" width="44" height="44" rx="12" fill="#e5b54a" fill-opacity=".14" stroke="#e5b54a" stroke-opacity=".35"/>
-<path transform="translate(88 163)" d="M-11 7 H10 A6 6 0 0 0 10 -5 A8.5 8.5 0 0 0 -6 -6 A6.5 6.5 0 0 0 -11 7 Z" fill="none" stroke="#e5b54a" stroke-width="2" stroke-linejoin="round"/>
-<text x="124" y="145" font-size="18" class="h">Anthropic usage service</text>
-<text x="124" y="169" class="s">one request <tspan class="hi">~every 2 min</tspan>,</text>
-<text x="124" y="190" class="s">through your existing login</text>
+<g class="in">
+  <rect x="48" y="124" width="320" height="116" rx="12" fill="#212121" stroke="#2c2c2b"/>
+  <text x="72" y="158" fill="#9a9a96" font-size="12" letter-spacing="2">ABOUT EVERY 2 MIN</text>
+  <text x="72" y="188" fill="#efefec" font-size="17" font-weight="600">Anthropic usage service</text>
+  <text x="72" y="214" fill="#9a9a96" font-size="14.5">one request, through your existing login</text>
+</g>
 
 <!-- source 2 -->
-<rect x="48" y="244" width="330" height="100" rx="14" fill="url(#node)" stroke="#3a3936"/>
-<rect class="halo pS2" x="48" y="244" width="330" height="100" rx="14" fill="none" stroke="#22d3ee" stroke-opacity=".8"/>
-<rect x="66" y="272" width="44" height="44" rx="12" fill="#22d3ee" fill-opacity=".13" stroke="#22d3ee" stroke-opacity=".35"/>
-<g transform="translate(88 293)" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M-10 -9 H10 A3 3 0 0 1 13 -6 V3 A3 3 0 0 1 10 6 H-1 L-7 11 V6 H-10 A3 3 0 0 1 -13 3 V-6 A3 3 0 0 1 -10 -9 Z"/>
-  <path d="M-7 -3 H7 M-7 1.5 H2"/>
-</g>
-<text x="124" y="277" font-size="18" class="h">Each reply's limits</text>
-<text x="124" y="301" class="s">read live from the session,</text>
-<text x="124" y="322" class="s hi">every 3 s</text>
-
-<!-- middle -->
-<rect x="470" y="148" width="236" height="160" rx="14" fill="url(#node)" stroke="#3a3936"/>
-<rect x="470" y="148" width="236" height="160" rx="14" fill="url(#vio)" stroke="#a78bfa" stroke-opacity=".28"/>
-<circle class="spin fx" cx="588" cy="188" r="30" fill="none" stroke="#a78bfa" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="3 6"/>
-<rect class="halo pM" x="470" y="148" width="236" height="160" rx="14" fill="none" stroke="#a78bfa" stroke-opacity=".85"/>
-<rect x="566" y="166" width="44" height="44" rx="12" fill="#a78bfa" fill-opacity=".15" stroke="#a78bfa" stroke-opacity=".4"/>
-<g transform="translate(588 188)" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M-8 -10 C-8 -2 0 -3 0 4 M8 -10 C8 -2 0 -3 0 4 M0 4 V10 M-4 6.5 L0 10.5 L4 6.5"/>
-</g>
-<text x="588" y="240" font-size="18" text-anchor="middle" class="h">Merged per window</text>
-<text x="588" y="264" text-anchor="middle" class="s">newest reading wins,</text>
-<text x="588" y="285" text-anchor="middle" class="s">shared by every open chat</text>
-
-<!-- ports -->
-<g stroke="#171615" stroke-width="2">
-  <circle cx="378" cy="162" r="4.5" fill="#e5b54a"/>
-  <circle cx="378" cy="294" r="4.5" fill="#22d3ee"/>
-  <circle cx="470" cy="228" r="4.5" fill="#a78bfa"/>
-  <circle cx="706" cy="228" r="4.5" fill="#a78bfa"/>
-  <circle cx="798" cy="228" r="4.5" fill="#d97757"/>
+<g class="in i2">
+  <rect x="48" y="260" width="320" height="116" rx="12" fill="#212121" stroke="#2c2c2b"/>
+  <text x="72" y="294" fill="#9a9a96" font-size="12" letter-spacing="2">EVERY 3 SECONDS</text>
+  <text x="72" y="324" fill="#efefec" font-size="17" font-weight="600">Each reply's limits</text>
+  <text x="72" y="350" fill="#9a9a96" font-size="14.5">read live from the session</text>
 </g>
 
-<!-- output -->
-<rect x="798" y="104" width="354" height="248" rx="16" fill="url(#node)" stroke="#5a3c30"/>
-<path class="tr" pathLength="100" filter="url(#spark)" d="M814 104 H1136 A16 16 0 0 1 1152 120 V336 A16 16 0 0 1 1136 352 H814 A16 16 0 0 1 798 336 V120 A16 16 0 0 1 814 104 Z" fill="none" stroke="#f0a483" stroke-width="7" stroke-linecap="round"/>
-<path class="tr" pathLength="100" d="M814 104 H1136 A16 16 0 0 1 1152 120 V336 A16 16 0 0 1 1136 352 H814 A16 16 0 0 1 798 336 V120 A16 16 0 0 1 814 104 Z" fill="none" stroke="url(#trace)" stroke-width="2.5" stroke-linecap="round"/>
-<text x="816" y="140" font-size="19" class="h">The band above your prompt</text>
-<circle class="ring fx" cx="1130" cy="134" r="4" fill="#4ade80"/>
-<circle cx="1130" cy="134" r="4" fill="#4ade80"/>
+<!-- merge -->
+<g class="in i3">
+  <rect x="448" y="184" width="260" height="132" rx="12" fill="#212121" stroke="#2c2c2b"/>
+  <text x="472" y="218" fill="#9a9a96" font-size="12" letter-spacing="2">ON YOUR MACHINE</text>
+  <text x="472" y="248" fill="#efefec" font-size="17" font-weight="600">Merged per window</text>
+  <text x="472" y="274" fill="#9a9a96" font-size="14.5">newest reading wins,</text>
+  <text x="472" y="296" fill="#9a9a96" font-size="14.5">shared by every open chat</text>
+</g>
 
-<rect x="816" y="158" width="318" height="132" rx="10" fill="#262624" stroke="#3a3936"/>
-<g font-size="16">
-  <text x="834" y="190" class="h">5H</text>
-  <text x="834" y="228" class="h">Weekly</text>
-  <text x="834" y="266" class="h">Context</text>
-</g>
-<!-- 5H -->
-<rect x="912" y="179" width="150" height="8" rx="4" fill="#333332"/>
-<rect class="bar q h5" x="912" y="179" width="150" height="8" rx="4"/>
-<rect class="q tk" x="912" y="176" width="3" height="14" rx="1.5"/>
-<!-- Weekly -->
-<rect x="912" y="217" width="150" height="8" rx="4" fill="#333332"/>
-<rect class="bar q wk" x="912" y="217" width="150" height="8" rx="4"/>
-<rect x="1058" y="214" width="3" height="14" rx="1.5" fill="#e5534b"/>
-<!-- Context -->
-<rect x="912" y="255" width="150" height="8" rx="4" fill="#333332"/>
-<g class="bar q cx">
-  <rect x="912" y="255" width="150" height="8" rx="4" fill="#9b9a96"/>
-  <rect x="912" y="255" width="139" height="8" rx="4" fill="#a78bfa"/>
-  <rect x="912" y="255" width="126" height="8" rx="4" fill="#22d3ee"/>
-</g>
-<!-- ticking numbers -->
-<g font-size="16" font-weight="600" text-anchor="end">
-  <text x="1116" y="190" class="f k0" fill="#9b9a96">18%</text>
-  <text x="1116" y="190" class="f k1 on" fill="#9b9a96">37%</text>
-  <text x="1116" y="190" class="f k2" fill="#b3a37e">58%</text>
-  <text x="1116" y="190" class="f k3" fill="#e5a14a">79%</text>
-  <text x="1116" y="228" class="f k0" fill="#b0a281">57%</text>
-  <text x="1116" y="228" class="f k1 on" fill="#dcb253">72%</text>
-  <text x="1116" y="228" class="f k2" fill="#e57f4b">86%</text>
-  <text x="1116" y="228" class="f k3" fill="#e5534b">97%</text>
-  <text x="1116" y="266" class="f k0" fill="#c2a86e">38%</text>
-  <text x="1116" y="266" class="f k1 on" fill="#d3ae5c">45%</text>
-  <text x="1116" y="266" class="f k2" fill="#e5ab4a">53%</text>
-  <text x="1116" y="266" class="f k3" fill="#e58e4a">62%</text>
-</g>
-<!-- prompt -->
-<rect x="816" y="302" width="318" height="34" rx="10" fill="#1b1a19" stroke="#3a3936"/>
-<text x="832" y="325" font-size="20" font-weight="700" fill="#d97757">›</text>
-<rect class="caret" x="848" y="311" width="2" height="16" rx="1" fill="#f3f2ee"/>
+<!-- the band -->
+<g class="in i4">
+  <rect x="788" y="124" width="364" height="252" rx="12" fill="#212121" stroke="#2c2c2b"/>
+  <text x="812" y="158" fill="#9a9a96" font-size="12" letter-spacing="2">WHAT YOU SEE</text>
+  <text x="812" y="188" fill="#efefec" font-size="17" font-weight="600">The band above your prompt</text>
 
-<!-- footer -->
-<rect x="48" y="378" width="1104" height="64" rx="14" fill="#ffffff" fill-opacity=".03" stroke="#2f2e2b"/>
-<g clip-path="url(#stripClip)"><rect class="sweep" x="48" y="378" width="260" height="64" fill="url(#shine)"/></g>
-<g stroke="#2f2e2b"><path d="M416 392 V428 M784 392 V428"/></g>
-<g font-size="17" fill="#f3f2ee">
-  <g transform="translate(150 410)">
-    <circle class="bd bd1" r="20" fill="none" stroke="#e5b54a" stroke-width="1.5"/>
-    <circle r="16" fill="#e5b54a" fill-opacity=".14"/>
-    <g fill="none" stroke="#e5b54a" stroke-width="2" stroke-linecap="round"><circle r="7.5"/><path d="M-5.5 5.5 L5.5 -5.5"/></g>
-    <text x="28" y="6">No tokens used</text>
-  </g>
-  <g transform="translate(470 410)">
-    <circle class="bd bd2" r="20" fill="none" stroke="#4ade80" stroke-width="1.5"/>
-    <circle r="16" fill="#4ade80" fill-opacity=".13"/>
-    <g fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M0 -9 L7.5 -6 V0 C7.5 5 4 8 0 9.5 C-4 8 -7.5 5 -7.5 0 V-6 Z"/><path d="M-3.5 0 L-1 2.5 L3.5 -2"/></g>
-    <text x="28" y="6">Never sees your credentials</text>
-  </g>
-  <g transform="translate(822 410)">
-    <circle class="bd bd3" r="20" fill="none" stroke="#22d3ee" stroke-width="1.5"/>
-    <circle r="16" fill="#22d3ee" fill-opacity=".13"/>
-    <g fill="none" stroke="#22d3ee" stroke-width="2"><circle r="7.5"/><ellipse rx="3.2" ry="7.5"/><path d="M-7.5 0 H7.5"/></g>
-    <text x="28" y="6">One host: <tspan class="mono" fill="#f0a483">api.anthropic.com</tspan></text>
-  </g>
+  <text x="812" y="222" fill="#efefec" font-size="15" font-weight="600">5 Hour</text>
+  <rect x="890" y="214" width="194" height="8" rx="4" fill="#333332"/>
+  <rect class="grow" x="890" y="214" width="14" height="8" rx="4" fill="#9a9a96"/>
+  <rect class="tick" x="997" y="213" width="3" height="10" fill="#dcdbd6"/>
+  <text x="1128" y="222" fill="#9a9a96" font-size="15" text-anchor="end">7%</text>
+
+  <text x="812" y="254" fill="#efefec" font-size="15" font-weight="600">Weekly</text>
+  <rect x="890" y="246" width="194" height="8" rx="4" fill="#333332"/>
+  <rect class="grow g2" x="890" y="246" width="111" height="8" rx="4" fill="#aca285"/>
+  <rect class="tick" x="1079" y="245" width="3" height="10" fill="#e5534b"/>
+  <text x="1128" y="254" fill="#aca285" font-size="15" font-weight="600" text-anchor="end">57%</text>
+
+  <text x="812" y="286" fill="#efefec" font-size="15" font-weight="600">Context</text>
+  <rect x="890" y="278" width="194" height="8" rx="4" fill="#333332"/>
+  <g clip-path="url(#ctx)"><g class="grow g3">
+    <rect x="890" y="278" width="62" height="8" fill="#78d0ea"/>
+    <rect x="952" y="278" width="7" height="8" fill="#a48ef2"/>
+    <rect x="959" y="278" width="5" height="8" fill="#9a9a96"/>
+  </g></g>
+  <text x="1128" y="286" fill="#aca285" font-size="15" font-weight="600" text-anchor="end">38%</text>
+
+  <rect x="812" y="310" width="316" height="40" rx="8" fill="#151515" stroke="#2c2c2b"/>
+  <text x="828" y="336" fill="#9a9a96" font-size="18">›</text>
+  <rect x="844" y="320" width="2" height="20" fill="#efefec"/>
+</g>
+
+<!-- privacy facts -->
+<g class="in i5">
+  <rect x="48" y="400" width="1104" height="48" rx="12" fill="#212121" stroke="#2c2c2b"/>
+  <rect x="416" y="414" width="1" height="20" fill="#333332"/>
+  <rect x="784" y="414" width="1" height="20" fill="#333332"/>
+  <text x="232" y="429" fill="#efefec" font-size="15" text-anchor="middle">No tokens used</text>
+  <text x="600" y="429" fill="#efefec" font-size="15" text-anchor="middle">Never sees your credentials</text>
+  <text x="968" y="429" fill="#efefec" font-size="15" text-anchor="middle"><tspan fill="#9a9a96">One host:</tspan> api.anthropic.com</text>
 </g>
 </svg>

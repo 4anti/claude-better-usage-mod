@@ -1,60 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
-<title>Alerts: a bell rings as 90%, Limit reached and 5 Hour reset notifications pop in</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title>Alerts: a notification at 90%, one when the limit is reached, and one when the 5 Hour window resets</title>
 <style>
-.blob{transform-box:fill-box;transform-origin:center;animation:drift 12s ease-in-out infinite alternate}
-.b1{animation-duration:10s;animation-delay:-4s}.b2{animation-duration:14s;animation-delay:-7s}
-@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-14px) scale(1.12)}100%{transform:translate(-22px,12px) scale(.94)}}
-.sheen{animation:sheen 7s ease-in-out infinite}
-@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}
-
-.bell{transform-origin:0px -38px;animation:swing 9s ease-in-out infinite -6.3s}
-@keyframes swing{0%{transform:rotate(0)}4%{transform:rotate(0deg)}6.5%{transform:rotate(14deg)}9%{transform:rotate(-11deg)}11.5%{transform:rotate(8deg)}14%{transform:rotate(-5deg)}16.5%{transform:rotate(2deg)}19%{transform:rotate(0deg)}32%{transform:rotate(0deg)}34.5%{transform:rotate(14deg)}37%{transform:rotate(-11deg)}39.5%{transform:rotate(8deg)}42%{transform:rotate(-5deg)}44.5%{transform:rotate(2deg)}47%{transform:rotate(0deg)}60%{transform:rotate(0deg)}62.5%{transform:rotate(14deg)}65%{transform:rotate(-11deg)}67.5%{transform:rotate(8deg)}70%{transform:rotate(-5deg)}72.5%{transform:rotate(2deg)}75%{transform:rotate(0deg)}100%{transform:rotate(0)}}
-.wave{opacity:.5;transform-box:fill-box;transform-origin:center;animation:wave 9s ease-out infinite -6.3s}
-@keyframes wave{0%{opacity:0;transform:scale(.85)}4%{opacity:0;transform:scale(.85)}5.5%{opacity:.9;transform:scale(1)}14%{opacity:0;transform:scale(1.2)}32%{opacity:0;transform:scale(.85)}33.5%{opacity:.9;transform:scale(1)}42%{opacity:0;transform:scale(1.2)}60%{opacity:0;transform:scale(.85)}61.5%{opacity:.9;transform:scale(1)}70%{opacity:0;transform:scale(1.2)}100%{opacity:0;transform:scale(1.2)}}
-.bdg{transform-box:fill-box;transform-origin:center;animation:bdg 9s ease-out infinite -6.3s}
-@keyframes bdg{0%,4%{transform:scale(0)}6%{transform:scale(1.25)}8%,32%{transform:scale(1)}33.5%{transform:scale(1.3)}35.5%,60%{transform:scale(1)}61.5%{transform:scale(1.3)}63.5%,90%{transform:scale(1)}95%,100%{transform:scale(0)}}
-.n1,.n2{opacity:0}.n1{animation:n1 9s step-end infinite -6.3s}.n2{animation:n2 9s step-end infinite -6.3s}.n3{animation:n3 9s step-end infinite -6.3s}
-@keyframes n1{0%{opacity:0}4%{opacity:1}32%{opacity:0}100%{opacity:0}}@keyframes n2{0%{opacity:0}32%{opacity:1}60%{opacity:0}100%{opacity:0}}@keyframes n3{0%{opacity:0}60%{opacity:1}100%{opacity:0}}
-.spin{transform-box:fill-box;transform-origin:center;animation:spin 9s ease-in-out infinite -6.3s}
-@keyframes spin{0%,62%{transform:rotate(0)}70%,100%{transform:rotate(360deg)}}
-.breath{transform-box:fill-box;transform-origin:center;animation:breath 4.5s ease-in-out infinite -6.3s}
-@keyframes breath{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.06)}}
-.t0{animation:t0 9s ease-out infinite -6.3s}@keyframes t0{0%,4%{opacity:0;transform:translateX(30px)}7%{opacity:1;transform:translateX(-3px)}9%,88%{opacity:1;transform:translateX(0)}93%,100%{opacity:0;transform:translateX(0)}}
-.h0{opacity:0;animation:h0 9s ease-out infinite -6.3s}@keyframes h0{0%,5%{opacity:0}7%{opacity:1}26%,100%{opacity:0}}
-.t1{animation:t1 9s ease-out infinite -6.3s}@keyframes t1{0%,32%{opacity:0;transform:translateX(30px)}35%{opacity:1;transform:translateX(-3px)}37%,88%{opacity:1;transform:translateX(0)}93%,100%{opacity:0;transform:translateX(0)}}
-.h1{opacity:0;animation:h1 9s ease-out infinite -6.3s}@keyframes h1{0%,33%{opacity:0}35%{opacity:1}54%,100%{opacity:0}}
-.t2{animation:t2 9s ease-out infinite -6.3s}@keyframes t2{0%,60%{opacity:0;transform:translateX(30px)}63%{opacity:1;transform:translateX(-3px)}65%,88%{opacity:1;transform:translateX(0)}93%,100%{opacity:0;transform:translateX(0)}}
-.h2{opacity:0;animation:h2 9s ease-out infinite -6.3s}@keyframes h2{0%,61%{opacity:0}63%{opacity:1}82%,100%{opacity:0}}
-
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}</style>
-<defs>
-<linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
-<clipPath id="cc"><rect x="1" y="1" width="558" height="298" rx="18"/></clipPath>
-<linearGradient id="tg" x1="32" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0a483"/><stop offset=".45" stop-color="#d97757"/><stop offset="1" stop-color="#e5b54a"/></linearGradient>
-<linearGradient id="sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<clipPath id="tc"><text x="32" y="212" font-size="27" font-weight="700">Alerts that matter</text></clipPath>
-<radialGradient id="bl0"><stop offset="0" stop-color="#e5b54a" stop-opacity="0.34"/><stop offset="1" stop-color="#e5b54a" stop-opacity="0"/></radialGradient><radialGradient id="bl1"><stop offset="0" stop-color="#e5534b" stop-opacity="0.2"/><stop offset="1" stop-color="#e5534b" stop-opacity="0"/></radialGradient><radialGradient id="bl2"><stop offset="0" stop-color="#d97757" stop-opacity="0.22"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></radialGradient>
-<linearGradient id="bellg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7d57e"/><stop offset=".55" stop-color="#e5b54a"/><stop offset="1" stop-color="#c98f2a"/></linearGradient>
-<radialGradient id="bglow"><stop offset="0" stop-color="#e5b54a" stop-opacity=".45"/><stop offset="1" stop-color="#e5b54a" stop-opacity="0"/></radialGradient>
-</defs>
-<rect x=".5" y=".5" width="559" height="299" rx="18" fill="url(#card)" stroke="#3a3936"/>
-<g clip-path="url(#cc)"><circle class="blob b0" cx="104" cy="100" r="190" fill="url(#bl0)"/><circle class="blob b1" cx="520" cy="30" r="170" fill="url(#bl1)"/><circle class="blob b2" cx="420" cy="300" r="200" fill="url(#bl2)"/></g>
-<g transform="translate(104 100)">
-<circle class="breath" r="80" fill="url(#bglow)"/>
-<path class="wave" d="M42 -22 Q52 -6 42 10" fill="none" stroke="#e5b54a" stroke-width="3.5" stroke-linecap="round"/><path class="wave" d="M53 -32 Q69 -6 53 20" fill="none" stroke="#e5b54a" stroke-width="3.5" stroke-linecap="round"/><path class="wave" d="M-42 -22 Q-52 -6 -42 10" fill="none" stroke="#e5b54a" stroke-width="3.5" stroke-linecap="round"/><path class="wave" d="M-53 -32 Q-69 -6 -53 20" fill="none" stroke="#e5b54a" stroke-width="3.5" stroke-linecap="round"/>
-<g class="bell"><circle cy="-38" r="5" fill="#c98f2a"/><circle cy="31" r="7" fill="#c98f2a"/>
-<path d="M-31 20 C-25 13 -24 5 -24 -7 C-24 -23 -13 -34 0 -34 C13 -34 24 -23 24 -7 C24 5 25 13 31 20 Z" fill="url(#bellg)"/>
-<rect x="-35" y="17" width="70" height="9" rx="4.5" fill="#d9a23a"/>
-<path d="M-14 -22 C-18 -14 -18 -4 -18 4" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="4" stroke-linecap="round"/>
-<g transform="translate(25 -27)"><g class="bdg"><circle r="13" fill="#e5534b" stroke="#1d1c1a" stroke-width="3"/>
-<text class="n1" y="5.6" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">1</text><text class="n2" y="5.6" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">2</text><text class="n3" y="5.6" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">3</text></g></g>
-</g></g>
-<g class="t0"><rect x="196" y="30" width="332" height="40" rx="12" fill="#262523" stroke="#3a3936"/><rect class="h0" x="196" y="30" width="332" height="40" rx="12" fill="none" stroke="#e5b54a" stroke-width="1.5"/><rect x="208" y="38" width="56" height="24" rx="12" fill="#e5b54a"/><text x="236" y="55.5" text-anchor="middle" font-size="16" font-weight="700" fill="#1c1b1a">90%</text><text x="276" y="56" font-size="17" fill="#b8b6b0"><tspan fill="#f3f2ee" font-weight="600">5 Hour</tspan> limit almost used</text></g>
-<g class="t1"><rect x="196" y="80" width="332" height="40" rx="12" fill="#262523" stroke="#3a3936"/><rect class="h1" x="196" y="80" width="332" height="40" rx="12" fill="none" stroke="#e5534b" stroke-width="1.5"/><rect x="208" y="88" width="126" height="24" rx="12" fill="#e5534b"/><text x="271" y="105.5" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">Limit reached</text><text x="346" y="106" font-size="17" fill="#b8b6b0"><tspan fill="#f3f2ee" font-weight="600">5 Hour</tspan> resumes 16:40</text></g>
-<g class="t2"><rect x="196" y="130" width="332" height="40" rx="12" fill="#262523" stroke="#3a3936"/><rect class="h2" x="196" y="130" width="332" height="40" rx="12" fill="none" stroke="#4ade80" stroke-width="1.5"/><rect x="208" y="138" width="138" height="24" rx="12" fill="#4ade80"/><g transform="translate(224 150)"><g class="spin"><path d="M5.5 0 A5.5 5.5 0 1 1 2.75 -4.76" fill="none" stroke="#0f2a1a" stroke-width="2.2" stroke-linecap="round"/><path d="M6.2 -2.6 L1.0 -2.4 L4.6 -7.9 Z" fill="#0f2a1a"/></g></g><text x="236" y="155.5" font-size="16" font-weight="700" fill="#0f2a1a">5 Hour reset</text><text x="358" y="156" font-size="17" fill="#b8b6b0">full allowance back</text></g>
-
-<text x="32" y="212" font-size="27" font-weight="700" fill="url(#tg)">Alerts that matter</text>
-<g clip-path="url(#tc)"><rect class="sheen" x="-140" y="180" width="120" height="40" fill="url(#sh)" style="animation-delay:1.2s"/></g>
-<text x="32" y="244" font-size="18" fill="#b8b6b0">A heads-up at 90%, at the limit, and when</text><text x="32" y="268" font-size="18" fill="#b8b6b0">your 5 hours are back.</text>
+.in{animation:in 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.d1{animation-delay:.3s}.d2{animation-delay:1.3s}.d3{animation-delay:2.3s}
+.g1{animation-delay:.5s}.g2{animation-delay:1.5s}
+@keyframes in{0%,3%{opacity:0;transform:translateY(6px)}13%,100%{opacity:1;transform:translateY(0)}}
+@keyframes grow{0%,3%{transform:scaleX(0)}16%,100%{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.in,.grow{animation:none}}
+</style>
+<rect x=".5" y=".5" width="559" height="299" rx="12" fill="#212121" stroke="#2c2c2b"/>
+<text x="26" y="44" fill="#efefec" font-size="19" font-weight="600">Alerts that matter</text>
+<text x="26" y="72" fill="#9a9a96" font-size="14.5">A heads-up at 90%, at the limit, and when your 5 hours are back.</text>
+<g class="in d1">
+  <rect x="26.5" y="100.5" width="507" height="45" rx="10" fill="#151515" stroke="#2c2c2b"/>
+  <rect x="46" y="119" width="64" height="8" rx="4" fill="#333332"/>
+  <rect class="grow g1" x="46" y="119" width="58" height="8" rx="4" fill="#e5b54a"/>
+  <text x="128" y="128" fill="#efefec" font-size="14">5 Hour limit at 90% – resets in 1h 10m.</text>
+</g>
+<g class="in d2">
+  <rect x="26.5" y="158.5" width="507" height="45" rx="10" fill="#151515" stroke="#2c2c2b"/>
+  <rect x="46" y="177" width="64" height="8" rx="4" fill="#333332"/>
+  <rect class="grow g2" x="46" y="177" width="64" height="8" rx="4" fill="#e5534b"/>
+  <text x="128" y="186" fill="#efefec" font-size="14">5 Hour limit reached. Usage resumes at 4:40 PM.</text>
+</g>
+<g class="in d3">
+  <rect x="26.5" y="216.5" width="507" height="45" rx="10" fill="#151515" stroke="#2c2c2b"/>
+  <rect x="46" y="235" width="64" height="8" rx="4" fill="#333332"/>
+  <text x="128" y="244" fill="#efefec" font-size="14">5 Hour limit reset: your full allowance is back.</text>
+</g>
 </svg>

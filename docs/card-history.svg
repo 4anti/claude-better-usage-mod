@@ -1,53 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
-<title>Usage history: ten past five-hour windows grow as bars colored grey to yellow to red, with an average line</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title>Usage history: each 5 hour window's peak as a bar split by the chats that used it, the running one on top, a past one unfolded to list its chats</title>
 <style>
-.blob{transform-box:fill-box;transform-origin:center;animation:drift 12s ease-in-out infinite alternate}
-.b1{animation-duration:10s;animation-delay:-4s}.b2{animation-duration:14s;animation-delay:-7s}
-@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-14px) scale(1.12)}100%{transform:translate(-22px,12px) scale(.94)}}
-.sheen{animation:sheen 7s ease-in-out infinite}
-@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}
-
-.bar{transform-box:fill-box;transform-origin:50% 100%;animation:grow 9s linear infinite both -3.6s}
-@keyframes grow{0%{transform:scaleY(0);animation-timing-function:cubic-bezier(.25,1.35,.5,1)}14%,84%{transform:scaleY(1);animation-timing-function:ease-in}92%,100%{transform:scaleY(0)}}
-.avg{animation:avg 9s ease-out infinite -3.6s}
-@keyframes avg{0%,30%{opacity:0}38%,84%{opacity:1}92%,100%{opacity:0}}
-.flow{animation:flow 1.2s linear infinite -3.6s}
-@keyframes flow{to{stroke-dashoffset:-13}}
-.hit{animation:hit 9s ease-in-out infinite -3.6s}
-@keyframes hit{0%,20%{opacity:0}26%{opacity:1}40%{opacity:.45}54%{opacity:1}68%{opacity:.45}84%{opacity:1}92%,100%{opacity:0}}
-
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}</style>
-<defs>
-<linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
-<clipPath id="cc"><rect x="1" y="1" width="558" height="298" rx="18"/></clipPath>
-<linearGradient id="tg" x1="32" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0a483"/><stop offset=".45" stop-color="#d97757"/><stop offset="1" stop-color="#e5b54a"/></linearGradient>
-<linearGradient id="sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<clipPath id="tc"><text x="32" y="212" font-size="27" font-weight="700">Usage history</text></clipPath>
-<radialGradient id="bl0"><stop offset="0" stop-color="#a78bfa" stop-opacity="0.32"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient><radialGradient id="bl1"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.18"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient><radialGradient id="bl2"><stop offset="0" stop-color="#d97757" stop-opacity="0.22"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></radialGradient>
-<radialGradient id="hitg"><stop offset="0" stop-color="#e5534b" stop-opacity=".8"/><stop offset="1" stop-color="#e5534b" stop-opacity="0"/></radialGradient>
-</defs>
-<rect x=".5" y=".5" width="559" height="299" rx="18" fill="url(#card)" stroke="#3a3936"/>
-<g clip-path="url(#cc)"><circle class="blob b0" cx="240" cy="90" r="240" fill="url(#bl0)"/><circle class="blob b1" cx="520" cy="30" r="160" fill="url(#bl1)"/><circle class="blob b2" cx="60" cy="290" r="180" fill="url(#bl2)"/></g>
-<line x1="32" y1="48" x2="432" y2="48" stroke="#5a5955" stroke-width="1.5" stroke-dasharray="4 5"/>
-<text x="444" y="54" font-size="16" fill="#8a8984">limit</text>
-<circle class="hit" cx="212" cy="48" r="16" fill="url(#hitg)"/>
-<g class="bar" style="animation-delay:-3.60s"><path d="M39 160 V117.96 a5 5 0 0 1 5 -5 H60 a5 5 0 0 1 5 5 V160 Z" fill="#9b9a96"/><path d="M39 160 V117.96 a5 5 0 0 1 5 -5 H60 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-3.46s"><path d="M79 160 V88.84 a5 5 0 0 1 5 -5 H100 a5 5 0 0 1 5 5 V160 Z" fill="#d0ad5f"/><path d="M79 160 V88.84 a5 5 0 0 1 5 -5 H100 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-3.32s"><path d="M119 160 V130.28 a5 5 0 0 1 5 -5 H140 a5 5 0 0 1 5 5 V160 Z" fill="#9b9a96"/><path d="M119 160 V130.28 a5 5 0 0 1 5 -5 H140 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-3.18s"><path d="M159 160 V66.44 a5 5 0 0 1 5 -5 H180 a5 5 0 0 1 5 5 V160 Z" fill="#e5754b"/><path d="M159 160 V66.44 a5 5 0 0 1 5 -5 H180 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-3.04s"><path d="M199 160 V53 a5 5 0 0 1 5 -5 H220 a5 5 0 0 1 5 5 V160 Z" fill="#e5534b"/><path d="M199 160 V53 a5 5 0 0 1 5 -5 H220 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-2.90s"><path d="M239 160 V103.4 a5 5 0 0 1 5 -5 H260 a5 5 0 0 1 5 5 V160 Z" fill="#aa9f87"/><path d="M239 160 V103.4 a5 5 0 0 1 5 -5 H260 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-2.76s"><path d="M279 160 V139.24 a5 5 0 0 1 5 -5 H300 a5 5 0 0 1 5 5 V160 Z" fill="#9b9a96"/><path d="M279 160 V139.24 a5 5 0 0 1 5 -5 H300 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-2.62s"><path d="M319 160 V79.88 a5 5 0 0 1 5 -5 H340 a5 5 0 0 1 5 5 V160 Z" fill="#e5b04a"/><path d="M319 160 V79.88 a5 5 0 0 1 5 -5 H340 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-2.48s"><path d="M359 160 V96.68 a5 5 0 0 1 5 -5 H380 a5 5 0 0 1 5 5 V160 Z" fill="#bca675"/><path d="M359 160 V96.68 a5 5 0 0 1 5 -5 H380 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<g class="bar" style="animation-delay:-2.34s"><path d="M399 160 V112.36 a5 5 0 0 1 5 -5 H420 a5 5 0 0 1 5 5 V160 Z" fill="#9b9a96"/><path d="M399 160 V112.36 a5 5 0 0 1 5 -5 H420 a5 5 0 0 1 5 5 V160 Z" fill="url(#gloss)"/></g>
-<line x1="28" y1="160.5" x2="436" y2="160.5" stroke="#4a4946" stroke-width="1.5"/>
-<g class="avg"><line class="flow" x1="32" y1="93.8" x2="432" y2="93.8" stroke="#a78bfa" stroke-width="2.2" stroke-dasharray="7 6"/>
-<rect x="442" y="79.8" width="86" height="28" rx="14" fill="#a78bfa" fill-opacity=".18" stroke="#a78bfa" stroke-opacity=".7"/>
-<text x="485" y="99.3" text-anchor="middle" font-size="16" fill="#b8b6b0">avg <tspan font-weight="700" fill="#f3f2ee">59%</tspan></text></g>
-<circle cx="450" cy="148" r="4.5" fill="#e5534b"/><text x="460" y="154" font-size="16" fill="#8a8984">hit 1×</text>
-<text x="32" y="212" font-size="27" font-weight="700" fill="url(#tg)">Usage history</text>
-<g clip-path="url(#tc)"><rect class="sheen" x="-140" y="180" width="120" height="40" fill="url(#sh)" style="animation-delay:2.4s"/></g>
-<text x="32" y="244" font-size="18" fill="#b8b6b0">Your last 10 five-hour windows and 8 weeks,</text><text x="32" y="268" font-size="18" fill="#b8b6b0">at <tspan font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#f0a483">/quota-history</tspan>.</text>
+.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.fade{animation:fade 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.d1{animation-delay:.2s}.d2{animation-delay:.5s}.d3{animation-delay:.9s}.d4{animation-delay:1.1s}.d5{animation-delay:1.3s}
+@keyframes grow{0%{transform:scaleX(0)}16%,100%{transform:scaleX(1)}}
+@keyframes fade{0%,4%{opacity:0}14%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.grow,.fade{animation:none}}
+</style>
+<clipPath id="now"><rect x="186" y="119" width="290" height="8" rx="4"/></clipPath>
+<clipPath id="past"><rect x="186" y="193" width="290" height="8" rx="4"/></clipPath>
+<rect x=".5" y=".5" width="559" height="299" rx="12" fill="#212121" stroke="#2c2c2b"/>
+<text x="26" y="44" fill="#efefec" font-size="19" font-weight="600">Usage history</text>
+<text x="26" y="72" fill="#9a9a96" font-size="14.5">Last 10 five-hour windows and 8 weeks, by chat: <tspan fill="#efefec">/quota-history</tspan></text>
+<text x="26" y="104" fill="#9a9a96" font-size="12.5" font-weight="600" letter-spacing="2.2">5 HOUR</text>
+<path d="M28 119 L33.5 123 L28 127 Z" fill="#9a9a96"/>
+<text x="42" y="128" fill="#efefec" font-size="14">Now</text>
+<rect x="186" y="119" width="290" height="8" rx="4" fill="#333332"/>
+<g clip-path="url(#now)"><g class="grow d1">
+  <rect x="186" y="119" width="69.6" height="8" fill="#60a5fa"/>
+  <rect x="255.6" y="119" width="31.9" height="8" fill="#a78bfa"/>
+  <rect x="287.5" y="119" width="17.4" height="8" fill="#9a9a96"/>
+</g></g>
+<text x="534" y="128" fill="#9a9a96" font-size="14" font-weight="600" text-anchor="end">41%</text>
+<text class="fade d1" x="42" y="148" fill="#9a9a96" font-size="13.5">resets in 2h 10m</text>
+<text x="26" y="178" fill="#efefec" font-size="14" font-weight="600">Yesterday · Tuesday, October 13</text>
+<path d="M27 194.5 L35 194.5 L31 199.5 Z" fill="#9a9a96"/>
+<text x="42" y="202" fill="#efefec" font-size="14">9:39 PM – 2:39 AM</text>
+<rect x="186" y="193" width="290" height="8" rx="4" fill="#333332"/>
+<g clip-path="url(#past)"><g class="grow d2">
+  <rect x="186" y="193" width="89.9" height="8" fill="#60a5fa"/>
+  <rect x="275.9" y="193" width="55.1" height="8" fill="#f472b6"/>
+  <rect x="331" y="193" width="34.8" height="8" fill="#9a9a96"/>
+</g></g>
+<text x="534" y="202" fill="#aca285" font-size="14" font-weight="600" text-anchor="end">62%</text>
+<g class="fade d3"><circle cx="46" cy="219.5" r="4" fill="#60a5fa"/><text x="58" y="224" fill="#efefec" font-size="13.5">make the readme cards look like the band</text><text x="534" y="224" fill="#9a9a96" font-size="13.5" text-anchor="end">31%</text></g>
+<g class="fade d4"><circle cx="46" cy="239.5" r="4" fill="#f472b6"/><text x="58" y="244" fill="#efefec" font-size="13.5">add tests for the history pane</text><text x="534" y="244" fill="#9a9a96" font-size="13.5" text-anchor="end">19%</text></g>
+<g class="fade d5"><circle cx="46" cy="259.5" r="4" fill="#9a9a96"/><text x="58" y="264" fill="#efefec" font-size="13.5">Other / not recorded</text><text x="534" y="264" fill="#9a9a96" font-size="13.5" text-anchor="end">12%</text></g>
 </svg>

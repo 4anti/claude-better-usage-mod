@@ -1,92 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="Terminal typing /quota, /quota-history and /quota-settings, each followed by its result">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title id="t">Slash commands</title>
+<desc id="d">/quota turns the usage band on or off (when off, the status line shows the figures). /quota history or /quota-history opens Usage history, your past 5 Hour and Weekly windows. /quota settings or /quota-settings opens Usage settings: language, alerts, colours.</desc>
 <style>
-.sans{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif}
-.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-.cmd{font-size:22px;fill:#f3f2ee}
-.res{font-size:18px;fill:#b8b6b0}
-.blob{transform-box:fill-box;transform-origin:center}
-.b1{animation:drift1 12s ease-in-out infinite}
-.b2{animation:drift2 14s ease-in-out infinite}
-.b3{animation:drift3 11s ease-in-out infinite}
-.b4{animation:drift4 13s ease-in-out infinite}
-@keyframes drift1{0%,100%{transform:translate(0,0) scale(1);opacity:.32}50%{transform:translate(90px,30px) scale(1.15);opacity:.22}}
-@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1);opacity:.22}50%{transform:translate(-80px,-20px) scale(.92);opacity:.32}}
-@keyframes drift3{0%,100%{transform:translate(0,0) scale(1);opacity:.28}50%{transform:translate(70px,-26px) scale(1.12);opacity:.18}}
-@keyframes drift4{0%,100%{transform:translate(0,0) scale(.95);opacity:.2}50%{transform:translate(-90px,20px) scale(1.1);opacity:.3}}
-.comet{animation:comet 9s linear infinite}
-@keyframes comet{0%{stroke-dashoffset:1000}100%{stroke-dashoffset:0}}
-.dot{transform-box:fill-box;transform-origin:center;animation:dot 6s ease-in-out infinite}
-@keyframes dot{0%,80%,100%{transform:scale(1)}88%{transform:scale(1.25)}}
-.chev{animation:chev 2.4s ease-in-out infinite}
-@keyframes chev{0%,100%{opacity:1}50%{opacity:.55}}
-@media (prefers-reduced-motion: reduce){*{animation:none!important}}
-.l0{animation:l0 10s linear infinite}@keyframes l0{0%{opacity:0}1.5%{opacity:1}89%{opacity:1}94%{opacity:0}100%{opacity:0}}
-.l0c{animation:l0c 10s linear infinite}@keyframes l0c{0%{transform:translateX(-79.2px)}5%{transform:translateX(-79.2px);animation-timing-function:steps(6,end)}9.8%{transform:translateX(0)}100%{transform:translateX(0)}}
-.l0r{animation:l0r 10s linear infinite}@keyframes l0r{0%{opacity:0;transform:translateY(6px)}12.3%{opacity:0;transform:translateY(6px);animation-timing-function:cubic-bezier(.2,.7,.3,1)}16.8%{opacity:1;transform:translateY(0)}89%{opacity:1;transform:translateY(0)}94%{opacity:0;transform:translateY(0)}100%{opacity:0;transform:translateY(0)}}
-.l1{animation:l1 10s linear infinite}@keyframes l1{0%{opacity:0}18%{opacity:0}19.5%{opacity:1}89%{opacity:1}94%{opacity:0}100%{opacity:0}}
-.l1c{animation:l1c 10s linear infinite}@keyframes l1c{0%{transform:translateX(-184.8px)}20%{transform:translateX(-184.8px);animation-timing-function:steps(14,end)}31.2%{transform:translateX(0)}100%{transform:translateX(0)}}
-.l1r{animation:l1r 10s linear infinite}@keyframes l1r{0%{opacity:0;transform:translateY(6px)}33.7%{opacity:0;transform:translateY(6px);animation-timing-function:cubic-bezier(.2,.7,.3,1)}38.2%{opacity:1;transform:translateY(0)}89%{opacity:1;transform:translateY(0)}94%{opacity:0;transform:translateY(0)}100%{opacity:0;transform:translateY(0)}}
-.l2{animation:l2 10s linear infinite}@keyframes l2{0%{opacity:0}39.5%{opacity:0}41%{opacity:1}89%{opacity:1}94%{opacity:0}100%{opacity:0}}
-.l2c{animation:l2c 10s linear infinite}@keyframes l2c{0%{transform:translateX(-198px)}41.5%{transform:translateX(-198px);animation-timing-function:steps(15,end)}53.5%{transform:translateX(0)}100%{transform:translateX(0)}}
-.l2r{animation:l2r 10s linear infinite}@keyframes l2r{0%{opacity:0;transform:translateY(6px)}56%{opacity:0;transform:translateY(6px);animation-timing-function:cubic-bezier(.2,.7,.3,1)}60.5%{opacity:1;transform:translateY(0)}89%{opacity:1;transform:translateY(0)}94%{opacity:0;transform:translateY(0)}100%{opacity:0;transform:translateY(0)}}
-.sk{animation:sk 10s linear infinite}@keyframes sk{0%{transform:translateX(22px)}12.3%{transform:translateX(22px);animation-timing-function:cubic-bezier(.3,.7,.3,1)}15.8%{transform:translateX(0)}100%{transform:translateX(0)}}
-.st{animation:st 10s linear infinite}@keyframes st{0%{fill:#4ade80}12.3%{fill:#4ade80}15.8%{fill:#4d4d4a}100%{fill:#4d4d4a}}
-.h0{transform-box:fill-box;transform-origin:50% 100%;animation:h0 10s linear infinite}@keyframes h0{0%{transform:scaleY(0)}34.7%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}39.7%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h1{transform-box:fill-box;transform-origin:50% 100%;animation:h1 10s linear infinite}@keyframes h1{0%{transform:scaleY(0)}35.3%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}40.3%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h2{transform-box:fill-box;transform-origin:50% 100%;animation:h2 10s linear infinite}@keyframes h2{0%{transform:scaleY(0)}35.9%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}40.9%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h3{transform-box:fill-box;transform-origin:50% 100%;animation:h3 10s linear infinite}@keyframes h3{0%{transform:scaleY(0)}36.5%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}41.5%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h4{transform-box:fill-box;transform-origin:50% 100%;animation:h4 10s linear infinite}@keyframes h4{0%{transform:scaleY(0)}37.1%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}42.1%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h5{transform-box:fill-box;transform-origin:50% 100%;animation:h5 10s linear infinite}@keyframes h5{0%{transform:scaleY(0)}37.7%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}42.7%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h6{transform-box:fill-box;transform-origin:50% 100%;animation:h6 10s linear infinite}@keyframes h6{0%{transform:scaleY(0)}38.3%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}43.3%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h7{transform-box:fill-box;transform-origin:50% 100%;animation:h7 10s linear infinite}@keyframes h7{0%{transform:scaleY(0)}38.9%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}43.9%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h8{transform-box:fill-box;transform-origin:50% 100%;animation:h8 10s linear infinite}@keyframes h8{0%{transform:scaleY(0)}39.5%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}44.5%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.h9{transform-box:fill-box;transform-origin:50% 100%;animation:h9 10s linear infinite}@keyframes h9{0%{transform:scaleY(0)}40.1%{transform:scaleY(0);animation-timing-function:cubic-bezier(.2,.8,.3,1.15)}45.1%{transform:scaleY(1)}100%{transform:scaleY(1)}}
-.gear{transform-box:fill-box;transform-origin:center;animation:gear 10s linear infinite}@keyframes gear{to{transform:rotate(360deg)}}
-.cur{animation:cur 10s linear infinite}@keyframes cur{0%{transform:translate(78px,98px);animation-timing-function:step-end}5%{transform:translate(78px,98px);animation-timing-function:steps(6,end)}9.8%{transform:translate(157.2px,98px);animation-timing-function:step-end}18%{transform:translate(78px,168px);animation-timing-function:step-end}20%{transform:translate(78px,168px);animation-timing-function:steps(14,end)}31.2%{transform:translate(262.8px,168px);animation-timing-function:step-end}39.5%{transform:translate(78px,238px);animation-timing-function:step-end}41.5%{transform:translate(78px,238px);animation-timing-function:steps(15,end)}53.5%{transform:translate(276px,238px);animation-timing-function:step-end}94%{transform:translate(78px,98px);animation-timing-function:step-end}100%{transform:translate(78px,98px)}}
-.blink{animation:blink 10s linear infinite}@keyframes blink{0%{opacity:1;animation-timing-function:step-end}5%{opacity:1;animation-timing-function:step-end}9.8%{opacity:1;animation-timing-function:step-end}14.8%{opacity:0;animation-timing-function:step-end}19.8%{opacity:1;animation-timing-function:step-end}20%{opacity:1;animation-timing-function:step-end}31.2%{opacity:1;animation-timing-function:step-end}36.2%{opacity:0;animation-timing-function:step-end}41.2%{opacity:1;animation-timing-function:step-end}41.5%{opacity:1;animation-timing-function:step-end}53.5%{opacity:1;animation-timing-function:step-end}58.5%{opacity:0;animation-timing-function:step-end}63.5%{opacity:1;animation-timing-function:step-end}68.5%{opacity:0;animation-timing-function:step-end}73.5%{opacity:1;animation-timing-function:step-end}78.5%{opacity:0;animation-timing-function:step-end}83.5%{opacity:1;animation-timing-function:step-end}88.5%{opacity:0;animation-timing-function:step-end}93.5%{opacity:1;animation-timing-function:step-end}98.5%{opacity:0;animation-timing-function:step-end}100%{opacity:1}}</style>
+.in{animation:in 1.4s cubic-bezier(.2,.7,.2,1) both}
+.i2{animation-delay:.2s}.i3{animation-delay:.4s}
+.sw{animation:sw 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.knob{animation:knob 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.g2{animation-delay:.15s}.g3{animation-delay:.3s}
+.fade{animation:fade 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.f2{animation-delay:.15s}.f3{animation-delay:.3s}
+@keyframes in{0%{opacity:0}100%{opacity:1}}
+@keyframes sw{0%,8%{fill:#4d4d4a}20%,100%{fill:#4ade80}}
+@keyframes knob{0%,8%{transform:translateX(-12px)}20%,100%{transform:translateX(0)}}
+@keyframes grow{0%,6%{transform:scaleX(0)}22%,100%{transform:scaleX(1)}}
+@keyframes fade{0%,10%{opacity:0}24%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.in,.sw,.knob,.grow,.fade{animation:none}}
+</style>
 <defs>
-<linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
-<linearGradient id="hdr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2927"/><stop offset="1" stop-color="#211f1e"/></linearGradient>
-<linearGradient id="cometG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d97757"/><stop offset=".5" stop-color="#e5b54a"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
-<clipPath id="cardClip"><rect x="1" y="1" width="1198" height="298" rx="18"/></clipPath>
-<clipPath id="panelClip"><rect x="20" y="18" width="1160" height="264" rx="12"/></clipPath>
-<filter id="blur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="42"/></filter>
-<filter id="glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>
-<clipPath id="l0k"><rect class="l0c" x="78" y="74" width="79.2" height="34"/></clipPath>
-<clipPath id="l1k"><rect class="l1c" x="78" y="144" width="184.8" height="34"/></clipPath>
-<clipPath id="l2k"><rect class="l2c" x="78" y="214" width="198" height="34"/></clipPath>
-<linearGradient id="gearG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0a483"/><stop offset="1" stop-color="#d97757"/></linearGradient></defs>
-<rect x=".5" y=".5" width="1199" height="299" rx="18" fill="url(#cardBg)" stroke="#3a3936"/>
-<g clip-path="url(#cardClip)"><g filter="url(#blur)">
-<circle class="blob b1" opacity=".25" cx="140" cy="60" r="130" fill="#d97757"/>
-<circle class="blob b2" opacity=".25" cx="430" cy="290" r="110" fill="#e5b54a"/>
-<circle class="blob b3" opacity=".25" cx="820" cy="20" r="120" fill="#a78bfa"/>
-<circle class="blob b4" opacity=".25" cx="1090" cy="250" r="130" fill="#22d3ee"/>
-</g></g>
-<rect x="20" y="18" width="1160" height="264" rx="12" fill="#0e0d0c" fill-opacity=".68"/>
-<g clip-path="url(#panelClip)"><rect x="20" y="18" width="1160" height="40" fill="url(#hdr)" fill-opacity=".9"/>
-<line x1="20" y1="58.5" x2="1180" y2="58.5" stroke="#34332f"/></g>
-<rect x="20.5" y="18.5" width="1159" height="263" rx="11.5" fill="none" stroke="#3a3936"/>
-<rect class="comet" x="20.5" y="18.5" width="1159" height="263" rx="11.5" fill="none" stroke="url(#cometG)" stroke-width="4" pathLength="1000" stroke-dasharray="110 890" stroke-linecap="round" filter="url(#glow)" opacity=".7"/>
-<rect class="comet" x="20.5" y="18.5" width="1159" height="263" rx="11.5" fill="none" stroke="url(#cometG)" stroke-width="1.5" pathLength="1000" stroke-dasharray="110 890" stroke-linecap="round"/>
-<circle class="dot" style="animation-delay:0s" cx="44" cy="38" r="6.5" fill="#ff5f57"/>
-<circle class="dot" style="animation-delay:0.18s" cx="66" cy="38" r="6.5" fill="#febc2e"/>
-<circle class="dot" style="animation-delay:0.36s" cx="88" cy="38" r="6.5" fill="#28c840"/>
-<text class="mono" x="600" y="43.5" text-anchor="middle" font-size="16" fill="#8a8984">claude</text>
-<g class="l0"><text class="mono chev" x="48" y="98" font-size="22" font-weight="700" fill="#d97757">&gt;</text>
-<text class="mono cmd" x="78" y="98" textLength="79.2" lengthAdjust="spacing" clip-path="url(#l0k)">/quota</text></g>
-<g class="l0r"><path d="M55 108v12h12" fill="none" stroke="#5c5b57" stroke-width="1.6" stroke-linecap="round"/>
-<text class="sans res" x="82" y="127">Band hidden — the status line shows <tspan class="mono" font-size="17"><tspan fill="#f3f2ee">5H</tspan><tspan fill="#9b9a96"> 7%</tspan><tspan fill="#6f6e6a"> · </tspan><tspan fill="#f3f2ee">Weekly</tspan><tspan fill="#e0b860"> 57%</tspan><tspan fill="#6f6e6a"> · </tspan><tspan fill="#f3f2ee">Context</tspan><tspan fill="#d9b56a"> 38%</tspan></tspan></text></g>
-<g class="l1"><text class="mono chev" x="48" y="168" font-size="22" font-weight="700" fill="#d97757">&gt;</text>
-<text class="mono cmd" x="78" y="168" textLength="184.8" lengthAdjust="spacing" clip-path="url(#l1k)">/quota-history</text></g>
-<g class="l1r"><path d="M55 178v12h12" fill="none" stroke="#5c5b57" stroke-width="1.6" stroke-linecap="round"/>
-<text class="sans res" x="82" y="197">Opened <tspan fill="#f0a483" font-weight="600">Usage history</tspan></text></g>
-<g class="l2"><text class="mono chev" x="48" y="238" font-size="22" font-weight="700" fill="#d97757">&gt;</text>
-<text class="mono cmd" x="78" y="238" textLength="198" lengthAdjust="spacing" clip-path="url(#l2k)">/quota-settings</text></g>
-<g class="l2r"><path d="M55 248v12h12" fill="none" stroke="#5c5b57" stroke-width="1.6" stroke-linecap="round"/>
-<text class="sans res" x="82" y="267">Opened <tspan fill="#f0a483" font-weight="600">Usage settings</tspan></text></g>
-<g class="l0"><text class="sans" x="1084" y="110" text-anchor="end" font-size="16" fill="#8a8984">Band</text><rect class="st" x="1096" y="91" width="48" height="26" rx="13" fill="#4d4d4a"/><circle class="sk" cx="1109" cy="104" r="10" fill="#f3f2ee"/></g>
-<g class="l1r"><text class="sans" x="993" y="197" text-anchor="end" font-size="16" fill="#8a8984">last 10 windows</text><line x1="1006" y1="203.5" x2="1147" y2="203.5" stroke="#333332" stroke-width="2" stroke-linecap="round"/><rect class="h0" x="1009" y="184" width="9" height="17" rx="2.5" fill="#9b9a96"/><rect class="h1" x="1023" y="172" width="9" height="29" rx="2.5" fill="#b3a37e"/><rect class="h2" x="1037" y="190" width="9" height="11" rx="2.5" fill="#9b9a96"/><rect class="h3" x="1051" y="160.5" width="9" height="40.5" rx="2.5" fill="#e5984a"/><rect class="h4" x="1065" y="177.5" width="9" height="23.5" rx="2.5" fill="#9b9a96"/><rect class="h5" x="1079" y="151" width="9" height="50" rx="2.5" fill="#e5534b"/><rect class="h6" x="1093" y="169.5" width="9" height="31.5" rx="2.5" fill="#c1a86e"/><rect class="h7" x="1107" y="187" width="9" height="14" rx="2.5" fill="#9b9a96"/><rect class="h8" x="1121" y="165.5" width="9" height="35.5" rx="2.5" fill="#d9b156"/><rect class="h9" x="1135" y="175" width="9" height="26" rx="2.5" fill="#a19c90"/></g>
-<g class="l2r"><text class="sans" x="1090" y="261" text-anchor="end" font-size="16" fill="#8a8984">Language · Alerts · Auto compact</text><g class="gear"><circle cx="1124" cy="247" r="17" fill="none" stroke="url(#gearG)" stroke-width="6" stroke-dasharray="6.68 6.67"/><circle cx="1124" cy="247" r="11" fill="none" stroke="url(#gearG)" stroke-width="7"/></g></g>
-<g class="cur" transform="translate(276,238)"><rect class="blink" x="1" y="-19" width="11.2" height="25" rx="2" fill="#f0a483"/></g>
+  <clipPath id="h1"><rect x="928" y="151" width="200" height="8" rx="4"/></clipPath>
+  <clipPath id="h2"><rect x="928" y="163" width="200" height="8" rx="4"/></clipPath>
+  <clipPath id="h3"><rect x="928" y="175" width="200" height="8" rx="4"/></clipPath>
+</defs>
+<rect width="1200" height="300" rx="16" fill="#151515"/>
+
+<text x="48" y="48" fill="#9a9a96" font-size="13" letter-spacing="2.4">SLASH COMMANDS</text>
+<text x="1152" y="48" fill="#9a9a96" font-size="14.5" text-anchor="end">Typing /quota lists all three</text>
+
+<rect x="48" y="68" width="1104" height="198" rx="12" fill="#212121" stroke="#2c2c2b"/>
+<rect x="72" y="134" width="1056" height="1" fill="#2c2c2b"/>
+<rect x="72" y="200" width="1056" height="1" fill="#2c2c2b"/>
+
+<!-- /quota -->
+<g class="in">
+  <text x="72" y="98" fill="#efefec" font-size="16" font-weight="600">/quota</text>
+  <text x="72" y="118" fill="#9a9a96" font-size="13.5">[history | settings]</text>
+  <text x="330" y="98" fill="#efefec" font-size="16">Turn the usage band on or off</text>
+  <text x="330" y="118" fill="#9a9a96" font-size="14">When off, the status line shows the figures instead</text>
+  <text x="1086" y="106" fill="#9a9a96" font-size="14" text-anchor="end">Band</text>
+  <rect class="sw" x="1098" y="92" width="30" height="18" rx="9" fill="#4ade80"/>
+  <circle class="knob" cx="1119" cy="101" r="6" fill="#efefec"/>
+</g>
+
+<!-- /quota history -->
+<g class="in i2">
+  <text x="72" y="164" fill="#efefec" font-size="16" font-weight="600">/quota history</text>
+  <text x="72" y="184" fill="#9a9a96" font-size="13.5">or /quota-history</text>
+  <text x="330" y="164" fill="#efefec" font-size="16">Your past 5 Hour and Weekly windows</text>
+  <text x="330" y="184" fill="#9a9a96" font-size="14">Opens Usage history: each window's peak, split by chat</text>
+  <rect x="928" y="151" width="200" height="8" rx="4" fill="#333332"/>
+  <rect x="928" y="163" width="200" height="8" rx="4" fill="#333332"/>
+  <rect x="928" y="175" width="200" height="8" rx="4" fill="#333332"/>
+  <g clip-path="url(#h1)"><g class="grow">
+    <rect x="928" y="151" width="80" height="8" fill="#60a5fa"/>
+    <rect x="1008" y="151" width="60" height="8" fill="#f472b6"/>
+    <rect x="1068" y="151" width="24" height="8" fill="#9a9a96"/>
+  </g></g>
+  <g clip-path="url(#h2)"><g class="grow g2">
+    <rect x="928" y="163" width="68" height="8" fill="#60a5fa"/>
+    <rect x="996" y="163" width="36" height="8" fill="#4ade80"/>
+    <rect x="1032" y="163" width="10" height="8" fill="#9a9a96"/>
+  </g></g>
+  <g clip-path="url(#h3)"><g class="grow g3">
+    <rect x="928" y="175" width="100" height="8" fill="#f472b6"/>
+    <rect x="1028" y="175" width="76" height="8" fill="#60a5fa"/>
+    <rect x="1104" y="175" width="24" height="8" fill="#9a9a96"/>
+  </g></g>
+</g>
+
+<!-- /quota settings -->
+<g class="in i3">
+  <text x="72" y="230" fill="#efefec" font-size="16" font-weight="600">/quota settings</text>
+  <text x="72" y="250" fill="#9a9a96" font-size="13.5">or /quota-settings</text>
+  <text x="330" y="230" fill="#efefec" font-size="16">The usage band's settings: language, alerts, colours</text>
+  <text x="330" y="250" fill="#9a9a96" font-size="14">Opens Usage settings, the same values as /config</text>
+  <g class="fade"><rect x="868" y="221" width="78" height="24" rx="6" fill="#373838"/><text x="907" y="237.5" fill="#efefec" font-size="13" text-anchor="middle">Language</text></g>
+  <g class="fade f2"><rect x="954" y="221" width="62" height="24" rx="6" fill="#373838"/><text x="985" y="237.5" fill="#efefec" font-size="13" text-anchor="middle">Alerts</text></g>
+  <g class="fade f3"><rect x="1024" y="221" width="104" height="24" rx="6" fill="#373838"/><text x="1076" y="237.5" fill="#efefec" font-size="13" text-anchor="middle">Auto compact</text></g>
+</g>
 </svg>

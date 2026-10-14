@@ -1,58 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
-<title>Forecast to the reset: a usage bar fills while its forecast tick runs ahead and turns red</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title>Forecast to the reset: each limit's bar with a tick where it lands by its reset, on track for 5 Hour, a warning for Weekly</title>
 <style>
-.blob{transform-box:fill-box;transform-origin:center;animation:drift 12s ease-in-out infinite alternate}
-.b1{animation-duration:10s;animation-delay:-4s}.b2{animation-duration:14s;animation-delay:-7s}
-@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-14px) scale(1.12)}100%{transform:translate(-22px,12px) scale(.94)}}
-.sheen{animation:sheen 7s ease-in-out infinite}
-@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}
-
-.fill{transform:translateX(-347.2px);animation:fill 10s linear infinite -4.5s}
-@keyframes fill{0%,6%{transform:translateX(-496px)}40%,48%{transform:translateX(-347.2px)}78%,90%{transform:translateX(-188.48px)}96%,100%{transform:translateX(-496px)}}
-.tk{transform:translateX(272.8px);animation:tk 10s linear infinite -4.5s}
-@keyframes tk{0%,6%{transform:translateX(0)}40%,48%{transform:translateX(272.8px)}66%,90%{transform:translateX(496px)}96%,100%{transform:translateX(0)}}
-.tkc{fill:#dcdbd6;animation:tkc 10s linear infinite -4.5s}
-@keyframes tkc{0%,52%{fill:#dcdbd6}60%{fill:#e5b54a}68%,90%{fill:#e5534b}95%,100%{fill:#dcdbd6}}
-.fc{fill:#9b9a96;animation:fc 10s linear infinite -4.5s}
-@keyframes fc{0%,66.75%{fill:#9b9a96}78%,90%{fill:#bfa772}96%,100%{fill:#9b9a96}}
-.num{transform:translateY(-390px);animation:num 10s linear infinite -4.5s}
-@keyframes num{0%,6%{transform:translateY(0);animation-timing-function:steps(15,end)}40%,48%{transform:translateY(-390px);animation-timing-function:steps(16,end)}78%,90%{transform:translateY(-806px);animation-timing-function:steps(31,end)}96%,100%{transform:translateY(0)}}
-.ping{opacity:0;transform-box:fill-box;transform-origin:center;animation:ping 10s ease-out infinite -4.5s}
-@keyframes ping{0%,69%{opacity:0;transform:scale(.4)}70%{opacity:.9;transform:scale(.5)}77%{opacity:0;transform:scale(2.4)}78%{opacity:0;transform:scale(.4)}80%{opacity:.9;transform:scale(.5)}87%,100%{opacity:0;transform:scale(2.4)}}
-.capA{animation:capA 10s linear infinite -4.5s}
-@keyframes capA{0%,56%{opacity:1}58%,93%{opacity:0}96%,100%{opacity:1}}
-.capB{opacity:0;animation:capB 10s linear infinite -4.5s}
-@keyframes capB{0%,57%{opacity:0}60%,90%{opacity:1}93%,100%{opacity:0}}
-.flow{animation:flow .9s linear infinite -4.5s}
-@keyframes flow{to{stroke-dashoffset:-8}}
-
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}</style>
-<defs>
-<linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201f1d"/><stop offset="1" stop-color="#171615"/></linearGradient>
-<clipPath id="cc"><rect x="1" y="1" width="558" height="298" rx="18"/></clipPath>
-<linearGradient id="tg" x1="32" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0a483"/><stop offset=".45" stop-color="#d97757"/><stop offset="1" stop-color="#e5b54a"/></linearGradient>
-<linearGradient id="sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<clipPath id="tc"><text x="32" y="212" font-size="27" font-weight="700">Forecast to the reset</text></clipPath>
-<radialGradient id="bl0"><stop offset="0" stop-color="#d97757" stop-opacity="0.36"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></radialGradient><radialGradient id="bl1"><stop offset="0" stop-color="#e5b54a" stop-opacity="0.26"/><stop offset="1" stop-color="#e5b54a" stop-opacity="0"/></radialGradient><radialGradient id="bl2"><stop offset="0" stop-color="#a78bfa" stop-opacity="0.2"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
-<clipPath id="trk"><rect x="32" y="80" width="496" height="14" rx="7"/></clipPath>
-<clipPath id="pc"><rect class="tk" x="-464" y="74" width="496" height="26"/></clipPath>
-<clipPath id="nclip"><rect x="400" y="40" width="132" height="28"/></clipPath>
-<radialGradient id="hg"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".35" stop-color="#f0a483" stop-opacity=".35"/><stop offset="1" stop-color="#d97757" stop-opacity="0"/></radialGradient>
-</defs>
-<rect x=".5" y=".5" width="559" height="299" rx="18" fill="url(#card)" stroke="#3a3936"/>
-<g clip-path="url(#cc)"><circle class="blob b0" cx="110" cy="60" r="230" fill="url(#bl0)"/><circle class="blob b1" cx="480" cy="140" r="200" fill="url(#bl1)"/><circle class="blob b2" cx="540" cy="290" r="170" fill="url(#bl2)"/></g>
-<g transform="translate(0 10)"><text x="32" y="62" font-size="19" font-weight="700" fill="#f3f2ee">5 Hour</text>
-<g clip-path="url(#nclip)"><g class="fc"><g class="num" font-size="21" font-weight="700"><text x="528" y="62" text-anchor="end">0%</text><text x="528" y="88" text-anchor="end">2%</text><text x="528" y="114" text-anchor="end">4%</text><text x="528" y="140" text-anchor="end">6%</text><text x="528" y="166" text-anchor="end">8%</text><text x="528" y="192" text-anchor="end">10%</text><text x="528" y="218" text-anchor="end">12%</text><text x="528" y="244" text-anchor="end">14%</text><text x="528" y="270" text-anchor="end">16%</text><text x="528" y="296" text-anchor="end">18%</text><text x="528" y="322" text-anchor="end">20%</text><text x="528" y="348" text-anchor="end">22%</text><text x="528" y="374" text-anchor="end">24%</text><text x="528" y="400" text-anchor="end">26%</text><text x="528" y="426" text-anchor="end">28%</text><text x="528" y="452" text-anchor="end">30%</text><text x="528" y="478" text-anchor="end">32%</text><text x="528" y="504" text-anchor="end">34%</text><text x="528" y="530" text-anchor="end">36%</text><text x="528" y="556" text-anchor="end">38%</text><text x="528" y="582" text-anchor="end">40%</text><text x="528" y="608" text-anchor="end">42%</text><text x="528" y="634" text-anchor="end">44%</text><text x="528" y="660" text-anchor="end">46%</text><text x="528" y="686" text-anchor="end">48%</text><text x="528" y="712" text-anchor="end">50%</text><text x="528" y="738" text-anchor="end">52%</text><text x="528" y="764" text-anchor="end">54%</text><text x="528" y="790" text-anchor="end">56%</text><text x="528" y="816" text-anchor="end">58%</text><text x="528" y="842" text-anchor="end">60%</text><text x="528" y="868" text-anchor="end">62%</text></g></g></g>
-<rect x="32" y="80" width="496" height="14" rx="7" fill="#333332"/>
-<g clip-path="url(#pc)"><line class="flow" x1="32" y1="87" x2="528" y2="87" stroke="#dcdbd6" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0.01 8" opacity=".85"/></g>
-<g clip-path="url(#trk)"><g class="fill"><rect class="fc" x="32" y="80" width="496" height="14" rx="7"/><rect x="32" y="80" width="496" height="14" rx="7" fill="url(#gloss)"/></g></g>
-<g class="fill"><circle cx="528" cy="87" r="16" fill="url(#hg)"/></g>
-<g transform="translate(32 0)"><g class="tk"><circle class="ping" cx="0" cy="87" r="11" fill="none" stroke="#e5534b" stroke-width="2"/><rect class="tkc" x="-2" y="73" width="4" height="28" rx="2"/></g></g>
-<g class="capA"><circle cx="41" cy="122" r="8.5" fill="none" stroke="#dcdbd6" stroke-width="1.8"/><path d="M37 122.3 l2.8 2.8 l5 -5.4" fill="none" stroke="#dcdbd6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><text x="58" y="128" font-size="17" fill="#b8b6b0">On track – <tspan font-weight="700" fill="#f3f2ee">55%</tspan> at reset</text></g>
-<g class="capB"><path d="M41 112 L51 129 H31 Z" fill="#e5534b" stroke="#e5534b" stroke-width="2" stroke-linejoin="round"/><rect x="40.1" y="117" width="1.8" height="6" rx=".9" fill="#1c1b1a"/><circle cx="41" cy="126" r="1.1" fill="#1c1b1a"/><text x="58" y="128" font-size="17" fill="#b8b6b0">Limit will hit in <tspan font-weight="700" fill="#e5534b">1h 20m</tspan></text></g>
-<text x="528" y="128" font-size="17" fill="#8a8984" text-anchor="end">resets in 4h 50m</text></g>
-<text x="32" y="212" font-size="27" font-weight="700" fill="url(#tg)">Forecast to the reset</text>
-<g clip-path="url(#tc)"><rect class="sheen" x="-140" y="180" width="120" height="40" fill="url(#sh)" style="animation-delay:0.0s"/></g>
-<text x="32" y="244" font-size="18" fill="#b8b6b0">On pace for about 55% by reset —</text><text x="32" y="268" font-size="18" fill="#b8b6b0">or a warning before you run out.</text>
+.grow{transform-box:fill-box;transform-origin:left center;animation:grow 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.tick{animation:tick 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.fade{animation:fade 10s cubic-bezier(.2,.7,.2,1) infinite both}
+.d1{animation-delay:.3s}.d2{animation-delay:.6s}.d3{animation-delay:.9s}
+@keyframes grow{0%{transform:scaleX(0)}16%,100%{transform:scaleX(1)}}
+@keyframes tick{0%,12%{opacity:0}22%,100%{opacity:1}}
+@keyframes fade{0%,4%{opacity:0}14%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.grow,.tick,.fade{animation:none}}
+</style>
+<rect x=".5" y=".5" width="559" height="299" rx="12" fill="#212121" stroke="#2c2c2b"/>
+<text x="26" y="44" fill="#efefec" font-size="19" font-weight="600">Forecast to the reset</text>
+<text x="26" y="72" fill="#9a9a96" font-size="14.5">On pace for about 55% by reset, or a warning before you run out.</text>
+<text class="fade d3" x="26" y="120" fill="#aca285" font-size="15" font-weight="600">At this pace you'll run out before Sunday's reset.</text>
+<text x="26" y="166" fill="#efefec" font-size="16" font-weight="600">5 Hour</text>
+<rect x="110" y="158" width="364" height="8" rx="4" fill="#333332"/>
+<rect class="grow" x="110" y="158" width="25" height="8" rx="4" fill="#9a9a96"/>
+<rect class="tick d1" x="309" y="157" width="3" height="10" fill="#dcdbd6"/>
+<text x="534" y="167" fill="#9a9a96" font-size="16" font-weight="600" text-anchor="end">7%</text>
+<text class="fade d1" x="26" y="191" fill="#9a9a96" font-size="14.5">On pace for about 55% by reset – resets in 4h 50m</text>
+<text x="26" y="234" fill="#efefec" font-size="16" font-weight="600">Weekly</text>
+<rect x="110" y="226" width="364" height="8" rx="4" fill="#333332"/>
+<rect class="grow d1" x="110" y="226" width="207" height="8" rx="4" fill="#aca285"/>
+<rect class="tick d2" x="470" y="225" width="3" height="10" fill="#e5534b"/>
+<text x="534" y="235" fill="#aca285" font-size="16" font-weight="600" text-anchor="end">57%</text>
+<text class="fade d2" x="26" y="259" fill="#9a9a96" font-size="14.5">Limit will hit in 3d 3h – resets in 5d 11h</text>
 </svg>
